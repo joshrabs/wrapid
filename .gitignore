@@ -1,0 +1,11 @@
+# npm
+node_modules
+*.log
+.eslintcache
+
+# elm
+elm-stuff
+repl-temp-*
+
+# app
+dist
