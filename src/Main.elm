@@ -7,6 +7,7 @@ import Navigation as Nav
 import List.Extra exposing (find)
 import Maybe exposing (andThen)
 
+import Client.Generic.Authentication.Login.Login as Login exposing (loginView, Msg)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
 
@@ -28,6 +29,7 @@ type alias Model =
     { history : List Nav.Location
     , profiles : List Profile
     , currentImg : Maybe String
+    , currentView : ViewStates
     }
 
 type alias Url =
@@ -40,21 +42,20 @@ type alias Profile =
     , url : Maybe String
     }
 
-
+type ViewStates = LoginView | ExtraPortalView
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] [] Nothing
+    ( Model [ location ] [] Nothing LoginView
     , Cmd.none
     )
-
-
 
 -- UPDATE
 
 
 type Msg
     = UrlChange Nav.Location
+    | LoginMsg Login.Msg
     | GetAllProfiles
     | Profiles (List Profile)
     | ShowAvatar String
@@ -89,26 +90,30 @@ update msg model =
                 ( { model | currentImg = url }
                 , Cmd.none
                 )
-
+        LoginMsg loginMsg -> (model, Cmd.none)
 
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-    div []
-        [
-          let
-              rightItems = {avatar = Just model.currentImg}
-          in
-            Dashboard.view {navbar = {rightItems = Just rightItems}}
-        , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-        , h1 [] [ text "History" ]
-        , ul [] (List.map viewLocation model.history)
-        , h1 [] [ text "Data" ]
-        , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-        , ul [] (List.map viewProfile model.profiles)
-        ]
+    case model.currentView of
+      LoginView -> Html.map LoginMsg (Login.loginView Nothing)
+      ExtraPortalView ->
+        div []
+            [
+              let
+                  rightItems = {avatar = Just model.currentImg}
+              in
+                Dashboard.view {navbar = {rightItems = Just rightItems}}
+            , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
+            , h1 [] [ text "History" ]
+            , ul [] (List.map viewLocation model.history)
+            , h1 [] [ text "Data" ]
+            , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+            , ul [] (List.map viewProfile model.profiles)
+            ]
+
 
 viewLink : String -> Html msg
 viewLink name =
