@@ -80,6 +80,23 @@ const createSchedule = `
   }
 `;
 
+
+const signinUser = `
+  mutation ($email: String!, $password: String!) {
+    signinUser(email: {email: $email, password: $password}) {
+      token
+    }
+  }
+`
+
+const userQuery = `
+  query {
+    user {
+      id
+    }
+  }
+`
+
 export default {
 
   // Queries

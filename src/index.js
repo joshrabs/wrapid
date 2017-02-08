@@ -13,14 +13,13 @@ app.ports.getAllProfiles.subscribe(function () {
   client.getAllProfiles()
     .then(result => {
       const frmt = result.allBaseProfiles.map(e => {
-        const obj = {};
-        obj.id = e.id;
-        obj.firstName = e.firstName;
-        if (e.file) {
-          obj.url = e.file.url;
-        } else {
-          obj.url = null;
-        }
+        let obj = {
+          id: e.id,
+          firstName: e.firstName
+        };
+
+        obj.url = e.file ? e.file.url : null;
+
         return obj;
       });
       console.log(frmt);

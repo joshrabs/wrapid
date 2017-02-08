@@ -9,7 +9,7 @@ import Maybe exposing (andThen)
 
 import Client.Generic.Authentication.Login.Login as Login exposing (loginView, Msg)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
-
+import Client.ExtraPortal.ExtraPortal as ExtraPortal exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -29,7 +29,7 @@ type alias Model =
     { history : List Nav.Location
     , profiles : List Profile
     , currentImg : Maybe String
-    , currentView : ViewStates
+    , currentView : ViewState
     }
 
 type alias Url =
@@ -42,7 +42,7 @@ type alias Profile =
     , url : Maybe String
     }
 
-type ViewStates = LoginView | ExtraPortalView
+type ViewState = LoginView | ExtraPortalView
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
@@ -59,11 +59,14 @@ type Msg
     | GetAllProfiles
     | Profiles (List Profile)
     | ShowAvatar String
+    | ChangeView ViewState
+    | ExtraPortalMsg ExtraPortal.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ChangeView viewState -> ({model | currentView = viewState}, Cmd.none)
         UrlChange location ->
             ( { model | history = location :: model.history }
             , Cmd.none
@@ -91,28 +94,35 @@ update msg model =
                 , Cmd.none
                 )
         LoginMsg loginMsg -> (model, Cmd.none)
+        ExtraPortalMsg epMsg -> (model, Cmd.none)
 
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-    case model.currentView of
-      LoginView -> Html.map LoginMsg (Login.loginView Nothing)
-      ExtraPortalView ->
-        div []
-            [
-              let
-                  rightItems = {avatar = Just model.currentImg}
-              in
-                Dashboard.view {navbar = {rightItems = Just rightItems}}
-            , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-            , h1 [] [ text "History" ]
-            , ul [] (List.map viewLocation model.history)
-            , h1 [] [ text "Data" ]
-            , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-            , ul [] (List.map viewProfile model.profiles)
-            ]
+    div []
+    [
+        button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
+      , button [onClick (ChangeView LoginView)] [text "Login"]
+      , div []
+          [
+            let
+                rightItems = {avatar = Just model.currentImg}
+            in
+              Dashboard.view {navbar = {rightItems = Just rightItems}}
+          , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
+          , h1 [] [ text "History" ]
+          , ul [] (List.map viewLocation model.history)
+          , h1 [] [ text "Data" ]
+          , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+          , ul [] (List.map viewProfile model.profiles)
+          ]
+      , case model.currentView of
+          LoginView -> Html.map LoginMsg (Login.loginView Nothing)
+          ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal {profile = {firstName = "Steve"}})
+
+    ]
 
 
 viewLink : String -> Html msg
