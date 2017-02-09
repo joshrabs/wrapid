@@ -1,15 +1,15 @@
 port module Main exposing (main)
 
 import Html exposing (Html, a, button, div, h1, img, li, p, text, ul)
-import Html.Attributes exposing (href, src)
+import Html.Attributes exposing (href, src, style)
 import Html.Events exposing (onClick)
 import Navigation as Nav
 import List.Extra exposing (find)
 import Maybe exposing (andThen)
 
 import Client.Generic.Authentication.Login.Login as Login exposing (loginView, Msg)
-import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal exposing (..)
+import Client.PAPortal.PAPortal as PAPortal exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -35,14 +35,14 @@ type alias Model =
 type alias Url =
     String
 
-
 type alias Profile =
     { id : String
     , firstName : String
     , url : Maybe String
     }
 
-type ViewState = LoginView | ExtraPortalView
+
+type ViewState = LoginView | ExtraPortalView | PAPortalView
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
@@ -61,6 +61,7 @@ type Msg
     | ShowAvatar String
     | ChangeView ViewState
     | ExtraPortalMsg ExtraPortal.Msg
+    | PAPortalMsg PAPortal.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +96,7 @@ update msg model =
                 )
         LoginMsg loginMsg -> (model, Cmd.none)
         ExtraPortalMsg epMsg -> (model, Cmd.none)
+        PAPortalMsg paMsg -> (model, Cmd.none)
 
 
 -- VIEW
@@ -103,25 +105,23 @@ view : Model -> Html Msg
 view model =
     div []
     [
-        button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
-      , button [onClick (ChangeView LoginView)] [text "Login"]
-      , div []
-          [
-            let
-                rightItems = {avatar = Just model.currentImg}
-            in
-              Dashboard.view {navbar = {rightItems = Just rightItems}}
-          , ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-          , h1 [] [ text "History" ]
-          , ul [] (List.map viewLocation model.history)
-          , h1 [] [ text "Data" ]
-          , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-          , ul [] (List.map viewProfile model.profiles)
-          ]
-      , case model.currentView of
+      case model.currentView of
           LoginView -> Html.map LoginMsg (Login.loginView Nothing)
           ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal {profile = {firstName = "Steve"}})
-
+          PAPortalView -> Html.map PAPortalMsg (PAPortal.viewPAPortal (PAPortal.defaultModel "ciykqvsynnqo60127o3illsce"))
+      , div [style [("position", "fixed"), ("bottom", "0px"), ("border", "1px solid black")]]
+      [
+          div [] [
+                ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
+              , h1 [] [ text "History" ]
+              , ul [] (List.map viewLocation model.history)
+              , h1 [] [ text "Data" ]
+              , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+              ]
+        , button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
+        , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
+        , button [onClick (ChangeView LoginView)] [text "Login"]
+      ]
     ]
 
 
@@ -134,12 +134,6 @@ viewLocation : Nav.Location -> Html msg
 viewLocation location =
     li [] [ text (location.pathname ++ location.hash) ]
 
-
-viewProfile : Profile -> Html Msg
-viewProfile profile =
-    li
-        [ onClick (ShowAvatar profile.id) ]
-        [ text profile.firstName ]
 
 
 
