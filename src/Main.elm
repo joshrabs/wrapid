@@ -16,18 +16,18 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = subscriptions
         }
 
 
 
 -- MODEL
 
-
 type alias Model =
     { history : List Nav.Location
     , currentImg : Maybe String
     , currentModelView : ModelView
+    , title: String
     }
 
 type ViewState = LoginView | ExtraPortalView | PAPortalView
@@ -51,7 +51,7 @@ defaultModelView: ModelView
 defaultModelView = {model = (PAPortal.initModel "meow"), viewState=LoginView}
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing defaultModelView
+    ( Model [ location ] Nothing defaultModelView "Yo"
     , Cmd.none
     )
 
@@ -83,9 +83,10 @@ update msg model =
         PAPortalMsg paMsg ->
           let
             (paPortalModel, paCmd) = PAPortal.update paMsg model.currentModelView.model
+
             currentModelView = {model = paPortalModel, viewState = model.currentModelView.viewState}
           in
-            ({model | currentModelView = currentModelView}, Cmd.none)
+            ({model | currentModelView = currentModelView}, Cmd.map (\b -> PAPortalMsg b) paCmd)
 
 
 view : Model -> Html Msg
@@ -96,14 +97,14 @@ view model =
           LoginView -> Html.map LoginMsg (Login.loginView Nothing)
           ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal {profile = {firstName = "Steve"}})
           PAPortalView -> Html.map PAPortalMsg
-                  (PAPortal.viewPAPortal (PAPortal.initModel "ciykqvsynnqo60127o3illsce"))
+                  (PAPortal.viewPAPortal model.currentModelView.model)
       , div [style [("position", "fixed"), ("bottom", "0px"), ("border", "1px solid black")]]
       [
           div [] [
                 ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
               , h1 [] [ text "History" ]
               , ul [] (List.map viewLocation model.history)
-              , h1 [] [ text "Data" ]
+              , h1 [] [ text model.title ]
               ]
         , button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
         , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
@@ -112,12 +113,6 @@ view model =
     ]
 
 
--- setViewState: ViewState -> ViewModel -> Model -> Model
--- setViewState viewState viewModel model =
---   let
---     currentModelView = {model= viewModel, viewState = viewState}
---   in
---     {model | currentModelView = currentModelView}
 
 viewLink : String -> Html msg
 viewLink name =
@@ -133,5 +128,10 @@ viewLocation location =
 -- PORTS
 
 
-
 -- SUBSCRIPTIONS
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+    [
+      Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.currentModelView.model)
+    ]
