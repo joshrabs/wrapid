@@ -58,7 +58,7 @@ viewRightItems: Maybe RightItems -> Html msg
 viewRightItems rightItems =
   div [style [("display", "flex"), ("align-items", "center"), ("margin", "8px")]]
   [
-      rightItemBox iconBell
+      rightItemBox (iconBell [{message = "Do stuff"}])
     , rightItemBox (case rightItems of
         Just rightItems ->
           case rightItems.avatar of
