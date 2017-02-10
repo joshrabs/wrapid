@@ -10,6 +10,7 @@ import Material.Icon as Icon
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Client.Generic.Dashboard.HamburgerMenu exposing (iconBell)
 
 import WrapidLogo exposing (logo)
 
@@ -49,7 +50,7 @@ navbarView: NavbarModel -> Html msg
 navbarView navbar =
   div [style styles.navContainer]
   [
-     div [style [("margin-left", "8px")]] [logo]
+     div [style [("margin-left", "16px")]] [logo]
     ,div [] [viewRightItems navbar.rightItems]
   ]
 
@@ -57,13 +58,14 @@ viewRightItems: Maybe RightItems -> Html msg
 viewRightItems rightItems =
   div [style [("display", "flex"), ("align-items", "center"), ("margin", "8px")]]
   [
-    rightItemBox (case rightItems of
-      Just rightItems ->
-        case rightItems.avatar of
-          Just avatar -> div [] [viewAvatar avatar]
-          Nothing -> div [] [text "not showing an avatar?!"]
+      rightItemBox iconBell
+    , rightItemBox (case rightItems of
+        Just rightItems ->
+          case rightItems.avatar of
+            Just avatar -> div [] [viewAvatar avatar]
+            Nothing -> div [] [text "not showing an avatar?!"]
 
-      Nothing -> div [] [text "No right items!"])
+        Nothing -> div [] [text "No right items!"])
     , rightItemBox viewHamburgerMenu
   ]
 
