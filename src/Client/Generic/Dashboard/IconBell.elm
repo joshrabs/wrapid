@@ -1,4 +1,4 @@
-module Client.Generic.Dashboard.HamburgerMenu exposing (..)
+module Client.Generic.Dashboard.IconBell exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 

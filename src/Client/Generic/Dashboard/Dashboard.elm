@@ -44,7 +44,45 @@ view model =
     navbarView model.navbar
   ]
 
+type alias PanelHeader = {title: String}
+type alias PanelFooter = {title: String}
 
+makePanel: Maybe PanelHeader -> (Html msg) -> Maybe PanelFooter -> Html msg
+makePanel header body footer =
+  let
+    panelHeader =
+      case header of
+        Just header -> div [style panelHeaderStyle]
+          [div [style panelHeaderItemStyle] [text header.title]]
+        Nothing -> div [] []
+  in
+    div [style panelBodyStyle]
+      [ panelHeader
+        , body
+      ]
+
+panelHeaderStyle =
+  [("display", "flex")
+  ,("justify-content", "space-between")
+  ,("align-items", "center")
+  ,("margin", "8px 0px 8px 0px")
+  ,("padding-bottom", "8px")
+  ,("border-bottom", "1px solid #EBF0F5")
+  ]
+
+panelHeaderItemStyle =
+  [("font-family", "Roboto-Medium")
+  ,("font-size", "12px")
+  ,("color", "#9B9EA7")
+  ,("letter-spacing", "0")
+  ,("margin", "4px 12px 0px 12px")
+  ]
+
+panelBodyStyle =
+  [("margin", "4px 8px 4px 8px")
+  , ("background", "#FFFFFF")
+  , ("box-shadow", "0 2px 4px 0 #D2D6DF")
+  ]
 
 navbarView: NavbarModel -> Html msg
 navbarView navbar =
