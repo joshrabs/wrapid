@@ -10,7 +10,7 @@ import Material.Icon as Icon
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Client.Generic.Dashboard.HamburgerMenu exposing (iconBell)
+import Client.Generic.Dashboard.IconBell exposing (iconBell)
 
 import WrapidLogo exposing (logo)
 
