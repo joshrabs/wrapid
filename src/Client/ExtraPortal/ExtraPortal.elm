@@ -25,6 +25,12 @@ type Msg = ChangeView ViewState
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
+defaultNotificationItems =
+  [
+    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
+    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
+  ]
+
 defaultCrewInfoItems =
   [{name = "Josh Weinberg", role="Lead PA"}
   ,{name = "Randy Lahey", role="Extra PA"}
@@ -47,13 +53,7 @@ viewExtraPortal model =
         in
           Dashboard.view {navbar = {rightItems = Just rightItems}}
       , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
-      ,
-        let
-          panelHeader = Just {title ="Notifications", rightItem=(Just "3")}
-          panelBody = (viewNotificationBar [{description="Lunch in 1 hour"}])
-          footer = Nothing
-        in
-          Dashboard.makePanel panelHeader panelBody footer
+      , viewNotificationBarPanel defaultNotificationItems
       ,
         let
           panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
