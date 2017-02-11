@@ -38,9 +38,10 @@ view model =
   ]
 
 type alias PanelHeader = {title: String, rightItem: Maybe String}
-type alias PanelFooter = {title: String}
+type alias PanelFooter footerMsg = Html footerMsg
 
-makePanel: Maybe PanelHeader -> (Html msg) -> Maybe PanelFooter -> Html msg
+
+makePanel: Maybe PanelHeader -> (Html msg) -> Maybe (PanelFooter msg) -> Html msg
 makePanel header body footer =
   let
     panelHeader =
@@ -54,10 +55,15 @@ makePanel header body footer =
               Nothing -> span [] []
           ]
         Nothing -> div [] []
+    panelFooter =
+      case footer of
+        Just footer -> div [style panelFooterStyle] [footer]
+        Nothing -> div [] []
   in
     div [style panelBodyStyle]
-      [ panelHeader
-        , body
+      [   panelHeader
+        ,body
+        ,panelFooter
       ]
 
 panelHeaderStyle =
@@ -81,6 +87,11 @@ panelBodyStyle =
   [("margin", "4px 8px 4px 8px")
   , ("background", "#FFFFFF")
   , ("box-shadow", "0 2px 4px 0 #D2D6DF")
+  ]
+
+panelFooterStyle =
+  [("padding-bottom", "8px")
+  ,("border-top", "1px solid #EBF0F5")
   ]
 
 navbarView: NavbarModel -> Html msg

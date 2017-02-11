@@ -6,6 +6,7 @@ import Html.Attributes exposing (style)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar exposing (..)
+import Client.ExtraPortal.Schedule exposing (..)
 
 -- MODEL
 
@@ -54,13 +55,7 @@ viewExtraPortal model =
           Dashboard.view {navbar = {rightItems = Just rightItems}}
       , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
       , viewNotificationBarPanel defaultNotificationItems
-      ,
-        let
-          panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
-          panelBody = (viewSchedule defaultScheduleItems)
-          footer = Nothing
-        in
-          Dashboard.makePanel panelHeader panelBody footer
+      , viewSchedulePanel defaultScheduleItems
        ,
          let
            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
@@ -106,39 +101,7 @@ headerProductionStyle =
   ,("line-height", "20px")
   ]
 
-type alias Schedule = List ScheduleItem
-type alias ScheduleItem = {name: String, startTm: String}
-viewSchedule: Schedule -> Html Msg
-viewSchedule schedule =
-  div []
-  [
-    let
-      listItems = List.map (\s -> (
-          div [style [("display", "flex"), ("justify-content", "space-between"), ("margin", "8px")]]
-            [
-              span [style scheduleItemNameStyle] [text s.name]
-              ,span [style scheduleItemTitleStyle] [text s.startTm]
-            ]
-      )) schedule
-    in
-      div [] listItems
-  ]
 
-scheduleItemNameStyle =
-  [
-     ("font-family", "Roboto-Regular")
-    ,("font-size", "12px")
-    ,("color", "#363A43")
-    ,("letter-spacing", "0")
-  ]
-
-scheduleItemTitleStyle =
-  [
-     ("font-family", "RobotoMono-Regular")
-    ,("font-size", "14px")
-    ,("color", "#9B9EA7")
-    ,("letter-spacing", "0")
-  ]
 
 type alias CrewInfoItem = {name: String, role: String}
 viewCrewInfoItems: List CrewInfoItem -> Html Msg
