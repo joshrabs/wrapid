@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Html exposing (Html, a, button, div, h1, img, li, p, text, ul)
+import Html exposing (Html, a, button, div, h1, h4, img, li, p, text, ul)
 import Html.Attributes exposing (href, src, style)
 import Html.Events exposing (onClick)
 import Navigation as Nav
@@ -101,10 +101,9 @@ view model =
       , div [style [("position", "fixed"), ("bottom", "0px"), ("border", "1px solid black")]]
       [
           div [] [
-                ul [] (List.map viewLink [ "bears", "cats", "dogs", "elephants", "fish" ])
-              , h1 [] [ text "History" ]
+                ul [] (List.map viewLink [ "bears" ])
+              , h4 [] [ text "History" ]
               , ul [] (List.map viewLocation model.history)
-              , h1 [] [ text model.title ]
               ]
         , button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
         , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]

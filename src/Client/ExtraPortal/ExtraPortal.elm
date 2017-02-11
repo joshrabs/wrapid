@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 
 -- MODEL
 
@@ -54,11 +55,19 @@ viewExtraPortal model =
           Dashboard.makePanel panelHeader panelBody footer
        ,
          let
+           panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
+           panelBody = (viewWardrobeStatus NotCheckedIn)
+           footer = Nothing
+         in
+           Dashboard.makePanel panelHeader panelBody footer
+      ,
+         let
            panelHeader = Just {title ="Contact Info", rightItem=Nothing}
            panelBody = (viewCrewInfoItems defaultCrewInfoItems)
            footer = Nothing
          in
            Dashboard.makePanel panelHeader panelBody footer
+
       ]
 
 
