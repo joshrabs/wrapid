@@ -52,17 +52,26 @@ viewNotificationBarItem item =
     ]
   ]
   [
-      div []
+      div [style
+        [
+          ("margin", "16px 0px 0px 16px")
+        ]]
       [
         case item.icon of
           LunchIcon -> lunchIcon
-          Default -> defaultTagIcon
+          Default ->
+            defaultTagIcon
       ]
-     ,div []
+     ,
+      div [style [
+         ("display", "flex")
+        ,("flex-direction", "column")
+        ,("margin", "8px 0px 8px 24px")
+      ]]
        [
         span [style
          [
-            ("margin", "8px")
+            ("margin", "8px 0px 0px 0px")
            ,("font-family", "Roboto-Regular")
            ,("font-size", "14px")
            ,("color", "#363A43")
@@ -73,8 +82,7 @@ viewNotificationBarItem item =
         ,
           span [style
            [
-              ("margin", "8px")
-             ,("font-family", "RobotoMono-Regular")
+              ("font-family", "RobotoMono-Regular")
              ,("font-size", "14px")
              ,("color", "#6D717A")
              ,("letter-spacing", "0")

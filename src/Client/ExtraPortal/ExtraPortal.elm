@@ -70,7 +70,6 @@ viewExtraPortal model =
            footer = Nothing
          in
            Dashboard.makePanel panelHeader panelBody footer
-
       ]
 
 
