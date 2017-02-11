@@ -5,6 +5,7 @@ import Html.Attributes exposing (style)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
+import Client.ExtraPortal.NotificationBar exposing (..)
 
 -- MODEL
 
@@ -46,6 +47,13 @@ viewExtraPortal model =
         in
           Dashboard.view {navbar = {rightItems = Just rightItems}}
       , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
+      ,
+        let
+          panelHeader = Just {title ="Notifications", rightItem=(Just "3")}
+          panelBody = (viewNotificationBar [{description="Lunch in 1 hour"}])
+          footer = Nothing
+        in
+          Dashboard.makePanel panelHeader panelBody footer
       ,
         let
           panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
