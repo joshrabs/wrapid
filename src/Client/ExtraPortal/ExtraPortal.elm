@@ -22,6 +22,12 @@ type Msg = ChangeView ViewState
 
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
+
+defaultCrewInfoItems =
+  [{name = "Josh Weinberg", role="PA"}
+  ,{name = "Patty Lebotomy", role="Wardrobe"}
+  ,{name = "Blah", role="Prod"}
+  ]
 --VIEW
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
@@ -39,6 +45,13 @@ viewExtraPortal model =
           footer = Nothing
         in
           Dashboard.makePanel panelHeader panelBody footer
+       ,
+         let
+           panelHeader = Just {title ="Contact Info"}
+           panelBody = (viewCrewInfoItems defaultCrewInfoItems)
+           footer = Nothing
+         in
+           Dashboard.makePanel panelHeader panelBody footer
       ]
 
 
@@ -68,6 +81,7 @@ headerProductionStyle =
   ,("letter-spacing", "0")
   ,("line-height", "20px")
   ]
+
 type alias Schedule = List String
 viewSchedule: Schedule -> Html Msg
 viewSchedule schedule =
@@ -77,4 +91,34 @@ viewSchedule schedule =
       listItems = List.map (\s -> (div [] [text s])) schedule
     in
       div [] listItems
+  ]
+
+
+type alias CrewInfoItem = {name: String, role: String}
+viewCrewInfoItems: List CrewInfoItem -> Html Msg
+viewCrewInfoItems prodContacts =
+  div []
+  [
+    let
+      listItems = List.map (\s -> (
+          div [style [("display", "flex"), ("flex-direction", "column"), ("margin-left", "8px")]]
+          [
+            span [style [
+               ("font-family", "Roboto-Medium")
+              ,("font-size", "12px")
+              ,("color", "#282C35")
+              ,("letter-spacing", "0")
+              ,("line-height", "24px")
+            ]] [text s.name]
+           , span [style [
+              ("font-family", "Roboto")
+             ,("font-size", "16px")
+             ,("color", "#6D717A")
+             ,("letter-spacing", "0")
+             ,("line-height", "24px")
+           ]][text s.role]
+          ]
+      )) prodContacts
+    in
+      div [style [("display", "flex"), ("flex-direction", "column")]] listItems
   ]
