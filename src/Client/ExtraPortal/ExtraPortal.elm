@@ -24,9 +24,16 @@ defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 defaultCrewInfoItems =
-  [{name = "Josh Weinberg", role="PA"}
+  [{name = "Josh Weinberg", role="Lead PA"}
+  ,{name = "Randy Lahey", role="Extra PA"}
   ,{name = "Patty Lebotomy", role="Wardrobe"}
-  ,{name = "Blah", role="Prod"}
+  ]
+
+defaultScheduleItems =
+  [
+    {name="Start Time", startTm="8:00 AM"}
+    ,{name="Break for Lunch", startTm="12:00 PM"}
+    ,{name="Estimated End Time", startTm="6:00 PM"}
   ]
 --VIEW
 viewExtraPortal: Model -> Html Msg
@@ -40,14 +47,14 @@ viewExtraPortal model =
       , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
       ,
         let
-          panelHeader = Just {title ="Schedule"}
-          panelBody = (viewSchedule ["1st task!", "2nd task!", "3rd task!"])
+          panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
+          panelBody = (viewSchedule defaultScheduleItems)
           footer = Nothing
         in
           Dashboard.makePanel panelHeader panelBody footer
        ,
          let
-           panelHeader = Just {title ="Contact Info"}
+           panelHeader = Just {title ="Contact Info", rightItem=Nothing}
            panelBody = (viewCrewInfoItems defaultCrewInfoItems)
            footer = Nothing
          in
@@ -82,17 +89,39 @@ headerProductionStyle =
   ,("line-height", "20px")
   ]
 
-type alias Schedule = List String
+type alias Schedule = List ScheduleItem
+type alias ScheduleItem = {name: String, startTm: String}
 viewSchedule: Schedule -> Html Msg
 viewSchedule schedule =
   div []
   [
     let
-      listItems = List.map (\s -> (div [] [text s])) schedule
+      listItems = List.map (\s -> (
+          div [style [("display", "flex"), ("justify-content", "space-between"), ("margin", "8px")]]
+            [
+              span [style scheduleItemNameStyle] [text s.name]
+              ,span [style scheduleItemTitleStyle] [text s.startTm]
+            ]
+      )) schedule
     in
       div [] listItems
   ]
 
+scheduleItemNameStyle =
+  [
+     ("font-family", "Roboto-Regular")
+    ,("font-size", "12px")
+    ,("color", "#363A43")
+    ,("letter-spacing", "0")
+  ]
+
+scheduleItemTitleStyle =
+  [
+     ("font-family", "RobotoMono-Regular")
+    ,("font-size", "14px")
+    ,("color", "#9B9EA7")
+    ,("letter-spacing", "0")
+  ]
 
 type alias CrewInfoItem = {name: String, role: String}
 viewCrewInfoItems: List CrewInfoItem -> Html Msg

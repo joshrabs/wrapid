@@ -1,12 +1,5 @@
 module Client.Generic.Dashboard.Dashboard exposing (..)
 
-import Material
-import Material.Scheme
-import Material.Color as Color
-import Material.Options as Options exposing (css, when)
-import Material.Typography as Typography
-import Material.Layout as Layout
-import Material.Icon as Icon
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -44,7 +37,7 @@ view model =
     navbarView model.navbar
   ]
 
-type alias PanelHeader = {title: String}
+type alias PanelHeader = {title: String, rightItem: Maybe String}
 type alias PanelFooter = {title: String}
 
 makePanel: Maybe PanelHeader -> (Html msg) -> Maybe PanelFooter -> Html msg
@@ -53,7 +46,13 @@ makePanel header body footer =
     panelHeader =
       case header of
         Just header -> div [style panelHeaderStyle]
-          [div [style panelHeaderItemStyle] [text header.title]]
+          [
+           span [style panelHeaderItemStyle] [text header.title]
+          ,
+            case header.rightItem of
+              Just rightItem -> span [style panelHeaderItemStyle] [text rightItem]
+              Nothing -> span [] []
+          ]
         Nothing -> div [] []
   in
     div [style panelBodyStyle]
