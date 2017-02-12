@@ -2,6 +2,7 @@ module Client.ExtraPortal.Pages.FormStatusPage exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (style, src)
+import Html.Events exposing (onClick)
 
 import Assets.Icons.CheckedCircleIcon exposing (viewCheckedCircle)
 import Assets.Icons.ForwardArrow exposing (viewForwardArrow)
@@ -15,8 +16,8 @@ type alias FormStatus =
    ,imgSrc: String
   }
 
-viewFormStatusPage: FormStatuses -> Html msg
-viewFormStatusPage statuses =
+viewFormStatusPage: msg -> FormStatuses -> Html msg
+viewFormStatusPage msg statuses =
   div [style [("margin", "8px")]]
     [
       div [style [
@@ -31,7 +32,7 @@ viewFormStatusPage statuses =
         ]]
         [text "Your Completed Forms"]
       ]
-      ,span [style [
+      ,span [onClick msg, style [
         ("display", "flex")
         ,("align-items", "center")
         ,("font-family", "Roboto")

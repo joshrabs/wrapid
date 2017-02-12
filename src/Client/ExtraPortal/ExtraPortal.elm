@@ -102,7 +102,7 @@ viewExtraPortal model =
         ]
       ProfileWizard -> div [] [text "meow"]
       FormStatus ->
-        viewFormStatusPage defaultFormStatus
+        viewFormStatusPage (ChangeView DailyMonitor) defaultFormStatus
 
     ]
 
