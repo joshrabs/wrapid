@@ -9,6 +9,8 @@ import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar exposing (..)
 import Client.ExtraPortal.Schedule exposing (..)
 
+import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
+
 -- MODEL
 
 type alias Model = {currentView: ViewState}
@@ -52,6 +54,14 @@ defaultScheduleItems =
     ,{name="Break for Lunch", startTm="12:00 PM"}
     ,{name="Estimated End Time", startTm="6:00 PM"}
   ]
+
+defaultFormStatus: FormStatusPage.FormStatuses
+defaultFormStatus =
+  [{formName = "Pence", completedTime = "11/12/2017", imgSrc = "meow"}
+  ,{formName = "Emergency Contact", completedTime = "11/12/2017", imgSrc = "meow"}
+  ,{formName = "EFS Voucher", completedTime = "11/12/2017", imgSrc = "meow"}
+  ]
+
 --VIEW
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
@@ -90,7 +100,8 @@ viewExtraPortal model =
              Dashboard.makePanel panelHeader panelBody footer
         ]
       ProfileWizard -> div [] [text "meow"]
-      FormStatus -> div [] [text "Form Status"]
+      FormStatus ->
+        viewFormStatusPage defaultFormStatus
 
     ]
 
