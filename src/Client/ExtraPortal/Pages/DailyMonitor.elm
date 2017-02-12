@@ -1,4 +1,4 @@
-module Client.ExtraPortal.ExtraPortal exposing (..)
+module Client.ExtraPortal.Pages.DailyMonitor exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -10,15 +10,13 @@ import Client.ExtraPortal.Schedule exposing (..)
 
 -- MODEL
 
-type alias Model = {
-  profile: Profile
-}
+type alias Model = Maybe String
 
 type alias Profile = {
   firstName: String
 }
 
-type ViewState = ProfileWizard | FormStatus
+type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
 type Msg = ChangeView ViewState
@@ -32,14 +30,15 @@ defaultNotificationItems =
     {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
     ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
   ]
-defaultCrewInfoItems: List { name : String, role : String }
+
+defaultCrewInfoItems : List { name : String, role : String }
 defaultCrewInfoItems =
   [{name = "Josh Weinberg", role="Lead PA"}
   ,{name = "Randy Lahey", role="Extra PA"}
   ,{name = "Patty Lebotomy", role="Wardrobe"}
   ]
 
-defaultScheduleItems: Schedule
+defaultScheduleItems : Schedule
 defaultScheduleItems =
   [
     {name="Start Time", startTm="8:00 AM"}
@@ -47,8 +46,8 @@ defaultScheduleItems =
     ,{name="Estimated End Time", startTm="6:00 PM"}
   ]
 --VIEW
-viewExtraPortal: Model -> Html Msg
-viewExtraPortal model =
+viewDailyMonitor: Model -> Html Msg
+viewDailyMonitor model =
   div []
       [
         let
@@ -84,6 +83,7 @@ viewHeader header =
     , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
     ,span [] [text (header.production)]
   ]
+
 headerTitleStyle : List ( String, String )
 headerTitleStyle =
   [
