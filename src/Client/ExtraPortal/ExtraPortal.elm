@@ -57,9 +57,9 @@ defaultScheduleItems =
 
 defaultFormStatus: FormStatusPage.FormStatuses
 defaultFormStatus =
-  [{formName = "Pence", completedTime = "11/12/2017", imgSrc = "meow"}
-  ,{formName = "Emergency Contact", completedTime = "11/12/2017", imgSrc = "meow"}
-  ,{formName = "EFS Voucher", completedTime = "11/12/2017", imgSrc = "meow"}
+  [{formName = "Pence", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "Emergency Contact", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "EFS Voucher", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
   ]
 
 --VIEW

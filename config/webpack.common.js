@@ -23,7 +23,6 @@ module.exports = function (config) {
         },
         {
           test: /\.(jpg|png|svg|gif)$/,
-          include: config.src,
           use: [
             { loader: 'file-loader',
               options: { name: './images/[name].[hash].[ext]' }
