@@ -2,6 +2,7 @@ module Client.ExtraPortal.ExtraPortal exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
@@ -10,18 +11,23 @@ import Client.ExtraPortal.Schedule exposing (..)
 
 -- MODEL
 
-type alias Model = {
-  profile: Profile
-}
+type alias Model = {currentView: ViewState}
+initModel: Model
+initModel = {currentView = DailyMonitor}
 
 type alias Profile = {
   firstName: String
 }
 
-type ViewState = ProfileWizard | FormStatus
+type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
 type Msg = ChangeView ViewState
+update: Msg -> Model -> (Model, Cmd msg)
+update msg model =
+  case msg of
+    ChangeView viewState ->
+      ({model | currentView = viewState}, Cmd.none)
 
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
@@ -50,29 +56,40 @@ defaultScheduleItems =
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
   div []
-      [
-        let
-            rightItems = {avatar = Just defaultUrl}
-        in
-          Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
-      , viewNotificationBarPanel defaultNotificationItems
-      , viewSchedulePanel defaultScheduleItems
-       ,
-         let
-           panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
-           panelBody = (viewWardrobeStatus NotCheckedIn)
-           footer = Nothing
-         in
-           Dashboard.makePanel panelHeader panelBody footer
-      ,
-         let
-           panelHeader = Just {title ="Contact Info", rightItem=Nothing}
-           panelBody = (viewCrewInfoItems defaultCrewInfoItems)
-           footer = Nothing
-         in
-           Dashboard.makePanel panelHeader panelBody footer
-      ]
+    [
+     button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
+    ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
+    ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
+    ,case model.currentView of
+      DailyMonitor ->
+        div []
+        [
+          let
+              rightItems = {avatar = Just defaultUrl}
+          in
+            Dashboard.view {navbar = {rightItems = Just rightItems}}
+        , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
+        , viewNotificationBarPanel defaultNotificationItems
+        , viewSchedulePanel defaultScheduleItems
+         ,
+           let
+             panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
+             panelBody = (viewWardrobeStatus NotCheckedIn)
+             footer = Nothing
+           in
+             Dashboard.makePanel panelHeader panelBody footer
+        ,
+           let
+             panelHeader = Just {title ="Contact Info", rightItem=Nothing}
+             panelBody = (viewCrewInfoItems defaultCrewInfoItems)
+             footer = Nothing
+           in
+             Dashboard.makePanel panelHeader panelBody footer
+        ]
+      ProfileWizard -> div [] [text "meow"]
+      FormStatus -> div [] [text "Form Status"]
+
+    ]
 
 
 type alias Header = {firstName: String, production: String}

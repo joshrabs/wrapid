@@ -26,13 +26,13 @@ main =
 type alias Model =
     { history : List Nav.Location
     , currentImg : Maybe String
-    , currentModelView : ModelView
+    , currentViewState : ViewState
+    , extraPortalModel: ExtraPortal.Model
+    , paPortalModel: PAPortal.Model
     , title: String
     }
 
 type ViewState = LoginView | ExtraPortalView | PAPortalView
-type alias ViewModel =  PAPortal.Model
-type alias ModelView = {model: ViewModel, viewState: ViewState}
 
 
 type alias Url =
@@ -47,11 +47,9 @@ type alias Profile =
 
 
 
-defaultModelView: ModelView
-defaultModelView = {model = (PAPortal.initModel "meow"), viewState=LoginView}
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing defaultModelView "Yo"
+    ( Model [ location ] Nothing LoginView ExtraPortal.initModel (PAPortal.initModel "word") "Yo"
     , Cmd.none
     )
 
@@ -70,34 +68,39 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeView viewState ->
-          let
-              currentModelView = {model = model.currentModelView.model, viewState = viewState}
-          in
-              ({model | currentModelView = currentModelView}, Cmd.none)
+          case viewState of
+            LoginView ->
+              ({model | currentViewState=viewState}, Cmd.none)
+            ExtraPortalView ->
+              ({model | extraPortalModel = ExtraPortal.initModel, currentViewState=viewState}, Cmd.none)
+            PAPortalView ->
+              ({model | currentViewState=viewState}, Cmd.none)
         UrlChange location ->
             ( { model | history = location :: model.history }
             , Cmd.none
             )
         LoginMsg loginMsg -> (model, Cmd.none)
-        ExtraPortalMsg epMsg -> (model, Cmd.none)
+        ExtraPortalMsg epMsg ->
+          let
+            (extraPortalModel, epCmd) = ExtraPortal.update epMsg model.extraPortalModel
+          in
+            ({model | extraPortalModel = extraPortalModel}, Cmd.map (\b -> ExtraPortalMsg b) epCmd)
         PAPortalMsg paMsg ->
           let
-            (paPortalModel, paCmd) = PAPortal.update paMsg model.currentModelView.model
-
-            currentModelView = {model = paPortalModel, viewState = model.currentModelView.viewState}
+            (paPortalModel, paCmd) = PAPortal.update paMsg model.paPortalModel
           in
-            ({model | currentModelView = currentModelView}, Cmd.map (\b -> PAPortalMsg b) paCmd)
+            ({model | paPortalModel = paPortalModel}, Cmd.map (\b -> PAPortalMsg b) paCmd)
 
 
 view : Model -> Html Msg
 view model =
     div []
     [
-      case model.currentModelView.viewState of
+      case model.currentViewState of
           LoginView -> Html.map LoginMsg (Login.loginView Nothing)
-          ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal {profile = {firstName = "Steve"}})
+          ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
           PAPortalView -> Html.map PAPortalMsg
-                  (PAPortal.viewPAPortal model.currentModelView.model)
+                  (PAPortal.viewPAPortal model.paPortalModel)
       , div [style [("position", "fixed"), ("bottom", "0px"), ("border", "1px solid black")]]
       [
           div [] [
@@ -132,5 +135,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
     [
-      Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.currentModelView.model)
+      Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.paPortalModel)
     ]
