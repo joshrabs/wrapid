@@ -97,7 +97,7 @@ view model =
     div []
     [
       case model.currentViewState of
-          LoginView -> Html.map LoginMsg (Login.loginView Nothing)
+          LoginView -> Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
           ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
           PAPortalView -> Html.map PAPortalMsg
                   (PAPortal.viewPAPortal model.paPortalModel)
