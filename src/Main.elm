@@ -101,16 +101,10 @@ view model =
           ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
           PAPortalView -> Html.map PAPortalMsg
                   (PAPortal.viewPAPortal model.paPortalModel)
-      , div [style [("position", "fixed"), ("bottom", "0px"), ("border", "1px solid black")]]
-      [
-          div [] [
-                ul [] (List.map viewLink [ "bears" ])
-              , h4 [] [ text "History" ]
-              , ul [] (List.map viewLocation model.history)
-              ]
-        , button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
-        , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
-        , button [onClick (ChangeView LoginView)] [text "Login"]
+      , div [style [("position", "fixed"), ("top", "0px"), ("right", "0px"), ("border", "1px solid black")]]
+      [button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
+      , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
+      , button [onClick (ChangeView LoginView)] [text "Login"]
       ]
     ]
 

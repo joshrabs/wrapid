@@ -57,9 +57,12 @@ viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
   div []
     [
-     button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
-    ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
-    ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
+     div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
+     [
+       button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
+      ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
+      ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
+    ]
     ,case model.currentView of
       DailyMonitor ->
         div []
