@@ -82,7 +82,7 @@ viewExtraPortal model =
         div []
         [
 
-          viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
+          viewHeader {firstName="Steve", production="RunabetterSet Productions"}
         , viewNotificationBarPanel defaultNotificationItems
         , viewSchedulePanel defaultScheduleItems
          ,

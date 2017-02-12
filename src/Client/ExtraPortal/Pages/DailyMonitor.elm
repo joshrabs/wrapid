@@ -54,7 +54,7 @@ viewDailyMonitor model =
             rightItems = {avatar = Just defaultUrl}
         in
           Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
+      , viewHeader {firstName="Steve", production="RunabetterSet Productions"}
       , viewNotificationBarPanel defaultNotificationItems
       , viewSchedulePanel defaultScheduleItems
        ,

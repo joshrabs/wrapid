@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (style, src)
 
 import Assets.Icons.CheckedCircleIcon exposing (viewCheckedCircle)
+import Assets.Icons.ForwardArrow exposing (viewForwardArrow)
 
 type alias FormStatuses = List FormStatus
 
@@ -17,7 +18,32 @@ type alias FormStatus =
 viewFormStatusPage: FormStatuses -> Html msg
 viewFormStatusPage statuses =
   div [style [("margin", "8px")]]
-    (List.map (\item -> viewFormStatusIcon item) statuses)
+    [
+      div [style [
+        ("display", "flex"), ("flex-direction", "column")
+      ]]
+      [
+        span [style [
+          ("font-family", "Roboto-Bold")
+          ,("font-size", "32px")
+          ,("color", "#282C35")
+          ,("letter-spacing", "0")
+        ]]
+        [text "Your Completed Forms"]
+      ]
+      ,span [style [
+        ("display", "flex")
+        ,("align-items", "center")
+        ,("font-family", "Roboto")
+        ,("font-size", "16px")
+        ,("letter-spacing", "0")
+        ,("line-height", "20px")
+        ,("margin", "8px 0px 4px 0px")
+       ]]
+       [text "Go to daily tasks", viewForwardArrow "24" "24"]
+      ,div [] (List.map (\item -> viewFormStatusIcon item) statuses)
+    ]
+
 
 
 viewFormStatusIcon: FormStatus -> Html msg

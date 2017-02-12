@@ -8,6 +8,8 @@ import Material.Textfield as Textfield
 import Material
 import Material.Scheme
 
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+
 --MODEL
 
 type alias Model = {
@@ -46,16 +48,25 @@ type alias Mdl =
 
 loginView: Model -> Html Msg
 loginView model =
-      div []
-      [ input [ type_ "text", placeholder "Name", onInput Email ] []
-        , input [ type_ "password", placeholder "Password", onInput Password ] []
-        , Textfield.render Mdl
+  div []
+  [
+    Dashboard.view {navbar = {rightItems = Nothing}}
+    ,viewLoginPanel model
+  ]
+
+
+viewLoginPanel: Model -> Html Msg
+viewLoginPanel model =
+  let
+    panelHeader = Just {title ="Login", rightItem=Nothing}
+    panelBody =
+      div [style [("display", "flex"), ("flex-direction", "column")]]
+      [ Textfield.render Mdl
             [10,0]
             model.mdl
             [ Textfield.label "Enter email"
             , Textfield.floatingLabel
             , Textfield.email
-
             ]
             []
         , Textfield.render Mdl
@@ -69,3 +80,6 @@ loginView model =
             []
       ]
       |> Material.Scheme.top
+    footer = Nothing
+  in
+    Dashboard.makePanel panelHeader panelBody footer
