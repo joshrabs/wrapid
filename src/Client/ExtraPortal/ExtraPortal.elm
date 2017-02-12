@@ -67,21 +67,22 @@ viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
   div []
     [
-     div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
-     [
-       button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
-      ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
-      ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
-    ]
+      div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
+      [
+        button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
+       ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
+       ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
+       ]
+    , let
+          rightItems = {avatar = Just defaultUrl}
+      in
+        Dashboard.view {navbar = {rightItems = Just rightItems}}
     ,case model.currentView of
       DailyMonitor ->
         div []
         [
-          let
-              rightItems = {avatar = Just defaultUrl}
-          in
-            Dashboard.view {navbar = {rightItems = Just rightItems}}
-        , viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
+
+          viewHeader {firstName="Steve", production="AMC's the Walking Dead"}
         , viewNotificationBarPanel defaultNotificationItems
         , viewSchedulePanel defaultScheduleItems
          ,
