@@ -2,7 +2,6 @@ module Client.Generic.Authentication.Login.Login exposing (loginView, Msg, initM
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 
 import Material.Textfield as Textfield
 import Material

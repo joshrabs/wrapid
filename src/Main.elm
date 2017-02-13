@@ -10,6 +10,8 @@ import Client.Generic.Authentication.Login.Login as Login exposing (loginView, M
 import Client.ExtraPortal.ExtraPortal as ExtraPortal exposing (..)
 import Client.PAPortal.PAPortal as PAPortal exposing (..)
 
+import Client.Generic.Animation.FadeInUp as FadeInUp exposing (..)
+
 main : Program Never Model Msg
 main =
     Nav.program UrlChange
@@ -57,7 +59,8 @@ init location =
 
 
 type Msg
-    = UrlChange Nav.Location
+    = NoOp
+    | UrlChange Nav.Location
     | LoginMsg Login.Msg
     | ChangeView ViewState
     | ExtraPortalMsg ExtraPortal.Msg
@@ -67,6 +70,7 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp -> (model, Cmd.none)
         ChangeView viewState ->
           case viewState of
             LoginView ->
@@ -106,6 +110,7 @@ view model =
       , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
       , button [onClick (ChangeView LoginView)] [text "Login"]
       ]
+      , Html.map (\_ -> NoOp) (FadeInUp.view (Tuple.first FadeInUp.init))
     ]
 
 
