@@ -1,6 +1,7 @@
 port module Client.PAPortal.PAPortal exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (style)
 import Html.Events exposing (..)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
@@ -68,13 +69,45 @@ viewPAPortal model =
             rightItems = {avatar = Just model.user.url}
         in
           Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , h1 [] [text ("Welcome to the PA portal: " ++ model.user.firstName)]
+      , viewHeader
       , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
       , case model.extras of
           Just extras ->
             ul [] (List.map viewExtras extras)
           Nothing -> div [] [text "No extras!"]
       ]
+
+viewHeader: Html msg
+viewHeader =
+  viewHeaderInfo
+
+
+viewHeaderInfo: Html msg
+viewHeaderInfo =
+  div [style [("background-color", "#FFFFFF")]]
+  [
+    div [style [
+        ("margin", "16px")
+      , ("display", "inline-flex")
+      , ("flex-direction", "column")
+    ]]
+    [
+       span [style [
+        ("font-family", "Roboto-Regular")
+        ,("font-size", "12px")
+        ,("color", "#6D717A")
+       ]]
+      [text "Monday May 25, 2016"]
+      ,span [style [
+        ("font-family", "Roboto-Regular")
+        ,("font-size", "16px")
+        ,("margin", "8px 0px 8px 0px")
+        ,("color", "#282C35")
+        ,("letter-spacing", "0")
+        ]]
+        [text "RUNABETTERSET Productions"]
+    ]
+  ]
 
 
 viewExtras : Profile -> Html Msg
