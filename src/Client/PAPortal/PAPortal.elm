@@ -5,11 +5,13 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (..)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.PAPortal.HorizontalCalendar exposing (..)
 
 -- MODEL
 
 type alias Model =
-  { user: Profile
+  {
+    user: Profile
   , extras: Maybe (List Profile)
   }
 
@@ -63,19 +65,20 @@ update msg model =
 --VIEW
 viewPAPortal: Model -> Html Msg
 viewPAPortal model =
-  div []
-      [
-        let
-            rightItems = {avatar = Just model.user.url}
-        in
-          Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , viewHeader
-      , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-      , case model.extras of
-          Just extras ->
-            ul [] (List.map viewExtras extras)
-          Nothing -> div [] [text "No extras!"]
-      ]
+    div []
+        [
+          let
+              rightItems = {avatar = Just model.user.url}
+          in
+            Dashboard.view {navbar = {rightItems = Just rightItems}}
+        , viewHeader
+        , viewCalendar Nothing
+        , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+        , case model.extras of
+            Just extras ->
+              ul [] (List.map viewExtras extras)
+            Nothing -> div [] [text "No extras!"]
+        ]
 
 viewHeader: Html msg
 viewHeader =
