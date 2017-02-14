@@ -73,7 +73,13 @@ viewCalendarItem item =
           ,("font-size", "12px")
           ,("color", "#6D717A")
         ]]
-        [text "Wednesday"]
+        [text (item.day |> Date.dayOfWeek |> toString)]
+      ,  span [style [
+          ("width", "12px")
+          ,("height", "2px")
+          ,("margin", "4px 0px 4px 0px")
+          ,("background", "#D8D8D8")
+        ]][]
       , span [style [
           ("margin", "4px 0px 4px 0px")
           ,("font-family", "Helvetica-Bold")
