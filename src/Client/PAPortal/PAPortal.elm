@@ -13,6 +13,7 @@ type alias Model =
   {
     user: Profile
   , extras: Maybe (List Profile)
+  , currentView: ViewState
   }
 
 type alias Profile =
@@ -32,9 +33,10 @@ initModel userId =
   in
   { user = user
   , extras = Nothing
+  , currentView = LiveMonitor
   }
 
-type ViewState = ProfileWizard | FormStatus
+type ViewState = LiveMonitor | SkinManager
 
 -- UPDATE
 type Msg =
@@ -47,7 +49,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     ChangeView view ->
-      (model, Cmd.none)
+      ({model | currentView = view}, Cmd.none)
     GetAllProfiles ->
       let _ = Debug.log "Running get all profiles!"
       in
@@ -71,23 +73,57 @@ viewPAPortal model =
               rightItems = {avatar = Just model.user.url}
           in
             Dashboard.view {navbar = {rightItems = Just rightItems}}
-        , viewHeader
+        , viewHeader model.currentView
         , viewCalendar Nothing
-        , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-        , case model.extras of
-            Just extras ->
-              ul [] (List.map viewExtras extras)
-            Nothing -> div [] [text "No extras!"]
+        ,
+          case model.currentView of
+            LiveMonitor ->
+              div []
+              [
+                button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+              , case model.extras of
+                  Just extras ->
+                    ul [] (List.map viewExtras extras)
+                  Nothing -> div [] [text "No extras!"]
+              ]
+            SkinManager ->
+              div []
+              [
+                text "Skin manager!"
+              ]
         ]
 
-viewHeader: Html msg
-viewHeader =
-  viewHeaderInfo
+viewHeader: ViewState -> Html Msg
+viewHeader currentView =
+  let
+      getTabStyle tabType =
+        if currentView == tabType then selectedTabStyle
+          else baseTabStyle
+  in
+    div [style [("background-color", "#FFFFFF")]]
+    [
+      viewHeaderInfo
+      , div [style [("display", "flex"), ("border-top", "1px solid black")]]
+        [
+          div [onClick (ChangeView LiveMonitor)
+            , style (getTabStyle LiveMonitor)]
+            [text "Live Monitor"]
+          ,div [
+              onClick (ChangeView SkinManager)
+              , style (getTabStyle SkinManager)
+            ]
+            [text "Skin Manager"]
+        ]
+    ]
 
+
+baseTabStyle = [("padding", "8px")]
+
+selectedTabStyle = List.concat [baseTabStyle, [("border-bottom", "1px solid black")]]
 
 viewHeaderInfo: Html msg
 viewHeaderInfo =
-  div [style [("background-color", "#FFFFFF")]]
+  div [style []]
   [
     div [style [
         ("margin", "16px")
