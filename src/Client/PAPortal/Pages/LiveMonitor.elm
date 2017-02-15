@@ -83,7 +83,7 @@ viewLiveTable table =
 
 viewSearch: Html msg
 viewSearch =
-  input [style
+  div [style
     [
       ("display", "flex")
     , ("justify-content", "space-between")
@@ -93,7 +93,24 @@ viewSearch =
     , ("background", "#FFFFFF")
     , ("border-bottom", "1px solid black")
     ]]
-    [text "Search", button [] [text "Tasks"]]
+    [
+      input [] []
+      , div [style [
+          ("display", "flex")
+          ,("justify-content", "center")
+          ,("align-items", "center")
+          ,("background", "#FFFFFF")
+          ,("box-shadow", "0 2px 4px 0 rgba(155,158,167,0.50)")
+          ,("border-radius", "2px")
+          ,("font-family", "Roboto-Regular")
+          ,("font-size", "12px")
+          ,("color", "#0000FF")
+          ,("width", "72px")
+          ,("height", "32px")
+          ,("margin", "8px")
+          ,("letter-spacing" , "0")]]
+      [text "Tasks"]
+    ]
 
 viewLiveTableItems: List ExtraInfoItem -> Html msg
 viewLiveTableItems items =
