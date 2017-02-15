@@ -5,10 +5,11 @@ import Html.Attributes exposing (href, src, style)
 import Html.Events exposing (onClick)
 import Navigation as Nav
 import Maybe exposing (andThen)
+import Client.Generic.Authentication.Login.Login as Login
+import Client.ExtraPortal.ExtraPortal as ExtraPortal
+import Client.PAPortal.PAPortal as PAPortal
+import Types exposing (..)
 
-import Client.Generic.Authentication.Login.Login as Login exposing (loginView, Msg)
-import Client.ExtraPortal.ExtraPortal as ExtraPortal exposing (..)
-import Client.PAPortal.PAPortal as PAPortal exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -23,35 +24,14 @@ main =
 
 -- MODEL
 
-type alias Model =
-    { history : List Nav.Location
-    , currentImg : Maybe String
-    , currentViewState : ViewState
-    , extraPortalModel: ExtraPortal.Model
-    , paPortalModel: PAPortal.Model
-    , title: String
-    }
-
-type ViewState = LoginView | ExtraPortalView | PAPortalView
-
-
-type alias Url =
-    String
-
-type alias Profile =
-    { id : String
-    , firstName : String
-    , url : Maybe String
-    }
-
-
-
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
     ( Model [ location ] Nothing LoginView ExtraPortal.initModel (PAPortal.initModel "word") "Yo"
     , Cmd.none
     )
+
+
 
 -- UPDATE
 
@@ -68,46 +48,58 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeView viewState ->
-          case viewState of
-            LoginView ->
-              ({model | currentViewState=viewState}, Cmd.none)
-            ExtraPortalView ->
-              ({model | extraPortalModel = ExtraPortal.initModel, currentViewState=viewState}, Cmd.none)
-            PAPortalView ->
-              ({model | currentViewState=viewState}, Cmd.none)
+            case viewState of
+                LoginView ->
+                    ( { model | currentViewState = viewState }, Cmd.none )
+
+                ExtraPortalView ->
+                    ( { model | extraPortalModel = ExtraPortal.initModel, currentViewState = viewState }, Cmd.none )
+
+                PAPortalView ->
+                    ( { model | currentViewState = viewState }, Cmd.none )
+
         UrlChange location ->
             ( { model | history = location :: model.history }
             , Cmd.none
             )
-        LoginMsg loginMsg -> (model, Cmd.none)
+
+        LoginMsg loginMsg ->
+            ( model, Cmd.none )
+
         ExtraPortalMsg epMsg ->
-          let
-            (extraPortalModel, epCmd) = ExtraPortal.update epMsg model.extraPortalModel
-          in
-            ({model | extraPortalModel = extraPortalModel}, Cmd.map (\b -> ExtraPortalMsg b) epCmd)
+            let
+                ( extraPortalModel, epCmd ) =
+                    ExtraPortal.update epMsg model.extraPortalModel
+            in
+                ( { model | extraPortalModel = extraPortalModel }, Cmd.map (\b -> ExtraPortalMsg b) epCmd )
+
         PAPortalMsg paMsg ->
-          let
-            (paPortalModel, paCmd) = PAPortal.update paMsg model.paPortalModel
-          in
-            ({model | paPortalModel = paPortalModel}, Cmd.map (\b -> PAPortalMsg b) paCmd)
+            let
+                ( paPortalModel, paCmd ) =
+                    PAPortal.update paMsg model.paPortalModel
+            in
+                ( { model | paPortalModel = paPortalModel }, Cmd.map (\b -> PAPortalMsg b) paCmd )
 
 
 view : Model -> Html Msg
 view model =
     div []
-    [
-      case model.currentViewState of
-          LoginView -> Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
-          ExtraPortalView -> Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
-          PAPortalView -> Html.map PAPortalMsg
-                  (PAPortal.viewPAPortal model.paPortalModel)
-      , div [style [("position", "fixed"), ("top", "0px"), ("right", "0px"), ("border", "1px solid black")]]
-      [button [onClick (ChangeView ExtraPortalView)] [text "Extra Portal"]
-      , button [onClick (ChangeView PAPortalView)] [text "PA Portal"]
-      , button [onClick (ChangeView LoginView)] [text "Login"]
-      ]
-    ]
+        [ case model.currentViewState of
+            LoginView ->
+                Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
 
+            ExtraPortalView ->
+                Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
+
+            PAPortalView ->
+                Html.map PAPortalMsg
+                    (PAPortal.viewPAPortal model.paPortalModel)
+        , div [ style [ ( "position", "fixed" ), ( "top", "0px" ), ( "right", "0px" ), ( "border", "1px solid black" ) ] ]
+            [ button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
+            , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
+            , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
+            ]
+        ]
 
 
 viewLink : String -> Html msg
@@ -122,12 +114,11 @@ viewLocation location =
 
 
 -- PORTS
-
-
 -- SUBSCRIPTIONS
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-    [
-      Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.paPortalModel)
-    ]
+        [ Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.paPortalModel)
+        ]
