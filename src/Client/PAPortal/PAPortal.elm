@@ -103,7 +103,7 @@ viewHeader currentView =
     div [style [("background-color", "#FFFFFF")]]
     [
       viewHeaderInfo
-      , div [style [("display", "flex"), ("border-top", "1px solid black")]]
+      , div [style [("display", "flex"), ("border-top", "1px solid #EBF0F5")]]
         [
           div [onClick (ChangeView LiveMonitor)
             , style (getTabStyle LiveMonitor)]
@@ -117,9 +117,18 @@ viewHeader currentView =
     ]
 
 
-baseTabStyle = [("padding", "8px")]
+baseTabStyle = [
+  ("padding", "8px"), ("font-size", "14px"),("font-family", "Roboto-Regular")
+    ,("font-family", "Roboto-Regular")
+    ,("color", "#6D717A")]
 
-selectedTabStyle = List.concat [baseTabStyle, [("border-bottom", "1px solid black")]]
+selectedTabStyle = List.concat
+    [baseTabStyle,
+      [("border-bottom", "2px solid black")
+      ,("color", "black")
+      ,("font-family", "Roboto-Medium")
+      ]
+    ]
 
 viewHeaderInfo: Html msg
 viewHeaderInfo =
