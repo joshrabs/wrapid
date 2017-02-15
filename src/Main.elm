@@ -36,14 +36,6 @@ init location =
 -- UPDATE
 
 
-type Msg
-    = UrlChange Nav.Location
-    | LoginMsg Login.Msg
-    | ChangeView ViewState
-    | ExtraPortalMsg ExtraPortal.Msg
-    | PAPortalMsg PAPortal.Msg
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
