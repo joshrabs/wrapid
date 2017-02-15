@@ -35,7 +35,7 @@
     "webpack-merge": "^2.6.1"
   },
   "dependencies": {
-    "lokka": "^1.7.0",
-    "lokka-transport-http": "^1.6.1"
+    "apollo-client": "^0.8.5",
+    "graphql-tag": "^1.2.4"
   }
 }

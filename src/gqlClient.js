@@ -1,14 +1,16 @@
-import { Lokka } from 'lokka';
-import { Transport } from 'lokka-transport-http';
+import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import gql from 'graphql-tag';
 
-const client = new Lokka({
-  transport: new Transport('https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la')
+const client = new ApolloClient({
+  networkInterface: createNetworkInterface({
+    uri: 'https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la'
+  })
 });
 
 // Queries
 
-const getAllProfiles = `
-  query {
+const getAllProfiles = gql`query
+  {
     allBaseProfiles {
       id
       firstName
@@ -19,8 +21,8 @@ const getAllProfiles = `
   }
 `;
 
-const getUserProfile = `
-  query ($userId: ID) {
+const getUserProfile = gql`query($userId: ID)
+  {
     User(id: $userId) {
       baseprofile {
         id
@@ -33,8 +35,8 @@ const getUserProfile = `
   }
 `;
 
-const getUserSchedule = `
-  query ($userId: ID, $date: String) {
+const getUserSchedule = gql`query($userId: ID, $date: String)
+  {
     allExtraScheduleItemses(
       filter: {
         extraschedule: {
@@ -51,8 +53,8 @@ const getUserSchedule = `
 
 // Mutations
 
-const createUser = `
-  ($firstName: String!) {
+const createUser = gql`mutation($firstName: String!)
+  {
     createUser(
       baseprofile: {
         firstName: $firstName
@@ -66,8 +68,8 @@ const createUser = `
   }
 `;
 
-const createSchedule = `
-  ($date: String!, $title: String!, $startTm: String!) {
+const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: String!)
+  {
     createExtraSchedule(
       date: $date
       extrascheduleitemses: {
@@ -80,53 +82,38 @@ const createSchedule = `
   }
 `;
 
-
-const signinUser = `
-  mutation ($email: String!, $password: String!) {
-    signinUser(email: {email: $email, password: $password}) {
-      token
-    }
-  }
-`
-
-const userQuery = `
-  query {
-    user {
-      id
-    }
-  }
-`
-
 export default {
 
   // Queries
 
   getAllProfiles: function () {
-    return client.query(getAllProfiles);
+    const query = getAllProfiles;
+    return client.query({ query });
   },
 
   getUserProfile: function (userId) {
-    return client.query(getUserProfile, { userId: userId });
+    const query = getUserProfile;
+    const variables = { userId };
+    return client.query({ query, variables });
   },
 
   getUserSchedule: function (userId, date) {
-    return client.query(getUserSchedule, { userId: userId, date: date });
+    const query = getUserSchedule;
+    const variables = { userId, date };
+    return client.query({ query, variables });
   },
 
   // Mutations
 
   createUser: function (firstName) {
-    return client.mutate(createUser, { firstName: firstName });
+    const mutation = createUser;
+    const variables = { firstName };
+    return client.mutate({ mutation, variables });
   },
 
   createSchedule: function (date, title, startTm) {
-    return client.mutate(
-      createSchedule,
-      {
-        date: date,
-        title: title,
-        startTm: startTm
-      }
-    );
+    const mutation = createSchedule;
+    const variables = { date, title, startTm };
+    return client.mutate({ mutation, variables });
   }
 };
