@@ -6,6 +6,8 @@ import Html.Events exposing (..)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (..)
+import Client.PAPortal.Pages.SkinManager exposing (..)
+import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (..)
 
 -- MODEL
 
@@ -80,17 +82,14 @@ viewPAPortal model =
             LiveMonitor ->
               div []
               [
-                button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
+                viewLiveMonitor LiveMonitor.initModel
+              , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
               , case model.extras of
                   Just extras ->
                     ul [] (List.map viewExtras extras)
                   Nothing -> div [] [text "No extras!"]
               ]
-            SkinManager ->
-              div []
-              [
-                text "Skin manager!"
-              ]
+            SkinManager -> viewSkinManager
         ]
 
 viewHeader: ViewState -> Html Msg
