@@ -10,7 +10,8 @@ module.exports = function (config) {
 
     plugins: [
       new HtmlWebpackPlugin({
-        title: 'Webpack demo'
+        title: 'Wrapid',
+        template: 'src/index.html'
       }),
       new webpack.IgnorePlugin(/\/iconv-loader$/)
     ],

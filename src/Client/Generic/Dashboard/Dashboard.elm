@@ -90,7 +90,7 @@ makePanel header body footer =
                 Nothing ->
                     div [] []
     in
-        div [ style panelBodyStyle ]
+        div [ style panelContainerStyle ]
             [ panelHeader
             , body
             , panelFooter
@@ -115,6 +115,11 @@ panelHeaderItemStyle =
     , ( "margin", "4px 12px 0px 12px" )
     ]
 
+panelContainerStyle =
+    [ ( "margin", "4px 8px 4px 8px" )
+    , ( "background", "#FFFFFF" )
+    , ( "box-shadow", "0 2px 4px 0 #D2D6DF" )
+    ]
 
 panelBodyStyle =
     [ ( "margin", "4px 8px 4px 8px" )
