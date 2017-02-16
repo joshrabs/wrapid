@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Types exposing (..)
-import Client.Generic.Authentication.Login.Login as Login
+import Client.Generic.Authentication.Login.View as Login
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.View as PAPortal
 import Html exposing (Html, a, button, div, h1, h4, img, li, p, text, ul)

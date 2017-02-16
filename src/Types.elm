@@ -3,7 +3,7 @@ module Types exposing (..)
 import Navigation as Nav
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.Types as PAPortal
-import Client.Generic.Authentication.Login.Login as Login
+import Client.Generic.Authentication.Login.Types as Login
 
 
 type alias Model =
