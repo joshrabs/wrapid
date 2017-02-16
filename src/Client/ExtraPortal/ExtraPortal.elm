@@ -10,12 +10,20 @@ import Client.ExtraPortal.NotificationBar exposing (..)
 import Client.ExtraPortal.Schedule exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
+import Client.ExtraPortal.Pages.ProfileWizard as Wizard
 
 -- MODEL
 
-type alias Model = {currentView: ViewState}
+type alias Model =
+    { currentView: ViewState
+    , wizardModel : Wizard.Model
+    }
+
 initModel: Model
-initModel = {currentView = DailyMonitor}
+initModel =
+    { currentView = DailyMonitor
+    , wizardModel = Wizard.init
+    }
 
 type alias Profile = {
   firstName: String
@@ -24,12 +32,27 @@ type alias Profile = {
 type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
-type Msg = ChangeView ViewState
+
+type Msg =
+    ChangeView ViewState
+    | WizardMsg Wizard.Msg
+
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
-  case msg of
-    ChangeView viewState ->
-      ({model | currentView = viewState}, Cmd.none)
+    case msg of
+        ChangeView viewState ->
+            ({model | currentView = viewState}, Cmd.none)
+
+        WizardMsg subMsg ->
+            let
+                ( updatedWizardModel, wizardCmd ) =
+                    Wizard.update subMsg model.wizardModel
+            in
+                ( { model | wizardModel = updatedWizardModel }
+                , Cmd.none
+                )
+
+
 
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
@@ -66,43 +89,47 @@ defaultFormStatus =
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
   div []
-    [
-      div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
       [
-        button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
-       ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
-       ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
-       ]
-    , let
-          rightItems = {avatar = Just defaultUrl}
-      in
-        Dashboard.view {navbar = {rightItems = Just rightItems}}
-    ,case model.currentView of
-      DailyMonitor ->
-        div []
-        [
+       div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
+           [
+            button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
+           ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
+           ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
+           ]
+      , let
+            rightItems = {avatar = Just defaultUrl}
+       in
+           Dashboard.view {navbar = {rightItems = Just rightItems}}
+      , case model.currentView of
+            DailyMonitor ->
+                div []
+                    [
 
-          viewHeader {firstName="Steve", production="RunabetterSet Productions"}
-        , viewNotificationBarPanel defaultNotificationItems
-        , viewSchedulePanel defaultScheduleItems
-         ,
-           let
-             panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
-             panelBody = (viewWardrobeStatus NotCheckedIn)
-             footer = Nothing
-           in
-             Dashboard.makePanel panelHeader panelBody footer
-        ,
-           let
-             panelHeader = Just {title ="Contact Info", rightItem=Nothing}
-             panelBody = (viewCrewInfoItems defaultCrewInfoItems)
-             footer = Nothing
-           in
-             Dashboard.makePanel panelHeader panelBody footer
-        ]
-      ProfileWizard -> div [] [text "meow"]
-      FormStatus ->
-        viewFormStatusPage (ChangeView DailyMonitor) defaultFormStatus
+                     viewHeader {firstName="Steve", production="RunabetterSet Productions"}
+                    , viewNotificationBarPanel defaultNotificationItems
+                    , viewSchedulePanel defaultScheduleItems
+                    ,
+                        let
+                            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
+                            panelBody = (viewWardrobeStatus NotCheckedIn)
+                            footer = Nothing
+                        in
+                            Dashboard.makePanel panelHeader panelBody footer
+                    ,
+                        let
+                            panelHeader = Just {title ="Contact Info", rightItem=Nothing}
+                            panelBody = (viewCrewInfoItems defaultCrewInfoItems)
+                            footer = Nothing
+                        in
+                            Dashboard.makePanel panelHeader panelBody footer
+                    ]
+
+            ProfileWizard ->
+                div []
+                    [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
+
+            FormStatus ->
+                viewFormStatusPage (ChangeView DailyMonitor) defaultFormStatus
 
     ]
 
