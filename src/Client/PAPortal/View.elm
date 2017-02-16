@@ -64,6 +64,7 @@ viewHeader currentView =
             ]
 
 
+baseTabStyle : List ( String, String )
 baseTabStyle =
     [ ( "padding", "8px" )
     , ( "font-size", "14px" )
@@ -73,6 +74,7 @@ baseTabStyle =
     ]
 
 
+selectedTabStyle : List ( String, String )
 selectedTabStyle =
     List.concat
         [ baseTabStyle
