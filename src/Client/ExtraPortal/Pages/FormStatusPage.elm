@@ -7,6 +7,8 @@ import Html.Events exposing (onClick)
 import Assets.Icons.CheckedCircleIcon exposing (viewCheckedCircle)
 import Assets.Icons.ForwardArrow exposing (viewForwardArrow)
 
+defaultImgSrc = "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciz8vkq0f0jdc0168aoxv5h3w"
+
 type alias FormStatuses = List FormStatus
 
 type alias FormStatus =
@@ -57,7 +59,7 @@ viewFormStatusIcon item =
     ,("margin", "8px 16px 8px 0px")
   ]]
   [
-    img [src "../../../Assets/Images/theraccounATgmailDOTcom-EFS.jpg"
+    img [src defaultImgSrc
         , style [("width", "165px"), ("height", "118px")]] []
     ,div [style
       [("display", "flex")
