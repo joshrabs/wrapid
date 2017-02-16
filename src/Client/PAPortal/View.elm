@@ -26,11 +26,11 @@ viewPAPortal model =
                     [ viewLiveMonitor LiveMonitor.initModel
                     , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
                     , case model.extras of
-                        Just extras ->
-                            ul [] (List.map viewExtras extras)
-
-                        Nothing ->
+                        [] ->
                             div [] [ text "No extras!" ]
+
+                        extras ->
+                            div [] (List.map viewExtras extras)
                     ]
 
             SkinManager ->

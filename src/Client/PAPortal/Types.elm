@@ -3,7 +3,7 @@ module Client.PAPortal.Types exposing (..)
 
 type alias Model =
     { user : Profile
-    , extras : Maybe (List Profile)
+    , extras : List Profile
     , currentView : ViewState
     }
 

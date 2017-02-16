@@ -14,7 +14,7 @@ initModel userId =
             }
     in
         { user = user
-        , extras = Nothing
+        , extras = []
         , currentView = LiveMonitor
         }
 
@@ -35,7 +35,7 @@ update msg model =
                 )
 
         Profiles list ->
-            ( { model | extras = Just list }
+            ( { model | extras = list }
             , Cmd.none
             )
 
