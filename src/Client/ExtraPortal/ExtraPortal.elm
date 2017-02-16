@@ -110,11 +110,22 @@ viewExtraPortal model =
 type alias Header = {firstName: String, production: String}
 viewHeader: Header -> Html Msg
 viewHeader header =
-  div [style [("display", "flex"), ("flex-direction", "column"),("margin", "8px 4px 16px 16px")]]
+  div [style [("display", "flex"), ("flex-direction", "column"),("margin", "28px 4px 16px 16px")]]
   [
-     span [] [text "Monday May 25th, 2017"]
+     span [style [
+      ("font-family", "Roboto-Regular")
+      ,("font-size", "12px")
+      ,("color", "#6D717A")
+      ,("letter-spacing", "0")
+      ,("line-height", "20px")]] [text "Monday May 25th, 2017"]
     , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
-    ,span [] [text (header.production)]
+    ,span [style [
+        ("font-family", "Roboto-Regular")
+        ,("font-size", "16px")
+        ,("color", "#282C35")
+        ,("letter-spacing", "0")
+        ,("line-height", "20px")]]
+      [text (header.production)]
   ]
 headerTitleStyle : List ( String, String )
 headerTitleStyle =
@@ -122,6 +133,7 @@ headerTitleStyle =
   ("font-family", "Roboto-Bold")
   ,("font-size", "32px")
   ,("color", "#282C35")
+  ,("margin", "4px 0px 4px 0px")
   ,("letter-spacing", "0")
   ]
 
