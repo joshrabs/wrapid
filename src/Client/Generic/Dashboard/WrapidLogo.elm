@@ -1,4 +1,4 @@
-module WrapidLogo exposing (logo)
+module Client.Generic.Dashboard.WrapidLogo exposing (logo)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
