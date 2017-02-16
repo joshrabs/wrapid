@@ -3,7 +3,10 @@ module State exposing (..)
 import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
-import Client.PAPortal.Types as PATypes
+
+
+-- import Client.PAPortal.Types as PATypes
+
 import Client.PAPortal.State as PAState
 
 
