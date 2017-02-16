@@ -8,10 +8,7 @@ const WebpackChunkHash = require('webpack-chunk-hash');
 module.exports = function (config) {
   return {
     entry: {
-      vendor: [
-        'lokka',
-        'lokka-transport-http'
-      ]
+      path: config.src
     },
 
     output: {
