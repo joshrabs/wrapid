@@ -2,7 +2,7 @@ module Types exposing (..)
 
 import Navigation as Nav
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
-import Client.PAPortal.PAPortal as PAPortal
+import Client.PAPortal.Types as PAPortal
 import Client.Generic.Authentication.Login.Login as Login
 
 
@@ -32,10 +32,3 @@ type ViewState
 
 type alias Url =
     String
-
-
-type alias Profile =
-    { id : String
-    , firstName : String
-    , url : Maybe String
-    }
