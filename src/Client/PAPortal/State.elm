@@ -1,6 +1,7 @@
 module Client.PAPortal.State exposing (..)
 
 import Client.PAPortal.Types exposing (..)
+import Client.PAPortal.Pages.SkinManager as Skin
 import Ports exposing (..)
 
 
@@ -16,6 +17,7 @@ initModel userId =
         { user = user
         , extras = []
         , currentView = LiveMonitor
+        , skinModel = Skin.initModel
         }
 
 
@@ -38,6 +40,15 @@ update msg model =
             ( { model | extras = list }
             , Cmd.none
             )
+
+        SkinMsg subMsg ->
+            let
+                ( updatedSkinModel, skinCmd ) =
+                    Skin.update subMsg model.skinModel
+            in
+                ( { model | skinModel = updatedSkinModel }
+                , Cmd.none
+                )
 
 
 subscriptions : Model -> Sub Msg

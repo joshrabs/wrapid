@@ -4,7 +4,7 @@ import Client.Generic.Dashboard.Dashboard as Dashboard
 import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
-import Client.PAPortal.Pages.SkinManager exposing (viewSkinManager)
+import Client.PAPortal.Pages.SkinManager as Skin
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (..)
@@ -34,7 +34,8 @@ viewPAPortal model =
                     ]
 
             SkinManager ->
-                viewSkinManager
+                div []
+                    [ Html.map SkinMsg (Skin.view model.skinModel) ]
         ]
 
 
