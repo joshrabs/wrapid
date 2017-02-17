@@ -6,8 +6,9 @@ import Html.Events exposing (..)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (..)
-import Client.PAPortal.Pages.SkinManager exposing (..)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (..)
+import Client.PAPortal.Pages.SkinManager as Skin
+
 
 -- MODEL
 
@@ -16,6 +17,7 @@ type alias Model =
     user: Profile
   , extras: Maybe (List Profile)
   , currentView: ViewState
+  , skinModel : Skin.Model
   }
 
 type alias Profile =
@@ -35,7 +37,10 @@ initModel userId =
   in
   { user = user
   , extras = Nothing
-  , currentView = LiveMonitor
+  -- TODO: Switch init view
+  -- , currentView = LiveMonitor
+  , currentView = SkinManager
+  , skinModel = Skin.initModel
   }
 
 type ViewState = LiveMonitor | SkinManager
@@ -45,7 +50,7 @@ type Msg =
     ChangeView ViewState
   | GetAllProfiles
   | Profiles (List Profile)
-
+  | SkinMsg Skin.Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -63,6 +68,15 @@ update msg model =
         ( { model | extras = Just list }
         , Cmd.none
         )
+
+    SkinMsg subMsg ->
+        let
+            ( updatedSkinModel, skinCmd ) =
+                Skin.update subMsg model.skinModel
+        in
+            ( { model | skinModel = updatedSkinModel }
+            , Cmd.none
+            )
 
 
 
@@ -89,7 +103,10 @@ viewPAPortal model =
                     ul [] (List.map viewExtras extras)
                   Nothing -> div [] [text "No extras!"]
               ]
-            SkinManager -> viewSkinManager
+            SkinManager ->
+                div []
+                    [ Html.map SkinMsg (Skin.view model.skinModel) ]
+
         ]
 
 viewHeader: ViewState -> Html Msg
