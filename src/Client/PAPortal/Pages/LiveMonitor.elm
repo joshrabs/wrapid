@@ -1,6 +1,6 @@
 module Client.PAPortal.Pages.LiveMonitor exposing (..)
 
-import Html exposing (Html, div, text, input, button, img)
+import Html exposing (Html, div, text, input, button, img, span)
 import Html.Attributes exposing (style, src)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 
@@ -150,9 +150,44 @@ viewExtrasSnapStats model =
 
         clothingRatio =
             (model.holdClothes |> toString) ++ " / " ++ totalExtras
+
+        allIcons = [{num=clockRatio, text ="Clocked In"}, {num=clothingRatio, text ="Holding Clothes"}]
     in
-        div [ style [ ( "display", "flex" ) ] ]
-            [ div [] [ text clockRatio ]
-            , div [] [ text clothingRatio ]
-            , div [] []
-            ]
+        div [ style [ ( "display", "flex" ), ("margin", "12px 16px 12px 16px") ] ]
+          (List.map
+            (\r ->
+              div [style [
+                  ("display", "flex")
+                  , ("flex-direction", "column")
+                  , ("margin", "0px 12px 0px 4px")
+                  , ("padding-right", "24px")
+                  , ("border-right", "1px solid #EFF3F7")
+                ]]
+                [ span [style snapRatioStyle] [text r.num]
+                , span [style snapTextStyle] [text r.text]
+                ]
+            )
+            allIcons)
+
+
+snapRatioStyle: List (String, String)
+snapRatioStyle =
+  [("color", "#50E3C2")
+  ,("font-family", "Roboto-Regular")
+  ,("font-size", "20px")
+  ]
+
+snapTextStyle: List (String, String)
+snapTextStyle =
+  [("color", "#282C35")
+  ,("font-family", "Roboto-Regular")
+  ,("font-size", "12px")
+  ]
+
+snapStatStyle: String -> List (String, String)
+snapStatStyle color =
+  [
+    ("background-image", "radial-gradient(0% 50%, #9DFFF3 1%, #65F9DD 100%)")
+    ,("box-shadow", "0 8px 30px 0 rgba(0,0,0,0.04)")
+    ,("margin", "0px 8px 0px 8px")
+  ]
