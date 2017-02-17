@@ -8,6 +8,8 @@ import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar exposing (..)
 import Client.ExtraPortal.Schedule exposing (..)
 
+import Client.ExtraPortal.Types exposing (Schedule)
+
 -- MODEL
 
 type alias Model = Maybe String
@@ -50,13 +52,9 @@ viewDailyMonitor: Model -> Html Msg
 viewDailyMonitor model =
   div []
       [
-        let
-            rightItems = {avatar = Just defaultUrl}
-        in
-          Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , viewHeader {firstName="Steve", production="RunabetterSet Productions"}
+        viewHeader {firstName="Steve", production="RunabetterSet Productions"}
       , viewNotificationBarPanel defaultNotificationItems
-      , viewSchedulePanel defaultScheduleItems
+      , viewSchedulePanel defaultScheduleItems Nothing
        ,
          let
            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}

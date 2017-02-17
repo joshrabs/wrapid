@@ -11,6 +11,9 @@ import Client.ExtraPortal.Schedule exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard
+import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor)
+
+import Client.ExtraPortal.Types exposing (..)
 
 -- MODEL
 
@@ -25,16 +28,14 @@ initModel =
     , wizardModel = Wizard.init
     }
 
-type alias Profile = {
-  firstName: String
-}
 
 type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
 
 type Msg =
-    ChangeView ViewState
+      NoOp
+    | ChangeView ViewState
     | WizardMsg Wizard.Msg
 
 update: Msg -> Model -> (Model, Cmd msg)
@@ -51,6 +52,7 @@ update msg model =
                 ( { model | wizardModel = updatedWizardModel }
                 , Cmd.none
                 )
+        NoOp -> (model, Cmd.none)
 
 
 
@@ -102,27 +104,7 @@ viewExtraPortal model =
            Dashboard.view {navbar = {rightItems = Just rightItems}}
       , case model.currentView of
             DailyMonitor ->
-                div []
-                    [
-
-                     viewHeader {firstName="Steve", production="RunabetterSet Productions"}
-                    , viewNotificationBarPanel defaultNotificationItems
-                    , viewSchedulePanel defaultScheduleItems
-                    ,
-                        let
-                            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
-                            panelBody = (viewWardrobeStatus NotCheckedIn)
-                            footer = Nothing
-                        in
-                            Dashboard.makePanel panelHeader panelBody footer
-                    ,
-                        let
-                            panelHeader = Just {title ="Contact Info", rightItem=Nothing}
-                            panelBody = (viewCrewInfoItems defaultCrewInfoItems)
-                            footer = Nothing
-                        in
-                            Dashboard.makePanel panelHeader panelBody footer
-                    ]
+                Html.map (\_ -> NoOp) (viewDailyMonitor Nothing)
 
             ProfileWizard ->
                 div []
