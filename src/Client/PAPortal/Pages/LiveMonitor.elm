@@ -16,7 +16,8 @@ type alias LiveExtraTable =
 
 
 type alias ExtraInfoItem =
-    { displayName : String
+    { firstName : String
+    , lastName: String
     , imgSrc : String
     , isClockedIn : Bool
     }
@@ -45,8 +46,8 @@ fakeImg =
 
 fakeTable : LiveExtraTable
 fakeTable =
-    [ { displayName = "Steven MacCoun", imgSrc = fakeImg, isClockedIn = True }
-    , { displayName = "Josh Weinberg", imgSrc = fakeImg, isClockedIn = True }
+    [ { firstName = "Steven", lastName="MacCoun", imgSrc = fakeImg, isClockedIn = True }
+    , { firstName = "Josh", lastName="Weinberg", imgSrc = fakeImg, isClockedIn = True }
     ]
 
 
@@ -97,7 +98,7 @@ viewSearch =
     , ("height", "71px")
     , ("width", "100%")
     , ("background", "#FFFFFF")
-    , ("border-bottom", "1px solid black")
+    , ("border-bottom", "1px solid #EFF3F7")
     ]]
     [
       input [] []
@@ -124,8 +125,17 @@ viewLiveTableItems items =
 
 viewLiveTableItem : ExtraInfoItem -> Html msg
 viewLiveTableItem item =
-    div [ style [ ( "display", "flex" ), ( "justify-content", "space-between" ) ] ]
-        [ div [ style [ ( "display", "flex" ) ] ]
+    div [ style [
+          ( "display", "flex" )
+          , ("align-items", "center")
+          , ( "justify-content", "space-between" )
+          , ( "padding", "8px 4px 8px 4px" )
+        ]]
+        [ div [ style [
+            ( "display", "flex" )
+            ,( "align-items", "center" )
+            , ("margin", "8px 8px 8px 8px")
+            ] ]
             [ img
                 [ src item.imgSrc
                 , style
@@ -134,7 +144,28 @@ viewLiveTableItem item =
                     ]
                 ]
                 []
-            , text item.displayName
+            , div [style [
+                ("display", "flex")
+                , ("flex-direction", "column")
+                , ("justify-content", "center")
+                ,("margin", "4px 8px 2px 8px")
+                ,("padding", "4px")
+              ]]
+              [
+                span [style [
+                  ("font-size", "14px")
+                  ,("font-family", "Roboto-Regular")
+                  ,("color", "#282C35")
+                ]]
+                [text (item.firstName ++ " " ++ item.lastName)]
+                , span [style [
+                    ("font-size", "12px")
+                    ,("font-family", "Roboto-Regular")
+                    ,("color", "#9B9EA7")
+                    ,("margin", "2px 0px 2px 0px")
+                  ]]
+                  [text "Extra"]
+              ]
             ]
         ]
 
