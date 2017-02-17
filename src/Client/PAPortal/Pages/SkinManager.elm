@@ -9,6 +9,7 @@ import Html.Events exposing (onClick, onInput, onCheck)
 import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
 import Table exposing (defaultCustomizations)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -25,9 +26,7 @@ main =
 
 
 type alias Model =
-    { profiles : List Profile
-    , currentImg : Maybe String
-    , addRoles : AddRoles.Model
+    { addRoles : AddRoles.Model
     , roles : List Role
     , tableState : Table.State
     , query : String
@@ -35,16 +34,10 @@ type alias Model =
     , breakdown : Bool
     }
 
-type alias Profile =
-    { id : String
-    , firstName : String
-    , url : Maybe String
-    }
-
 
 initModel : Model
 initModel =
-    Model [] Nothing  AddRoles.init initRoles (Table.initialSort "Role") "" NoDialog False
+    Model AddRoles.init initRoles (Table.initialSort "Role") "" NoDialog False
 
 init : (Model, Cmd Msg)
 init =
@@ -55,8 +48,7 @@ init =
 
 
 type Msg
-    = ShowAvatar String
-    | SetQuery String
+    = SetQuery String
     | ToggleSelected String
     | ToggleSelectedAll Bool
     | SetTableState Table.State
@@ -73,7 +65,7 @@ type Dialog
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "msg: " msg of
+    case msg of
         SetQuery newQuery ->
             ( { model | query = newQuery }
             , Cmd.none )
@@ -84,19 +76,6 @@ update msg model =
             in
                 ( { model | dialogOpened = toggleDialog }
                 , Cmd.none )
-
-
-        ShowAvatar id ->
-            let
-                clickedUser =
-                    find (\usr -> usr.id == id) model.profiles
-
-                url =
-                    andThen .url clickedUser
-            in
-                ( { model | currentImg = url }
-                , Cmd.none
-                )
 
         ToggleSelected id ->
             ( { model | roles = List.map (toggle id) model.roles }
@@ -174,12 +153,26 @@ toggle id role =
 
 view : Model -> Html Msg
 view model =
+    Dashboard.makePanel
+        (Just {title = "Skin 2017-01-01", rightItem= Nothing})
+        (panelBody model)
+        (Just panelFooter)
+
+
+panelFooter : Html Msg
+panelFooter =
     div []
-        [ h1 [] [ text "Data" ]
-        , viewAddRoles model.dialogOpened model.addRoles
-        , viewTableWithSearch model.breakdown model.roles model.tableState model.query
-        , viewAvatar model.currentImg
+        [ button [ onClick Breakdown ] [ text "BREAKDOWN" ]
+        , button [ ] [ text "Export CSV" ]
+        , button [ ] [ text "Wrap Skin" ]
         ]
+
+
+panelBody : Model -> Html Msg
+panelBody model =
+    div []
+        [ viewAddRoles model.dialogOpened model.addRoles
+        , viewTableWithSearch model.breakdown model.roles model.tableState model.query        ]
 
 viewAddRoles : Dialog -> AddRoles.Model -> Html Msg
 viewAddRoles dialog addRolessModel =
@@ -300,7 +293,6 @@ config =
     , toMsg = SetTableState
     , columns =
         [ checkboxColumn
-        , Table.stringColumn "Id" .id
         , Table.stringColumn "Role" .role
         , Table.stringColumn "First" .first
         , Table.stringColumn "Last" .last
@@ -341,17 +333,6 @@ toRowAttrs role =
 viewLink : String -> Html msg
 viewLink name =
     li [] [ a [ href ("#" ++ name) ] [ text name ] ]
-
-
-viewAvatar : Maybe String -> Html msg
-viewAvatar url =
-    case url of
-        Nothing ->
-            text ""
-
-        Just loc ->
-            img [ src loc ] []
-
 
 
 -- PORTS
