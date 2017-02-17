@@ -34,6 +34,9 @@ viewNotificationBar items =
   [style
     [
       ("display", "flex")
+      ,("flex-wrap", "nowrap")
+      ,("overflow-x", "scroll")
+      ,("overflow-y", "hidden")
     ]
   ]
   (List.map (\item -> (viewNotificationBarItem item)) items)
@@ -44,11 +47,12 @@ viewNotificationBarItem item =
   div [style
    [
      ("display", "flex")
+    ,("flex-wrap", "nowrap")
     ,("margin", "8px")
     ,("background", "#FFFFFF")
     ,("box-shadow", "0 2px 4px 0 #D2D6DF")
     ,("height", "78px")
-    ,("width", "259px")
+    ,("min-width", "259px")
     ]
   ]
   [

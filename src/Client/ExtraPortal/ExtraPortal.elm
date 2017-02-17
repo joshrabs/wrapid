@@ -11,31 +11,37 @@ import Client.ExtraPortal.Schedule exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard
+import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor)
+
+import Client.ExtraPortal.Types exposing (..)
 
 -- MODEL
 
 type alias Model =
     { currentView: ViewState
     , wizardModel : Wizard.Model
+    , extraInfo: ExtraInfo
     }
+
+
 
 initModel: Model
 initModel =
     { currentView = DailyMonitor
     , wizardModel = Wizard.init
+    , extraInfo = {timecard = defaultTimeCard}
     }
 
-type alias Profile = {
-  firstName: String
-}
 
 type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
 
 type Msg =
-    ChangeView ViewState
+      NoOp
+    | ChangeView ViewState
     | WizardMsg Wizard.Msg
+    | DailyMonitorMsg DailyMonitor.Msg
 
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
@@ -51,39 +57,19 @@ update msg model =
                 ( { model | wizardModel = updatedWizardModel }
                 , Cmd.none
                 )
+        DailyMonitorMsg dmMsg ->
+              let
+                  (updatedDailyMonitorModel, dmCmd) =
+                    DailyMonitor.update dmMsg {timecard = model.extraInfo.timecard}
+              in
+                  ( { model | extraInfo = {timecard = updatedDailyMonitorModel.timecard} }
+                  , Cmd.none
+                  )
+        NoOp -> (model, Cmd.none)
 
 
 
-defaultUrl: Maybe String
-defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
-defaultNotificationItems: List NotificationBarItem
-defaultNotificationItems =
-  [
-    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
-    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
-  ]
-defaultCrewInfoItems: List { name : String, role : String }
-defaultCrewInfoItems =
-  [{name = "Josh Weinberg", role="Lead PA"}
-  ,{name = "Randy Lahey", role="Extra PA"}
-  ,{name = "Patty Lebotomy", role="Wardrobe"}
-  ]
-
-defaultScheduleItems: Schedule
-defaultScheduleItems =
-  [
-    {name="Start Time", startTm="8:00 AM"}
-    ,{name="Break for Lunch", startTm="12:00 PM"}
-    ,{name="Estimated End Time", startTm="6:00 PM"}
-  ]
-
-defaultFormStatus: FormStatusPage.FormStatuses
-defaultFormStatus =
-  [{formName = "Pence", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ,{formName = "Emergency Contact", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ,{formName = "EFS Voucher", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ]
 
 --VIEW
 viewExtraPortal: Model -> Html Msg
@@ -102,27 +88,10 @@ viewExtraPortal model =
            Dashboard.view {navbar = {rightItems = Just rightItems}}
       , case model.currentView of
             DailyMonitor ->
-                div []
-                    [
-
-                     viewHeader {firstName="Steve", production="RunabetterSet Productions"}
-                    , viewNotificationBarPanel defaultNotificationItems
-                    , viewSchedulePanel defaultScheduleItems
-                    ,
-                        let
-                            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
-                            panelBody = (viewWardrobeStatus NotCheckedIn)
-                            footer = Nothing
-                        in
-                            Dashboard.makePanel panelHeader panelBody footer
-                    ,
-                        let
-                            panelHeader = Just {title ="Contact Info", rightItem=Nothing}
-                            panelBody = (viewCrewInfoItems defaultCrewInfoItems)
-                            footer = Nothing
-                        in
-                            Dashboard.makePanel panelHeader panelBody footer
-                    ]
+              let
+                  dmModel = {timecard = model.extraInfo.timecard}
+              in
+                Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
 
             ProfileWizard ->
                 div []
@@ -137,11 +106,22 @@ viewExtraPortal model =
 type alias Header = {firstName: String, production: String}
 viewHeader: Header -> Html Msg
 viewHeader header =
-  div [style [("display", "flex"), ("flex-direction", "column"),("margin", "8px 4px 16px 16px")]]
+  div [style [("display", "flex"), ("flex-direction", "column"),("margin", "28px 4px 16px 16px")]]
   [
-     span [] [text "Monday May 25th, 2017"]
+     span [style [
+      ("font-family", "Roboto-Regular")
+      ,("font-size", "12px")
+      ,("color", "#6D717A")
+      ,("letter-spacing", "0")
+      ,("line-height", "20px")]] [text "Monday May 25th, 2017"]
     , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
-    ,span [] [text (header.production)]
+    ,span [style [
+        ("font-family", "Roboto-Regular")
+        ,("font-size", "16px")
+        ,("color", "#282C35")
+        ,("letter-spacing", "0")
+        ,("line-height", "20px")]]
+      [text (header.production)]
   ]
 headerTitleStyle : List ( String, String )
 headerTitleStyle =
@@ -149,6 +129,7 @@ headerTitleStyle =
   ("font-family", "Roboto-Bold")
   ,("font-size", "32px")
   ,("color", "#282C35")
+  ,("margin", "4px 0px 4px 0px")
   ,("letter-spacing", "0")
   ]
 
@@ -191,4 +172,43 @@ viewCrewInfoItems prodContacts =
       )) prodContacts
     in
       div [style [("display", "flex"), ("flex-direction", "column")]] listItems
+  ]
+
+
+
+--SAMPLE data
+
+
+defaultTimeCard: TimeCard
+defaultTimeCard = {clockinTs = Nothing, clockoutTs = Nothing}
+
+defaultUrl: Maybe String
+defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
+
+defaultNotificationItems: List NotificationBarItem
+defaultNotificationItems =
+  [
+    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
+    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
+  ]
+defaultCrewInfoItems: List { name : String, role : String }
+defaultCrewInfoItems =
+  [{name = "Josh Weinberg", role="Lead PA"}
+  ,{name = "Randy Lahey", role="Extra PA"}
+  ,{name = "Patty Lebotomy", role="Wardrobe"}
+  ]
+
+defaultScheduleItems: Schedule
+defaultScheduleItems =
+  [
+    {name="Start Time", startTm="8:00 AM"}
+    ,{name="Break for Lunch", startTm="12:00 PM"}
+    ,{name="Estimated End Time", startTm="6:00 PM"}
+  ]
+
+defaultFormStatus: FormStatusPage.FormStatuses
+defaultFormStatus =
+  [{formName = "Pence", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "Emergency Contact", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "EFS Voucher", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
   ]

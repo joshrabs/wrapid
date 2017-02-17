@@ -13,7 +13,8 @@ console.log(app)
 app.ports.getAllProfiles.subscribe(function () {
   client.getAllProfiles()
     .then(result => {
-      const frmt = result.allBaseProfiles.map(e => {
+      console.log(result);
+      const frmt = result.data.allBaseProfiles.map(e => {
         let obj = {
           id: e.id,
           firstName: e.firstName

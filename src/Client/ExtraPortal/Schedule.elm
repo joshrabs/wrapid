@@ -2,18 +2,24 @@ module Client.ExtraPortal.Schedule exposing (..)
 
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 import Svg exposing (svg, g, node)
 import Svg.Attributes exposing (d, viewBox, id, height, width, fill, fillRule, stroke, strokeWidth, transform, points)
 
-import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.ExtraPortal.Types exposing (TimeCard, Schedule)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 
 
-type alias Schedule = List ScheduleItem
-type alias ScheduleItem = {name: String, startTm: String}
+--UPDATE
+type PunchAction = PunchIn | PunchOut
 
-viewSchedulePanel: Schedule -> Html msg
-viewSchedulePanel schedule =
+--VIEW
+type ClockinStatus = NotClockedIn | ClockedInNotOut | ClockedOut
+
+
+viewSchedulePanel: Schedule -> Maybe TimeCard -> Html PunchAction
+viewSchedulePanel schedule timecard =
   let
     panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
     panelBody = (viewSchedule schedule)
@@ -21,12 +27,38 @@ viewSchedulePanel schedule =
       div
         [style [("display", "flex"), ("flex-direction", "row-reverse")]]
         [
-          div [style checkinButtonStyle]
-          [span [style checkinButtonTextStyle] [text "Check In"]]
+          div [onClick (PunchIn), style checkinButtonStyle]
+          [
+            span [style checkinButtonTextStyle]
+            [text
+              (case timecard of
+                Just timecard ->
+                  timecard |> clockinStatus |> clockinButtonText
+                Nothing -> "Check In")
+
+            ]
+          ]
         ]
       )
   in
     Dashboard.makePanel panelHeader panelBody footer
+
+
+clockinButtonText: ClockinStatus -> String
+clockinButtonText status =
+  case status of
+    NotClockedIn -> "Check In"
+    ClockedInNotOut -> "Check Out"
+    ClockedOut -> "Good Work!"
+
+clockinStatus: TimeCard -> ClockinStatus
+clockinStatus timecard =
+  case timecard.clockinTs of
+    Just clockinTs ->
+      case timecard.clockoutTs of
+        Just clockoutTs -> ClockedOut
+        Nothing -> ClockedInNotOut
+    Nothing -> NotClockedIn
 
 viewSchedule: Schedule -> Html msg
 viewSchedule schedule =
@@ -45,6 +77,7 @@ viewSchedule schedule =
   ]
 
 --CSS Styles
+scheduleItemNameStyle : List ( String, String )
 scheduleItemNameStyle =
   [
      ("font-family", "Roboto-Regular")
@@ -52,7 +85,7 @@ scheduleItemNameStyle =
     ,("color", "#363A43")
     ,("letter-spacing", "0")
   ]
-
+scheduleItemTitleStyle : List ( String, String )
 scheduleItemTitleStyle =
   [
      ("font-family", "RobotoMono-Regular")
@@ -61,6 +94,7 @@ scheduleItemTitleStyle =
     ,("letter-spacing", "0")
   ]
 
+checkinButtonStyle : List ( String, String )
 checkinButtonStyle =
   [
      ("display", "flex")
@@ -75,6 +109,7 @@ checkinButtonStyle =
     ,("margin", "8px")
   ]
 
+checkinButtonTextStyle : List ( String, String )
 checkinButtonTextStyle =
   [
      ("font-family", "Roboto-Medium")

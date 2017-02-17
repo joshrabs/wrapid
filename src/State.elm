@@ -3,12 +3,16 @@ module State exposing (..)
 import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
-import Client.PAPortal.PAPortal as PAPortal
+
+
+-- import Client.PAPortal.Types as PATypes
+
+import Client.PAPortal.State as PAState
 
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing LoginView ExtraPortal.initModel (PAPortal.initModel "word") "Yo"
+    ( Model [ location ] Nothing LoginView ExtraPortal.initModel (PAState.initModel "word") "Yo"
     , Cmd.none
     )
 
@@ -45,7 +49,7 @@ update msg model =
         PAPortalMsg paMsg ->
             let
                 ( paPortalModel, paCmd ) =
-                    PAPortal.update paMsg model.paPortalModel
+                    PAState.update paMsg model.paPortalModel
             in
                 ( { model | paPortalModel = paPortalModel }, Cmd.map (\b -> PAPortalMsg b) paCmd )
 
@@ -53,5 +57,5 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Sub.map (\pas -> PAPortalMsg pas) (PAPortal.subscriptions model.paPortalModel)
+        [ Sub.map (\pas -> PAPortalMsg pas) (PAState.subscriptions model.paPortalModel)
         ]
