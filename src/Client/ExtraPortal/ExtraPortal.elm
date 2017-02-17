@@ -20,12 +20,16 @@ import Client.ExtraPortal.Types exposing (..)
 type alias Model =
     { currentView: ViewState
     , wizardModel : Wizard.Model
+    , extraInfo: ExtraInfo
     }
+
+
 
 initModel: Model
 initModel =
     { currentView = DailyMonitor
     , wizardModel = Wizard.init
+    , extraInfo = {timecard = defaultTimeCard}
     }
 
 
@@ -56,36 +60,6 @@ update msg model =
 
 
 
-defaultUrl: Maybe String
-defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
-
-defaultNotificationItems: List NotificationBarItem
-defaultNotificationItems =
-  [
-    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
-    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
-  ]
-defaultCrewInfoItems: List { name : String, role : String }
-defaultCrewInfoItems =
-  [{name = "Josh Weinberg", role="Lead PA"}
-  ,{name = "Randy Lahey", role="Extra PA"}
-  ,{name = "Patty Lebotomy", role="Wardrobe"}
-  ]
-
-defaultScheduleItems: Schedule
-defaultScheduleItems =
-  [
-    {name="Start Time", startTm="8:00 AM"}
-    ,{name="Break for Lunch", startTm="12:00 PM"}
-    ,{name="Estimated End Time", startTm="6:00 PM"}
-  ]
-
-defaultFormStatus: FormStatusPage.FormStatuses
-defaultFormStatus =
-  [{formName = "Pence", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ,{formName = "Emergency Contact", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ,{formName = "EFS Voucher", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
-  ]
 
 --VIEW
 viewExtraPortal: Model -> Html Msg
@@ -104,7 +78,10 @@ viewExtraPortal model =
            Dashboard.view {navbar = {rightItems = Just rightItems}}
       , case model.currentView of
             DailyMonitor ->
-                Html.map (\_ -> NoOp) (viewDailyMonitor Nothing)
+              let
+                  dmModel = {timecard = model.extraInfo.timecard}
+              in
+                Html.map (\_ -> NoOp) (viewDailyMonitor dmModel)
 
             ProfileWizard ->
                 div []
@@ -185,4 +162,43 @@ viewCrewInfoItems prodContacts =
       )) prodContacts
     in
       div [style [("display", "flex"), ("flex-direction", "column")]] listItems
+  ]
+
+
+
+--SAMPLE data
+
+
+defaultTimeCard: TimeCard
+defaultTimeCard = {clockInTs = Nothing, clockoutTs = Nothing}
+
+defaultUrl: Maybe String
+defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
+
+defaultNotificationItems: List NotificationBarItem
+defaultNotificationItems =
+  [
+    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
+    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
+  ]
+defaultCrewInfoItems: List { name : String, role : String }
+defaultCrewInfoItems =
+  [{name = "Josh Weinberg", role="Lead PA"}
+  ,{name = "Randy Lahey", role="Extra PA"}
+  ,{name = "Patty Lebotomy", role="Wardrobe"}
+  ]
+
+defaultScheduleItems: Schedule
+defaultScheduleItems =
+  [
+    {name="Start Time", startTm="8:00 AM"}
+    ,{name="Break for Lunch", startTm="12:00 PM"}
+    ,{name="Estimated End Time", startTm="6:00 PM"}
+  ]
+
+defaultFormStatus: FormStatusPage.FormStatuses
+defaultFormStatus =
+  [{formName = "Pence", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "Emergency Contact", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
+  ,{formName = "EFS Voucher", completedDt = "11/12/2017", completedTs="8:00 AM", imgSrc = "meow"}
   ]

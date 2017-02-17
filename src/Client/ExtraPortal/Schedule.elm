@@ -6,7 +6,7 @@ import Html.Attributes exposing (style)
 import Svg exposing (svg, g, node)
 import Svg.Attributes exposing (d, viewBox, id, height, width, fill, fillRule, stroke, strokeWidth, transform, points)
 
-import Client.ExtraPortal.Types exposing (TimeCard, Schedule, ClockinStatus)
+import Client.ExtraPortal.Types exposing (TimeCard, Schedule)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
 type ClockinStatus = NotClockedIn | ClockedInNotOut | ClockedOut

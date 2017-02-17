@@ -8,45 +8,18 @@ import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar exposing (..)
 import Client.ExtraPortal.Schedule exposing (..)
 
-import Client.ExtraPortal.Types exposing (Schedule)
+import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
 
 -- MODEL
 
-type alias Model = Maybe String
-
-type alias Profile = {
-  firstName: String
-}
+type alias Model =
+  {
+    timecard: TimeCard
+  }
 
 type ViewState = ProfileWizard | FormStatus | DailyMonitor
 
--- UPDATE
-type Msg = ChangeView ViewState
 
-defaultUrl: Maybe String
-defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
-
-defaultNotificationItems: List NotificationBarItem
-defaultNotificationItems =
-  [
-    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
-    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
-  ]
-
-defaultCrewInfoItems : List { name : String, role : String }
-defaultCrewInfoItems =
-  [{name = "Josh Weinberg", role="Lead PA"}
-  ,{name = "Randy Lahey", role="Extra PA"}
-  ,{name = "Patty Lebotomy", role="Wardrobe"}
-  ]
-
-defaultScheduleItems : Schedule
-defaultScheduleItems =
-  [
-    {name="Start Time", startTm="8:00 AM"}
-    ,{name="Break for Lunch", startTm="12:00 PM"}
-    ,{name="Estimated End Time", startTm="6:00 PM"}
-  ]
 --VIEW
 viewDailyMonitor: Model -> Html Msg
 viewDailyMonitor model =
@@ -130,4 +103,33 @@ viewCrewInfoItems prodContacts =
       )) prodContacts
     in
       div [style [("display", "flex"), ("flex-direction", "column")]] listItems
+  ]
+
+
+--SAMPLE DATA
+-- UPDATE
+
+defaultUrl: Maybe String
+defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
+
+defaultNotificationItems: List NotificationBarItem
+defaultNotificationItems =
+  [
+    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
+    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
+  ]
+
+defaultCrewInfoItems : List { name : String, role : String }
+defaultCrewInfoItems =
+  [{name = "Josh Weinberg", role="Lead PA"}
+  ,{name = "Randy Lahey", role="Extra PA"}
+  ,{name = "Patty Lebotomy", role="Wardrobe"}
+  ]
+
+defaultScheduleItems : Schedule
+defaultScheduleItems =
+  [
+    {name="Start Time", startTm="8:00 AM"}
+    ,{name="Break for Lunch", startTm="12:00 PM"}
+    ,{name="Estimated End Time", startTm="6:00 PM"}
   ]
