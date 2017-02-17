@@ -20,7 +20,7 @@ type alias HorizontalCalendarItem = {day: Date, isSelected: Bool}
 
 defaultDay: Date
 defaultDay =
-  Date.fromString "2011/1/1" |> Result.withDefault (Date.fromTime 0)
+  Date.fromString "2017/5/1" |> Result.withDefault (Date.fromTime 0)
 
 fakeToday = add Day 2 defaultDay
 

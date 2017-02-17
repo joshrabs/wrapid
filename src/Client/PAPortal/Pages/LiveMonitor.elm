@@ -33,10 +33,10 @@ type alias ExtrasSnapStatModel =
 
 fakeSnapStateModel : ExtrasSnapStatModel
 fakeSnapStateModel =
-    { totalExtras = 100
-    , clockedIn = 90
-    , holdClothes = 20
-    , missingForms = 30
+    { totalExtras = 3
+    , clockedIn = 1
+    , holdClothes = 2
+    , missingForms = 2
     }
 
 
@@ -182,9 +182,16 @@ viewExtrasSnapStats model =
         clothingRatio =
             (model.holdClothes |> toString) ++ " / " ++ totalExtras
 
-        allIcons = [{num=clockRatio, text ="Clocked In"}, {num=clothingRatio, text ="Holding Clothes"}]
+        formRatio =
+            (model.missingForms |> toString) ++ " / " ++ totalExtras
+
+        allIcons =
+          [{num=clockRatio, text ="Clocked In"}
+          , {num=clothingRatio, text ="Hold Clothes"}
+          , {num=formRatio, text ="Missing Forms"}
+          ]
     in
-        div [ style [ ( "display", "flex" ), ("margin", "12px 16px 12px 16px") ] ]
+        div [ style [ ( "display", "flex" ), ("justify-content", "center"), ("margin", "12px 16px 12px 16px") ] ]
           (List.map
             (\r ->
               div [style [
