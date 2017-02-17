@@ -41,6 +41,7 @@ type Msg =
       NoOp
     | ChangeView ViewState
     | WizardMsg Wizard.Msg
+    | DailyMonitorMsg DailyMonitor.Msg
 
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
@@ -56,7 +57,16 @@ update msg model =
                 ( { model | wizardModel = updatedWizardModel }
                 , Cmd.none
                 )
+        DailyMonitorMsg dmMsg ->
+              let
+                  (updatedDailyMonitorModel, dmCmd) =
+                    DailyMonitor.update dmMsg {timecard = model.extraInfo.timecard}
+              in
+                  ( { model | extraInfo = {timecard = updatedDailyMonitorModel.timecard} }
+                  , Cmd.none
+                  )
         NoOp -> (model, Cmd.none)
+
 
 
 
@@ -81,7 +91,7 @@ viewExtraPortal model =
               let
                   dmModel = {timecard = model.extraInfo.timecard}
               in
-                Html.map (\_ -> NoOp) (viewDailyMonitor dmModel)
+                Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
 
             ProfileWizard ->
                 div []
@@ -170,7 +180,7 @@ viewCrewInfoItems prodContacts =
 
 
 defaultTimeCard: TimeCard
-defaultTimeCard = {clockInTs = Nothing, clockoutTs = Nothing}
+defaultTimeCard = {clockinTs = Nothing, clockoutTs = Nothing}
 
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"

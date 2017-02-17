@@ -3,10 +3,10 @@ module Client.ExtraPortal.Pages.DailyMonitor exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 
-import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
-import Client.ExtraPortal.NotificationBar exposing (..)
-import Client.ExtraPortal.Schedule exposing (..)
+import Client.ExtraPortal.NotificationBar exposing (viewNotificationBarPanel, NotificationIcon(..), NotificationBarItem)
+import Client.ExtraPortal.Schedule exposing (viewSchedulePanel, PunchAction(..))
 
 import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
 
@@ -17,8 +17,23 @@ type alias Model =
     timecard: TimeCard
   }
 
-type ViewState = ProfileWizard | FormStatus | DailyMonitor
+setTimeCardClockInOut: Maybe String -> Maybe String -> Model -> Model
+setTimeCardClockInOut clockin clockout model =
+  let
+      timecard = {clockinTs = clockin, clockoutTs = clockout}
+  in
+      {model | timecard = timecard}
 
+--UPDATE
+type Msg = TimeCardMsg PunchAction
+
+update: Msg -> Model -> (Model, Cmd msg)
+update msg model =
+  case msg of
+    TimeCardMsg punchAction ->
+      case punchAction of
+        PunchIn -> (setTimeCardClockInOut (Just "08:00") Nothing model, Cmd.none)
+        PunchOut -> (setTimeCardClockInOut (Just "08:00") (Just "08:00") model, Cmd.none)
 
 --VIEW
 viewDailyMonitor: Model -> Html Msg
@@ -27,7 +42,7 @@ viewDailyMonitor model =
       [
         viewHeader {firstName="Steve", production="RunabetterSet Productions"}
       , viewNotificationBarPanel defaultNotificationItems
-      , viewSchedulePanel defaultScheduleItems Nothing
+      , Html.map TimeCardMsg (viewSchedulePanel defaultScheduleItems (Just model.timecard))
        ,
          let
            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
@@ -46,7 +61,7 @@ viewDailyMonitor model =
 
 
 type alias Header = {firstName: String, production: String}
-viewHeader: Header -> Html Msg
+viewHeader: Header -> Html msg
 viewHeader header =
   div [style [("display", "flex"), ("flex-direction", "column"),("margin", "8px 4px 16px 16px")]]
   [
@@ -77,7 +92,7 @@ headerProductionStyle =
 
 
 type alias CrewInfoItem = {name: String, role: String}
-viewCrewInfoItems: List CrewInfoItem -> Html Msg
+viewCrewInfoItems: List CrewInfoItem -> Html msg
 viewCrewInfoItems prodContacts =
   div []
   [

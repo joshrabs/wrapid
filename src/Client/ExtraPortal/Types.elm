@@ -5,7 +5,7 @@ type alias ExtraInfo =
     timecard: TimeCard
   }
 type alias TimeCard =
-  { clockInTs: Maybe String
+  { clockinTs: Maybe String
   , clockoutTs: Maybe String
   }
 

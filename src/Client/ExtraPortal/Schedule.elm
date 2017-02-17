@@ -2,16 +2,23 @@ module Client.ExtraPortal.Schedule exposing (..)
 
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 import Svg exposing (svg, g, node)
 import Svg.Attributes exposing (d, viewBox, id, height, width, fill, fillRule, stroke, strokeWidth, transform, points)
 
 import Client.ExtraPortal.Types exposing (TimeCard, Schedule)
-import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 
+
+--UPDATE
+type PunchAction = PunchIn | PunchOut
+
+--VIEW
 type ClockinStatus = NotClockedIn | ClockedInNotOut | ClockedOut
 
-viewSchedulePanel: Schedule -> Maybe TimeCard -> Html msg
+
+viewSchedulePanel: Schedule -> Maybe TimeCard -> Html PunchAction
 viewSchedulePanel schedule timecard =
   let
     panelHeader = Just {title ="Schedule", rightItem=(Just "Monday May 25, 2017")}
@@ -20,7 +27,7 @@ viewSchedulePanel schedule timecard =
       div
         [style [("display", "flex"), ("flex-direction", "row-reverse")]]
         [
-          div [style checkinButtonStyle]
+          div [onClick (PunchIn), style checkinButtonStyle]
           [
             span [style checkinButtonTextStyle]
             [text
@@ -46,7 +53,7 @@ clockinButtonText status =
 
 clockinStatus: TimeCard -> ClockinStatus
 clockinStatus timecard =
-  case timecard.clockInTs of
+  case timecard.clockinTs of
     Just clockinTs ->
       case timecard.clockoutTs of
         Just clockoutTs -> ClockedOut
