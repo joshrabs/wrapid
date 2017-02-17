@@ -11,22 +11,19 @@ import Maybe exposing (andThen)
 import Table exposing (defaultCustomizations)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
-main : Program Never Model Msg
-main =
-    Html.program
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = (\_ -> Sub.none)
-        }
-
+import Material
+import Material.Scheme
+import Material.Options as Options
+import Material.Textfield as Textfield
+import Material.Button as Button
 
 
 -- MODEL
 
 
 type alias Model =
-    { addRoles : AddRoles.Model
+    { mdl : Material.Model
+    , addRoles : AddRoles.Model
     , roles : List Role
     , tableState : Table.State
     , query : String
@@ -37,7 +34,14 @@ type alias Model =
 
 initModel : Model
 initModel =
-    Model AddRoles.init initRoles (Table.initialSort "Role") "" NoDialog False
+    { mdl = Material.model
+    , addRoles = AddRoles.init
+    , roles = initRoles
+    , tableState =(Table.initialSort "Role")
+    , query = ""
+    , dialogOpened = NoDialog
+    , breakdown = False
+    }
 
 init : (Model, Cmd Msg)
 init =
@@ -48,7 +52,9 @@ init =
 
 
 type Msg
-    = SetQuery String
+    = Mdl (Material.Msg Msg)
+    | Batch (List Msg)
+    | SetQuery String
     | ToggleSelected String
     | ToggleSelectedAll Bool
     | SetTableState Table.State
@@ -66,6 +72,26 @@ type Dialog
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Mdl msg_ ->
+            Material.update Mdl msg_ model
+
+        Batch listOfMsg ->
+            let
+                ( finalModel, listOfFx ) =
+                    List.foldl
+                        (\msg ->
+                            \( mdl, fxList ) ->
+                                let
+                                    ( newModel, newFx ) =
+                                        update msg mdl
+                                in
+                                    ( newModel, fxList ++ [ newFx ] )
+                        )
+                        ( model, [] )
+                        listOfMsg
+            in
+                ( finalModel, Cmd.batch listOfFx )
+
         SetQuery newQuery ->
             ( { model | query = newQuery }
             , Cmd.none )
@@ -130,6 +156,7 @@ update msg model =
         Breakdown ->
             ( { model | breakdown = not model.breakdown }
             , Cmd.none)
+
         -- _ ->
         --     (model, Cmd.none)
 
@@ -153,18 +180,39 @@ toggle id role =
 
 view : Model -> Html Msg
 view model =
-    Dashboard.makePanel
-        (Just {title = "Skin 2017-01-01", rightItem= Nothing})
-        (panelBody model)
-        (Just panelFooter)
+    Material.Scheme.top
+        <| Dashboard.makePanel
+            (Just {title = "Skin 2017-01-01", rightItem= Nothing})
+            (panelBody model)
+            (Just (panelFooter model.mdl))
 
 
-panelFooter : Html Msg
-panelFooter =
+panelFooter : Material.Model -> Html Msg
+panelFooter mdl =
     div []
-        [ button [ onClick Breakdown ] [ text "BREAKDOWN" ]
-        , button [ ] [ text "Export CSV" ]
-        , button [ ] [ text "Wrap Skin" ]
+        [ Button.render Mdl
+              [ 4 ]
+              mdl
+              [ Button.ripple
+              , Button.accent
+              , Options.onClick Breakdown
+              ]
+              [ text "Breakdown" ]
+        , Button.render Mdl
+              [ 5 ]
+              mdl
+              [ Button.ripple
+              , Button.accent
+              ]
+              [ text "Export CSV" ]
+
+        , Button.render Mdl
+              [ 4 ]
+              mdl
+              [ Button.ripple
+              , Button.accent
+              ]
+              [ text "Wrap Skin" ]
         ]
 
 
@@ -172,7 +220,7 @@ panelBody : Model -> Html Msg
 panelBody model =
     div []
         [ viewAddRoles model.dialogOpened model.addRoles
-        , viewTableWithSearch model.breakdown model.roles model.tableState model.query        ]
+        , viewTableWithSearch model ]
 
 viewAddRoles : Dialog -> AddRoles.Model -> Html Msg
 viewAddRoles dialog addRolessModel =
@@ -198,27 +246,65 @@ viewEditRoles  =
         ]
 
 
-viewTableWithSearch : Bool -> List Role -> Table.State -> String -> Html Msg
-viewTableWithSearch breakdown roles tableState query =
+viewTableWithSearch : Model -> Html Msg
+-- viewTableWithSearch breakdown roles tableState query =
+viewTableWithSearch model =
     let
         lowerQuery =
-            String.toLower query
+            String.toLower model.query
 
         acceptableRole =
-            List.filter (String.contains lowerQuery << String.toLower << roleToString) roles
+            List.filter (String.contains lowerQuery << String.toLower << roleToString) model.roles
 
         checkedAll =
-            List.all (\x -> x.selected == True) roles
+            List.all (\x -> x.selected == True) model.roles
 
     in
         div []
-            [ input [ placeholder "Search by Role", onInput SetQuery ] []
-            , button [ onClick (ToggleDialog AddDialog) ] [ text "ADD" ]
-            , button [ onClick (ToggleDialog EditDialog) ] [ text "EDIT" ]
-            , button [ onClick Breakdown ] [ text "BREAKDOWN" ]
-            , input [ type_ "checkbox", onCheck ToggleSelectedAll, checked checkedAll ] []
-            , viewTable breakdown tableState acceptableRole
+            [ topButtons model.mdl checkedAll
+            , viewTable model.breakdown model.tableState acceptableRole
             ]
+
+topButtons : Material.Model -> Bool -> Html Msg
+topButtons mdl checkedAll =
+    div  []
+        [ input
+              [ type_ "checkbox"
+              , onCheck ToggleSelectedAll
+              , checked checkedAll
+              -- Hackish style
+              -- TODO: Use thead options in Customizations
+              , style [ ("position", "relative")
+                      , ("top", "30px")
+                      , ("left", "3px")]
+              ]
+              []
+        , Textfield.render Mdl
+              [ 0 ]
+              mdl
+              [ Textfield.label "Search by Role"
+              , Textfield.floatingLabel
+              , Options.dispatch Batch
+              , Options.onInput SetQuery
+              ]
+              []
+        , Button.render Mdl
+              [ 1 ]
+              mdl
+              [ Button.ripple
+              , Button.accent
+              , Options.onClick (ToggleDialog AddDialog)
+              ]
+              [ text "ADD" ]
+        , Button.render Mdl
+              [ 2 ]
+              mdl
+              [ Button.ripple
+              , Button.accent
+              , Options.onClick (ToggleDialog EditDialog)
+              ]
+              [ text "Edit" ]
+        ]
 
 viewTable : Bool -> Table.State -> List Role -> Html Msg
 viewTable bool tableState roles =

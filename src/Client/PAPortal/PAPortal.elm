@@ -37,9 +37,7 @@ initModel userId =
   in
   { user = user
   , extras = Nothing
-  -- TODO: Switch init view
-  -- , currentView = LiveMonitor
-  , currentView = SkinManager
+  , currentView = LiveMonitor
   , skinModel = Skin.initModel
   }
 
