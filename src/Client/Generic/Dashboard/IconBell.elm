@@ -34,7 +34,6 @@ iconBell notifications =
         , stroke "none" ]
           []
       ]
-      ,viewNotificationList notifications
   ]
 
 
