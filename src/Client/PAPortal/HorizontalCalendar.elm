@@ -1,6 +1,10 @@
 module Client.PAPortal.HorizontalCalendar exposing (..)
 
 import Date exposing (Date, day, month)
+import Date.Extra.Core exposing (nextDay)
+import Date.Extra.Utils exposing (dayList)
+import Date.Extra.Period exposing (add, Period(..))
+import Date.Extra.Compare as DateCompare exposing (is, Compare2)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
 
@@ -18,17 +22,28 @@ defaultDay: Date
 defaultDay =
   Date.fromString "2011/1/1" |> Result.withDefault (Date.fromTime 0)
 
+fakeToday = add Day 2 defaultDay
+
 defaultContext: Context
 defaultContext =
   {
-    selectedDay = defaultDay
+    selectedDay = fakeToday
     ,daysPrevious = 3
     ,daysNext = 3
   }
 
 
 defaultCalender: HorizontalCalendar
-defaultCalender = [{day = defaultDay, isSelected=False}, {day = defaultDay, isSelected=True}]
+defaultCalender =
+  (dayList 4 defaultDay)
+    |> List.map calendarItem
+
+calendarItem: Date -> HorizontalCalendarItem
+calendarItem d =
+  let
+      isSelected = DateCompare.is DateCompare.Same d fakeToday
+  in
+    {day = d, isSelected=isSelected}
 
 viewCalendar: Maybe HorizontalCalendar -> Html msg
 viewCalendar calendar =
@@ -56,7 +71,9 @@ viewCalendarItem item =
     ,("width", "120px")
     ,("font-family", "Helvetica-Light")
     ,("font-size", "7px")
-    -- ,("opacity", "0.2")
+    , ("opacity",
+          if DateCompare.is DateCompare.After item.day fakeToday
+            then "0.2" else "1.0")
   ]]
   [
     div [style [
