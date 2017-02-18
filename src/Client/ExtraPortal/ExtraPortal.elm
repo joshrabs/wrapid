@@ -1,13 +1,11 @@
-module Client.ExtraPortal.ExtraPortal exposing (..)
+port module Client.ExtraPortal.ExtraPortal exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
-import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar exposing (..)
-import Client.ExtraPortal.Schedule exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard
@@ -16,38 +14,54 @@ import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDaily
 import Client.ExtraPortal.Types exposing (..)
 
 -- MODEL
+type RemoteData a = Loading | Success a
 
 type alias Model =
-    { currentView: ViewState
+    { currentView: Pages
     , wizardModel : Wizard.Model
-    , extraInfo: ExtraInfo
+    , extraInfo: RemoteData ExtraInfo
     }
-
-
 
 initModel: Model
 initModel =
+  (
     { currentView = DailyMonitor
     , wizardModel = Wizard.init
-    , extraInfo = {timecard = defaultTimeCard}
-    }
+    , extraInfo = Loading
+    })
+
+dummyModel: Model
+dummyModel =
+  (
+    { currentView = DailyMonitor
+    , wizardModel = Wizard.init
+    , extraInfo = Success {timecard = {clockinTs = Just "8", clockoutTs = Just "16"}}
+    })
 
 
-type ViewState = ProfileWizard | FormStatus | DailyMonitor
+type Pages = ProfileWizard | FormStatus | DailyMonitor
 
 -- UPDATE
 
 type Msg =
       NoOp
-    | ChangeView ViewState
+    | ChangePage Pages
     | WizardMsg Wizard.Msg
     | DailyMonitorMsg DailyMonitor.Msg
+    | LoadRemoteData
+    | ExtraInfoRetrieved ExtraInfo
 
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
     case msg of
-        ChangeView viewState ->
-            ({model | currentView = viewState}, Cmd.none)
+        ChangePage page ->
+            ({model | currentView = page}, Cmd.none)
+
+        LoadRemoteData ->
+            (model, getExtraInfo("ciykqvsynnqo60127o3illsce"))
+
+        ExtraInfoRetrieved extraInfo ->
+            ({model | extraInfo = Success extraInfo}, Cmd.none)
 
         WizardMsg subMsg ->
             let
@@ -60,47 +74,48 @@ update msg model =
         DailyMonitorMsg dmMsg ->
               let
                   (updatedDailyMonitorModel, dmCmd) =
-                    DailyMonitor.update dmMsg {timecard = model.extraInfo.timecard}
+                    DailyMonitor.update dmMsg {timecard = {clockinTs = Just "08:00", clockoutTs =Just "16:00"}}
               in
-                  ( { model | extraInfo = {timecard = updatedDailyMonitorModel.timecard} }
+                  ( { model | extraInfo = Success {timecard = updatedDailyMonitorModel.timecard} }
                   , Cmd.none
                   )
         NoOp -> (model, Cmd.none)
 
 
 
-
-
 --VIEW
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
-  div []
-      [
-       div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
-           [
-            button [onClick (ChangeView ProfileWizard)] [text "Profile Wizard"]
-           ,button [onClick (ChangeView FormStatus)] [text "Form Status"]
-           ,button [onClick (ChangeView DailyMonitor)] [text "DailyMonitor"]
-           ]
-      , let
-            rightItems = {avatar = Just defaultUrl}
-       in
-           Dashboard.view {navbar = {rightItems = Just rightItems}}
-      , case model.currentView of
-            DailyMonitor ->
-              let
-                  dmModel = {timecard = model.extraInfo.timecard}
-              in
-                Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
+  case model.extraInfo of
+    Loading -> div [] [text "Loading"]
+    Success extraInfo ->
+      div []
+        [
+         div [style [("margin-bottom", "8px"), ("background-color", "orange"), ("display", "inline-flex")]]
+             [
+              button [onClick (ChangePage ProfileWizard)] [text "Profile Wizard"]
+             ,button [onClick (ChangePage FormStatus)] [text "Form Status"]
+             ,button [onClick (ChangePage DailyMonitor)] [text "DailyMonitor"]
+             ]
+        , let
+              rightItems = {avatar = Just defaultUrl}
+         in
+             Dashboard.view {navbar = {rightItems = Just rightItems}}
+        , case model.currentView of
+              DailyMonitor ->
+                let
+                    dmModel = {timecard = extraInfo.timecard}
+                in
+                  Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
 
-            ProfileWizard ->
-                div []
-                    [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
+              ProfileWizard ->
+                  div []
+                      [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
-            FormStatus ->
-                viewFormStatusPage (ChangeView DailyMonitor) defaultFormStatus
+              FormStatus ->
+                  viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus
 
-    ]
+      ]
 
 
 type alias Header = {firstName: String, production: String}
@@ -175,6 +190,14 @@ viewCrewInfoItems prodContacts =
   ]
 
 
+--PORTS
+port getExtraInfo : String -> Cmd msg
+port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
+
+--SUBSCRIPTIONS
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    receiveExtraInfo ExtraInfoRetrieved
 
 --SAMPLE data
 

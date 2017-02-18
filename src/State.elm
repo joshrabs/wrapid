@@ -26,7 +26,10 @@ update msg model =
                     ( { model | currentViewState = viewState }, Cmd.none )
 
                 ExtraPortalView ->
-                    ( { model | extraPortalModel = ExtraPortal.initModel, currentViewState = viewState }, Cmd.none )
+                  let
+                    (extraPortalModel, cmd) = ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
+                  in
+                    ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
 
                 PAPortalView ->
                     ( { model | currentViewState = viewState }, Cmd.none )
@@ -58,4 +61,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Sub.map (\pas -> PAPortalMsg pas) (PAState.subscriptions model.paPortalModel)
+        , Sub.map (\eps -> ExtraPortalMsg eps) (ExtraPortal.subscriptions model.extraPortalModel)
         ]
