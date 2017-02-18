@@ -3,7 +3,7 @@ module Client.PAPortal.Pages.LiveMonitor exposing (..)
 import Html exposing (Html, div, text, input, button, img, span)
 import Html.Attributes exposing (style, src)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
-
+import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 
 type alias Model =
     { extraSnapStat : ExtrasSnapStatModel
@@ -78,7 +78,7 @@ viewLiveTable table =
 
         panelBody =
             div []
-                [ viewSearch
+                [ viewSearchTaskBar
                 , (viewLiveTableItems table)
                 ]
 
@@ -88,8 +88,8 @@ viewLiveTable table =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewSearch : Html msg
-viewSearch =
+viewSearchTaskBar: Html msg
+viewSearchTaskBar =
   div [style
     [
       ("display", "flex")
@@ -101,7 +101,7 @@ viewSearch =
     , ("border-bottom", "1px solid #EFF3F7")
     ]]
     [
-      input [] []
+        viewSearch
       , div [style [
           ("display", "flex")
           ,("justify-content", "center")
@@ -118,6 +118,24 @@ viewSearch =
           ,("letter-spacing" , "0")]]
       [text "Tasks"]
     ]
+
+viewSearch : Html msg
+viewSearch =
+  div [style [("margin-left", "16px"), ("position", "relative")]]
+  [
+    input [style [("height", "16px")]] []
+    ,div [style [("position", "absolute"), ("left", "2px"), ("top", "-2px"),("display", "flex"), ("align-items", "center")]]
+      [
+        span [style [("margin-top", "4px")]] [viewSearchIcon]
+       ,span [style
+          [("font-size", "14px")
+          ,("font-family", "Roboto-Regular")
+          ,("color", "#45494E")
+          ,("margin-left", "4px")
+          ]]
+         [text "Search"]
+      ]
+  ]
 
 viewLiveTableItems items =
     div [] (List.map (\item -> viewLiveTableItem item) items)
