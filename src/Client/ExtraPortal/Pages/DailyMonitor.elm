@@ -27,6 +27,7 @@ setTimeCardClockInOut clockin clockout model =
 --UPDATE
 type Msg = TimeCardMsg PunchAction
 
+
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
   case msg of

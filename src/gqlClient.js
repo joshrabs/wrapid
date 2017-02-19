@@ -82,6 +82,27 @@ const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: S
   }
 `;
 
+const clockinExtra = gql`mutation clockinExtra($id: ID!, $clockinTs: String)
+  {
+    updateTimecard(id: $id, clockinTs: $clockinTs)
+    {
+      id
+    }
+  }
+`;
+
+const clockoutExtra = gql`mutation clockoutExtra($id: ID!, $clockoutTs: String)
+  {
+    updateTimecard(id:$id, clockoutTs:$clockoutTs)
+    {
+      id
+      effectiveDt
+      clockinTs
+      clockoutTs
+    }
+  }
+`;
+
 const getExtraInfo = gql`
   query($userId:ID, $date:String){
     User(id:$userId){
@@ -94,8 +115,10 @@ const getExtraInfo = gql`
   }
 `
 
-const createTimecard = gql`mutation ($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
-  createTimecard(clockinTs:$clockinTs, clockoutTs:$clockoutTs, effectiveDt:$effectiveDt){
+
+
+const createTimecard = gql`mutation createTimecard($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
+  createTimecard(userId:$userId, clockinTs:$clockinTs, clockoutTs:$clockoutTs, effectiveDt:$effectiveDt){
     id,
     effectiveDt
   }
@@ -105,8 +128,23 @@ export default {
 
   // Queries
 
+  clockoutExtra: function(id, clockoutTs){
+    const query = clockinExtra;
+    const variables = { id, clockoutTs };
+    console.log(query)
+    console.log(variables)
+    return client.mutate({ query, variables });
+  },
+
+  clockinExtra: function(id, clockinTs){
+    const mutation = clockinExtra;
+    const variables = { id, clockinTs};
+    return client.mutate({ mutation, variables });
+  },
+
   getExtraInfo: function(userId, date) {
     const query = getExtraInfo;
+    console.log("QUERY!", query)
     const variables = { userId, date };
     return client.query({ query, variables });
   },

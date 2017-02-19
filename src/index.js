@@ -50,3 +50,37 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
       console.log(error);
     });
 });
+
+app.ports.clockinExtra.subscribe(function (timecardClockin) {
+  console.log(`Getting extra info for`, timecardClockin)
+  const timecardId = timecardClockin[0]
+  const clockinTs = timecardClockin[1]
+  console.log(timecardId)
+  console.log(clockinTs)
+  console.log(client.clockinExtra)
+  client.clockinExtra(timecardId, clockinTs)
+    .then(result => {
+      console.log("result!", result);
+      const extraInfo = {timecard: {clockinTs, clockoutTs: null}}
+      app.ports.receiveExtraInfo.send(timecard);
+    })
+    .catch(error => {
+      console.log("ERROR!", error);
+    });
+});
+
+app.ports.createExtraSchedule.subscribe(function (scheduleParams) {
+  console.log(`Getting extra info for`, scheduleParams)
+  const date = scheduleParams[0]
+  const title = scheduleParams[1]
+  const startTm = scheduleParams[2]
+  client.createSchedule(date, title, startTm)
+    .then(result => {
+      console.log("result!", result);
+      const timecard = result.data
+      // app.ports.receiveExtraInfo.send(timecard);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+});

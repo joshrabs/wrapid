@@ -72,13 +72,17 @@ update msg model =
                 , Cmd.none
                 )
         DailyMonitorMsg dmMsg ->
-              let
-                  (updatedDailyMonitorModel, dmCmd) =
-                    DailyMonitor.update dmMsg {timecard = {clockinTs = Just "08:00", clockoutTs =Just "16:00"}}
-              in
-                  ( { model | extraInfo = Success {timecard = updatedDailyMonitorModel.timecard} }
-                  , Cmd.none
-                  )
+            ( model
+            , clockinExtra("cizbke6ld32du0152funy1fe3", "10:00am")
+            )
+            -- ( model
+            -- , createExtraSchedule("2017-02-18", "Schedule!", "08:00am")
+            -- )
+              -- let
+              --     (updatedDailyMonitorModel, dmCmd) =
+              --       DailyMonitor.update dmMsg model.extraInfo
+              -- in
+
         NoOp -> (model, Cmd.none)
 
 
@@ -194,7 +198,11 @@ viewCrewInfoItems prodContacts =
 type alias UserId = String
 type alias Day = String
 port getExtraInfo : (String, Day) -> Cmd msg
+port clockinExtra : (String, String) -> Cmd msg
+port createExtraSchedule : (String, String, String) -> Cmd msg
+
 port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
+
 
 --SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
