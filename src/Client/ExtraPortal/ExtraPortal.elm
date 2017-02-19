@@ -46,6 +46,7 @@ type Msg =
     | DailyMonitorMsg DailyMonitor.Msg
     | LoadRemoteData
     | ExtraInfoRetrieved ExtraInfo
+    | TimeCardUpdate TimeCard
 
 update: Msg -> Model -> (Model, Cmd msg)
 update msg model =
@@ -58,6 +59,16 @@ update msg model =
 
         ExtraInfoRetrieved extraInfo ->
             ({model | extraInfo = Success extraInfo}, Cmd.none)
+
+        TimeCardUpdate timecard ->
+          let
+            oldInfo = model.extraInfo
+            newExtraInfo =
+              case oldInfo of
+                Success a -> Success {a | timecard = timecard}
+                Loading -> oldInfo
+          in
+            ({model | extraInfo = newExtraInfo}, Cmd.none)
 
         WizardMsg subMsg ->
             let
@@ -198,12 +209,16 @@ port clockinExtra : (String, String) -> Cmd msg
 port createExtraSchedule : (String, String, String) -> Cmd msg
 
 port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
+port receiveTimecardUpdate : (TimeCard -> msg) -> Sub msg
 
 
 --SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    receiveExtraInfo ExtraInfoRetrieved
+    Sub.batch
+    [receiveExtraInfo ExtraInfoRetrieved
+    ,receiveTimecardUpdate TimeCardUpdate
+    ]
 
 --SAMPLE data
 

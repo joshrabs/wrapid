@@ -86,8 +86,9 @@ const clockinExtra = gql`mutation clockinExtra($id: ID!, $clockinTs: String)
   {
     updateTimecard(id: $id, clockinTs: $clockinTs)
     {
-      effectiveDt
-      clockinTs
+      id,
+      effectiveDt,
+      clockinTs,
       clockoutTs
     }
   }
@@ -97,9 +98,9 @@ const clockoutExtra = gql`mutation clockoutExtra($id: ID!, $clockoutTs: String)
   {
     updateTimecard(id:$id, clockoutTs:$clockoutTs)
     {
-      id
-      effectiveDt
-      clockinTs
+      id,
+      effectiveDt,
+      clockinTs,
       clockoutTs
     }
   }

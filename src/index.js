@@ -67,9 +67,8 @@ app.ports.clockinExtra.subscribe(function (timecardClockin) {
     .then(result => {
       console.log("result!", result);
       const {id, clockinTs, clockoutTs, effectiveDt} = result.data.updateTimecard
-      const extraInfo = {timecard: {id, clockinTs, clockoutTs, effectiveDt}}
-      console.log(extraInfo)
-      app.ports.receiveExtraInfo.send(extraInfo);
+      const timecard = {id, clockinTs, clockoutTs, effectiveDt}
+      app.ports.receiveTimecardUpdate.send(timecard);
     })
     .catch(error => {
       console.log("ERROR!", error);
