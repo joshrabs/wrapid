@@ -14,34 +14,20 @@ import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
 
 type alias Model =
   {
-    timecard: TimeCard
+    firstName: String
+    ,timecard: TimeCard
   }
 
-setTimeCardClockInOut: Maybe String -> Maybe String -> Model -> Model
-setTimeCardClockInOut clockin clockout model =
-  let
-      timecard = {clockinTs = clockin, clockoutTs = clockout}
-  in
-      {model | timecard = timecard}
 
 --UPDATE
 type Msg = TimeCardMsg PunchAction
-
-
-update: Msg -> Model -> (Model, Cmd msg)
-update msg model =
-  case msg of
-    TimeCardMsg punchAction ->
-      case punchAction of
-        PunchIn -> (setTimeCardClockInOut (Just "08:00") Nothing model, Cmd.none)
-        PunchOut -> (setTimeCardClockInOut (Just "08:00") (Just "08:00") model, Cmd.none)
 
 --VIEW
 viewDailyMonitor: Model -> Html Msg
 viewDailyMonitor model =
   div []
       [
-        viewHeader {firstName="Steve", production="RunabetterSet Productions"}
+        viewHeader {firstName=model.firstName, production="RunabetterSet Productions"}
       , viewNotificationBarPanel defaultNotificationItems
       , Html.map TimeCardMsg (viewSchedulePanel defaultScheduleItems (Just model.timecard))
        ,

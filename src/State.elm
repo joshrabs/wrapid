@@ -9,10 +9,12 @@ import Client.ExtraPortal.ExtraPortal as ExtraPortal
 
 import Client.PAPortal.State as PAState
 
+defaultUserID: String
+defaultUserID = "ciykqvsynnqo60127o3illsce"
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing LoginView ExtraPortal.initModel (PAState.initModel "word") "Yo"
+    ( Model [ location ] Nothing LoginView (ExtraPortal.initModel defaultUserID) (PAState.initModel "word") "Yo"
     , Cmd.none
     )
 

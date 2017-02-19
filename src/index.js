@@ -37,13 +37,18 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
   console.log(`Getting extra info for`, userDay)
   const userId = userDay[0]
   const day = userDay[1]
+  console.log(userId)
+  console.log(day)
   client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
-      const timecards = result.data.User.timecards
+      const {baseprofile, timecards} = result.data.User
+      console.log(baseprofile)
+      console.log("timecards!", timecards)
       const timecard = timecards.length > 0 ? timecards[0] : null
       console.log(timecard)
-      const extraInfo = {timecard}
+      const profile = baseprofile
+      const extraInfo = {timecard, profile}
       app.ports.receiveExtraInfo.send(extraInfo);
     })
     .catch(error => {
@@ -61,8 +66,8 @@ app.ports.clockinExtra.subscribe(function (timecardClockin) {
   client.clockinExtra(timecardId, clockinTs)
     .then(result => {
       console.log("result!", result);
-      const {clockinTs, clockoutTs, effectiveDt} = result.data.updateTimecard
-      const extraInfo = {timecard: {clockinTs, clockoutTs, effectiveDt}}
+      const {id, clockinTs, clockoutTs, effectiveDt} = result.data.updateTimecard
+      const extraInfo = {timecard: {id, clockinTs, clockoutTs, effectiveDt}}
       console.log(extraInfo)
       app.ports.receiveExtraInfo.send(extraInfo);
     })

@@ -19,24 +19,20 @@ type RemoteData a = Loading | Success a
 type alias Model =
     { currentView: Pages
     , wizardModel : Wizard.Model
+    , userId: UserID
     , extraInfo: RemoteData ExtraInfo
     }
 
-initModel: Model
-initModel =
+initModel: String -> Model
+initModel userId =
   (
     { currentView = DailyMonitor
     , wizardModel = Wizard.init
+    , userId = userId
     , extraInfo = Loading
     })
 
-dummyModel: Model
-dummyModel =
-  (
-    { currentView = DailyMonitor
-    , wizardModel = Wizard.init
-    , extraInfo = Success {timecard = {clockinTs = Just "8", clockoutTs = Just "16"}}
-    })
+
 
 
 type Pages = ProfileWizard | FormStatus | DailyMonitor
@@ -58,7 +54,7 @@ update msg model =
             ({model | currentView = page}, Cmd.none)
 
         LoadRemoteData ->
-            (model, getExtraInfo(("ciykqvsynnqo60127o3illsce", "2017-02-18")))
+            (model, getExtraInfo((model.userId, "2017-02-18")))
 
         ExtraInfoRetrieved extraInfo ->
             ({model | extraInfo = Success extraInfo}, Cmd.none)
@@ -108,7 +104,7 @@ viewExtraPortal model =
         , case model.currentView of
               DailyMonitor ->
                 let
-                    dmModel = {timecard = extraInfo.timecard}
+                    dmModel = {timecard = extraInfo.timecard, firstName=extraInfo.profile.firstName}
                 in
                   Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
 
@@ -211,9 +207,6 @@ subscriptions model =
 
 --SAMPLE data
 
-
-defaultTimeCard: TimeCard
-defaultTimeCard = {clockinTs = Nothing, clockoutTs = Nothing}
 
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"

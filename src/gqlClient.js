@@ -106,9 +106,14 @@ const clockoutExtra = gql`mutation clockoutExtra($id: ID!, $clockoutTs: String)
 `;
 
 const getExtraInfo = gql`
-  query($userId:ID, $date:String){
+  query getDaysExtraInfo($userId:ID, $date:String){
     User(id:$userId){
+      baseprofile {
+        firstName
+        lastName
+      },
       timecards(filter: {effectiveDt: $date}) {
+        id,
         effectiveDt,
         clockinTs,
         clockoutTs
