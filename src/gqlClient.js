@@ -110,6 +110,7 @@ const getExtraInfo = gql`
   query getDaysExtraInfo($userId:ID, $date:String){
     User(id:$userId){
       baseprofile {
+        avatar { url }
         firstName
         lastName
       },

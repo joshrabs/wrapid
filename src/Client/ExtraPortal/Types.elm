@@ -25,7 +25,11 @@ type alias ScheduleItem =
   }
 
 type alias Profile =
-  {
-    firstName: String,
-    lastName: String
+  { avatar: Avatar --Should be URL
+  , firstName: String
+  , lastName: String
+  }
+
+type alias Avatar =
+  {url: Maybe String --Should be URL
   }

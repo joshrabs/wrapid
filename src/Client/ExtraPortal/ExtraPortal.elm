@@ -5,7 +5,6 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
-import Client.ExtraPortal.NotificationBar exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard
@@ -109,7 +108,8 @@ viewExtraPortal model =
              ,button [onClick (ChangePage DailyMonitor)] [text "DailyMonitor"]
              ]
         , let
-              rightItems = {avatar = Just defaultUrl}
+              avatar = extraInfo.profile.avatar.url
+              rightItems = {avatar = Just avatar}
          in
              Dashboard.view {navbar = {rightItems = Just rightItems}}
         , case model.currentView of
