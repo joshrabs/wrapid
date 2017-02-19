@@ -115,7 +115,11 @@ viewExtraPortal model =
         , case model.currentView of
               DailyMonitor ->
                 let
-                    dmModel = {timecard = extraInfo.timecard, firstName=extraInfo.profile.firstName}
+                    dmModel =
+                      { timecard = extraInfo.timecard
+                      , firstName=extraInfo.profile.firstName
+                      , schedule=extraInfo.schedule
+                      }
                 in
                   Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
 
@@ -239,13 +243,6 @@ defaultCrewInfoItems =
   ,{name = "Patty Lebotomy", role="Wardrobe"}
   ]
 
-defaultScheduleItems: Schedule
-defaultScheduleItems =
-  [
-    {name="Start Time", startTm="8:00 AM"}
-    ,{name="Break for Lunch", startTm="12:00 PM"}
-    ,{name="Estimated End Time", startTm="6:00 PM"}
-  ]
 
 defaultFormStatus: FormStatusPage.FormStatuses
 defaultFormStatus =

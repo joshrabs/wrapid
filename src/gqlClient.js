@@ -113,6 +113,14 @@ const getExtraInfo = gql`
         firstName
         lastName
       },
+      extraschedule (filter: {date:$date}){
+        date
+        extrascheduleitemses(orderBy:startTm_ASC){
+          name
+          startTm
+          endTm
+        }
+      },
       timecards(filter: {effectiveDt: $date}) {
         id,
         effectiveDt,

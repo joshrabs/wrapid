@@ -16,6 +16,7 @@ type alias Model =
   {
     firstName: String
     ,timecard: TimeCard
+    ,schedule: Schedule
   }
 
 
@@ -29,8 +30,8 @@ viewDailyMonitor model =
       [
         viewHeader {firstName=model.firstName, production="RunabetterSet Productions"}
       , viewNotificationBarPanel defaultNotificationItems
-      , Html.map TimeCardMsg (viewSchedulePanel defaultScheduleItems (Just model.timecard))
-       ,
+      , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
+      ,
          let
            panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
            panelBody = (viewWardrobeStatus NotCheckedIn)
@@ -126,12 +127,4 @@ defaultCrewInfoItems =
   [{name = "Josh Weinberg", role="Lead PA"}
   ,{name = "Randy Lahey", role="Extra PA"}
   ,{name = "Patty Lebotomy", role="Wardrobe"}
-  ]
-
-defaultScheduleItems : Schedule
-defaultScheduleItems =
-  [
-    {name="Start Time", startTm="8:00 AM"}
-    ,{name="Break for Lunch", startTm="12:00 PM"}
-    ,{name="Estimated End Time", startTm="6:00 PM"}
   ]

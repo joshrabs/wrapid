@@ -42,13 +42,14 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
   client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
-      const {baseprofile, timecards} = result.data.User
+      const {baseprofile, timecards, extraschedule} = result.data.User
       console.log(baseprofile)
       console.log("timecards!", timecards)
       const timecard = timecards.length > 0 ? timecards[0] : null
       console.log(timecard)
+      const schedule = extraschedule.extrascheduleitemses
       const profile = baseprofile
-      const extraInfo = {timecard, profile}
+      const extraInfo = {timecard, profile, schedule}
       app.ports.receiveExtraInfo.send(extraInfo);
     })
     .catch(error => {
