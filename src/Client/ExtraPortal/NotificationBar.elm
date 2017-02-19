@@ -30,7 +30,7 @@ convertScheduleItem item =
 
 getIcon: ScheduleItem -> NotificationIcon
 getIcon item =
-  if item.name == "Lunch" then LunchIcon else Default
+  if item.category == "Lunch" then LunchIcon else Default
 
 --VIEW
 
@@ -53,6 +53,7 @@ viewNotificationBar items =
       ,("flex-wrap", "nowrap")
       ,("overflow-x", "scroll")
       ,("overflow-y", "hidden")
+      ,("background", "rgb(61, 61, 61)")
     ]
   ]
   (List.map (\item -> (viewNotificationBarItem item)) items)
@@ -120,7 +121,7 @@ startEndText item =
 
 defaultTagIcon: Html msg
 defaultTagIcon =
-  svg [ fill "#6D717A", height "24", viewBox "0 0 24 24", width "24" ]
+  svg [ fill "rgb(80, 227, 194)", height "24", viewBox "0 0 24 24", width "24" ]
     [ Svg.path [ d "M0 0h24v24H0z", fill "none" ]
         []
     , text "    "

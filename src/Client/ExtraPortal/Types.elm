@@ -6,6 +6,8 @@ type alias ExtraInfo =
     ,profile: Profile
     ,schedule: Schedule
   }
+
+
 type alias TimeCard =
   { id: String
   , effectiveDt: String
@@ -17,10 +19,10 @@ type alias UserID = String
 type alias Schedule = List ScheduleItem
 type alias ScheduleItem =
   { name: String
+  , category: String
   , startTm: String
   , endTm: Maybe String
   }
-
 
 type alias Profile =
   {

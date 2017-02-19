@@ -117,6 +117,7 @@ const getExtraInfo = gql`
         date
         extrascheduleitemses(orderBy:startTm_ASC){
           name
+          category
           startTm
           endTm
         }
