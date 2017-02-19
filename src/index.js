@@ -33,12 +33,16 @@ app.ports.getAllProfiles.subscribe(function () {
 });
 
 
-app.ports.getExtraInfo.subscribe(function (userId) {
-  console.log(`Getting extra info for ${userId}`)
-  client.getExtraInfo(userId)
+app.ports.getExtraInfo.subscribe(function (userDay) {
+  console.log(`Getting extra info for`, userDay)
+  const userId = userDay[0]
+  const day = userDay[1]
+  client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
-      const timecard = result.data.User.timecards[0]
+      const timecards = result.data.User.timecards
+      const timecard = timecards.length > 0 ? timecards[0] : null
+      console.log(timecard)
       const extraInfo = {timecard}
       app.ports.receiveExtraInfo.send(extraInfo);
     })

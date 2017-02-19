@@ -83,10 +83,9 @@ const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: S
 `;
 
 const getExtraInfo = gql`
-  query ($userId:ID) {
+  query($userId:ID, $date:String){
     User(id:$userId){
-      id
-      timecards {
+      timecards(filter: {effectiveDt: $date}) {
         effectiveDt,
         clockinTs,
         clockoutTs
@@ -106,9 +105,9 @@ export default {
 
   // Queries
 
-  getExtraInfo: function(userId) {
+  getExtraInfo: function(userId, date) {
     const query = getExtraInfo;
-    const variables = { userId };
+    const variables = { userId, date };
     return client.query({ query, variables });
   },
 

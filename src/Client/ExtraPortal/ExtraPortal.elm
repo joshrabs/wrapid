@@ -58,7 +58,7 @@ update msg model =
             ({model | currentView = page}, Cmd.none)
 
         LoadRemoteData ->
-            (model, getExtraInfo("ciykqvsynnqo60127o3illsce"))
+            (model, getExtraInfo(("ciykqvsynnqo60127o3illsce", "2017-02-18")))
 
         ExtraInfoRetrieved extraInfo ->
             ({model | extraInfo = Success extraInfo}, Cmd.none)
@@ -191,7 +191,9 @@ viewCrewInfoItems prodContacts =
 
 
 --PORTS
-port getExtraInfo : String -> Cmd msg
+type alias UserId = String
+type alias Day = String
+port getExtraInfo : (String, Day) -> Cmd msg
 port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
 
 --SUBSCRIPTIONS
