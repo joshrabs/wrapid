@@ -230,12 +230,6 @@ subscriptions model =
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
-defaultNotificationItems: List NotificationBarItem
-defaultNotificationItems =
-  [
-    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
-    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
-  ]
 defaultCrewInfoItems: List { name : String, role : String }
 defaultCrewInfoItems =
   [{name = "Josh Weinberg", role="Lead PA"}

@@ -68,9 +68,7 @@ viewSchedule schedule =
           div [style [("display", "flex"), ("justify-content", "space-between"), ("margin", "8px")]]
             [
               span [style scheduleItemNameStyle] [text s.name]
-              ,case s.startTm of
-                Just startTm -> span [style scheduleItemTitleStyle] [text startTm]
-                Nothing -> div [] []
+              ,span [style scheduleItemTitleStyle] [text s.startTm]
             ]
       )) schedule
     in

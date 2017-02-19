@@ -7,16 +7,32 @@ import Svg exposing (svg, g, node)
 import Svg.Attributes exposing (d, viewBox, id, height, width, fill, fillRule, stroke, strokeWidth, transform, points)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
+import Client.ExtraPortal.Types exposing (Schedule, ScheduleItem)
 
-
+--MODEL
+type alias Notifications = List NotificationBarItem
 type alias NotificationBarItem =
-  {description: String
+  {scheduleItem: ScheduleItem
   , icon: NotificationIcon
-  , startTm: String
-  , endTm: String
   }
 
 type NotificationIcon = Default | LunchIcon
+
+convertSchedule: Schedule -> Notifications
+convertSchedule schedule =
+  List.map convertScheduleItem schedule
+
+convertScheduleItem: ScheduleItem -> NotificationBarItem
+convertScheduleItem item =
+  {scheduleItem = item
+  ,icon = (getIcon item)
+  }
+
+getIcon: ScheduleItem -> NotificationIcon
+getIcon item =
+  if item.name == "Lunch" then LunchIcon else Default
+
+--VIEW
 
 viewNotificationBarPanel: List NotificationBarItem -> Html msg
 viewNotificationBarPanel items =
@@ -82,7 +98,7 @@ viewNotificationBarItem item =
            ,("letter-spacing", "0")
            ,("line-height", "20px")
          ]]
-         [Html.text item.description]
+         [Html.text item.scheduleItem.name]
         ,
           span [style
            [
@@ -92,11 +108,15 @@ viewNotificationBarItem item =
              ,("letter-spacing", "0")
              ,("line-height", "20px")
            ]]
-           [Html.text (item.startTm ++ " - " ++ item.endTm)]
+           [Html.text (startEndText item.scheduleItem)]
       ]
   ]
 
-
+startEndText: ScheduleItem -> String
+startEndText item =
+  case item.endTm of
+    Just endTm -> item.startTm ++ " - " ++ endTm
+    Nothing -> item.startTm
 
 defaultTagIcon: Html msg
 defaultTagIcon =

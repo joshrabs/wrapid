@@ -5,7 +5,7 @@ import Html.Attributes exposing (style)
 
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
-import Client.ExtraPortal.NotificationBar exposing (viewNotificationBarPanel, NotificationIcon(..), NotificationBarItem)
+import Client.ExtraPortal.NotificationBar as NotificationBar exposing (convertSchedule, viewNotificationBarPanel, NotificationIcon(..), NotificationBarItem)
 import Client.ExtraPortal.Schedule exposing (viewSchedulePanel, PunchAction(..))
 
 import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
@@ -29,7 +29,7 @@ viewDailyMonitor model =
   div []
       [
         viewHeader {firstName=model.firstName, production="RunabetterSet Productions"}
-      , viewNotificationBarPanel defaultNotificationItems
+      , viewNotificationBarPanel (NotificationBar.convertSchedule model.schedule)
       , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
       ,
          let
@@ -115,12 +115,6 @@ viewCrewInfoItems prodContacts =
 defaultUrl: Maybe String
 defaultUrl = Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
-defaultNotificationItems: List NotificationBarItem
-defaultNotificationItems =
-  [
-    {description="Lunch in 1 Hour", icon=LunchIcon, startTm="12:00 PM", endTm="1:00 PM"}
-    ,{description="Shoot Zombie Set", icon=Default, startTm="4:00 PM", endTm="4:30 PM"}
-  ]
 
 defaultCrewInfoItems : List { name : String, role : String }
 defaultCrewInfoItems =

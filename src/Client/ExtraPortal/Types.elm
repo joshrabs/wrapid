@@ -17,7 +17,7 @@ type alias UserID = String
 type alias Schedule = List ScheduleItem
 type alias ScheduleItem =
   { name: String
-  , startTm: Maybe String
+  , startTm: String
   , endTm: Maybe String
   }
 
