@@ -42,7 +42,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case Debug.log "role msg: " msg of
+    case msg of
         UpdRole str ->
             ( { model | role = str }
             , Cmd.none)

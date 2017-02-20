@@ -128,9 +128,6 @@ update msg model =
 
         AddRolesMsg subMsg ->
             let
-                _ =
-                    Debug.log "model: " model
-
                 ( updatedAddRolesModel, addRolesCmd ) =
                     AddRoles.update subMsg model.addRoles
             in
@@ -267,8 +264,6 @@ acceptableRoles query roles =
         lowerQuery =
             String.join "" << String.words <| String.toLower query
 
-        _ =
-            Debug.log "lowerQuery" lowerQuery
     in
         roles
             |> List.filter
@@ -384,12 +379,6 @@ viewTableBreakdown tableState roles =
     let
         acceptableRole =
             groupWhile (compareBreakdown) (sortBreakdown roles)
-
-        _ =
-            Debug.log "groupWhile: " (List.map (\x -> List.length x) acceptableRole)
-
-        d =
-            Debug.log "groupWhile: " (List.map (\x -> x.first) roles)
     in
         Table.view configBreakdown tableState (flatListRole acceptableRole)
 
