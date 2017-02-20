@@ -8,6 +8,7 @@ import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (..)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
+import Client.PAPortal.Pages.Wrap as WrapPage
 
 
 -- MODEL
@@ -41,7 +42,7 @@ initModel userId =
   , skinModel = Skin.initModel
   }
 
-type ViewState = LiveMonitor | SkinManager
+type ViewState = LiveMonitor | SkinManager | Wrap
 
 -- UPDATE
 type Msg =
@@ -104,6 +105,7 @@ viewPAPortal model =
             SkinManager ->
                 div []
                     [ Html.map SkinMsg (Skin.view model.skinModel) ]
+            Wrap -> WrapPage.view
 
         ]
 
@@ -126,7 +128,12 @@ viewHeader currentView =
               onClick (ChangeView SkinManager)
               , style (getTabStyle SkinManager)
             ]
-            [text "Skin Manager"]
+            [text "Skin "]
+          ,div [
+              onClick (ChangeView Wrap)
+              , style (getTabStyle SkinManager)
+            ]
+            [text "Wrap"]
         ]
     ]
 
