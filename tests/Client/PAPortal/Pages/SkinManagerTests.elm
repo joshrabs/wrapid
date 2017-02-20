@@ -10,15 +10,18 @@ all : Test
 all =
     describe "SkinManager"
         [ describe "acceptableRole"
-            [ test "Filter by role" <|
+            [ test "Filter one field wihtout space" <|
                 \() ->
                     Expect.equal (acceptableRoles "Role" [role1]) [role1]
-            , test "Filter by First with space" <|
+            , test "Filter one field with space" <|
                 \() ->
                     Expect.equal (acceptableRoles "First Name" [role1]) [role1]
             , test "Filter multiple fields with spaces" <|
                 \() ->
                     Expect.equal (acceptableRoles "Role First" [role1]) [role1]
+            , test "Filter multiple fields without spaces" <|
+                \() ->
+                    Expect.equal (acceptableRoles "RoleFirst" [role1]) [role1]
             ]
         ]
 

@@ -249,9 +249,16 @@ acceptableRoles : String -> List Role -> List Role
 acceptableRoles query roles =
     let
         lowerQuery =
-            String.toLower query
+            String.join "" << String.words <| String.toLower query
+        _ = Debug.log "lowerQuery" lowerQuery
     in
-        List.filter (String.contains lowerQuery << String.toLower << roleToString) roles
+        roles
+            |> List.filter
+               (String.contains lowerQuery
+                    << String.join ""
+                    << String.words
+                    << String.toLower
+                    << roleToString)
 
 
 viewTableWithSearch : Model -> Html Msg
