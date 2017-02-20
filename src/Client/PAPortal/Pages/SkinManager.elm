@@ -245,24 +245,25 @@ viewEditRoles  =
         , input [ placeholder "Edit Role", onInput EditRoles ] []
         ]
 
+acceptableRoles : String -> List Role -> List Role
+acceptableRoles query roles =
+    let
+        lowerQuery =
+            String.toLower query
+    in
+        List.filter (String.contains lowerQuery << String.toLower << roleToString) roles
+
 
 viewTableWithSearch : Model -> Html Msg
 -- viewTableWithSearch breakdown roles tableState query =
 viewTableWithSearch model =
     let
-        lowerQuery =
-            String.toLower model.query
-
-        acceptableRole =
-            List.filter (String.contains lowerQuery << String.toLower << roleToString) model.roles
-
         checkedAll =
             List.all (\x -> x.selected == True) model.roles
-
     in
         div []
             [ topButtons model.mdl checkedAll
-            , viewTable model.breakdown model.tableState acceptableRole
+            , viewTable model.breakdown model.tableState (acceptableRoles model.query model.roles)
             ]
 
 topButtons : Material.Model -> Bool -> Html Msg
