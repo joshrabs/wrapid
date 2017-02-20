@@ -6,24 +6,26 @@ import Test exposing (..)
 import Expect
 import String
 
+
 all : Test
 all =
     describe "SkinManager"
         [ describe "acceptableRole"
-            [ test "Filter one field wihtout space" <|
+            [ test "Filter one field without space" <|
                 \() ->
-                    Expect.equal (acceptableRoles "Role" [role1]) [role1]
+                    Expect.equal (acceptableRoles "Zombie" [ realRole ]) [ realRole ]
             , test "Filter one field with space" <|
                 \() ->
-                    Expect.equal (acceptableRoles "First Name" [role1]) [role1]
+                    Expect.equal (acceptableRoles "Zombie Extra" [ realRole ]) [ realRole ]
             , test "Filter multiple fields with spaces" <|
                 \() ->
-                    Expect.equal (acceptableRoles "Role First" [role1]) [role1]
+                    Expect.equal (acceptableRoles "Josh Weinberg" [ realRole ]) [ realRole ]
             , test "Filter multiple fields without spaces" <|
                 \() ->
-                    Expect.equal (acceptableRoles "RoleFirst" [role1]) [role1]
+                    Expect.equal (acceptableRoles "JoshWeinberg" [ realRole ]) [ realRole ]
             ]
         ]
 
 
-role1 = Role "" "Role" "First Name" "" "" "" "" "" "" "" "" "" "" False
+realRole =
+    Role "" "Zombie Extra" "Josh" "Weinberg" "8:00 Am" "$ 125/12" "12:00" "1 hr" "" "" "5:00PM" "josh@gmail.com" "" False

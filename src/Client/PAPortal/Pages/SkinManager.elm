@@ -2,7 +2,6 @@ module Client.PAPortal.Pages.SkinManager exposing (..)
 
 import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
-
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
 import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
 import Html.Events exposing (onClick, onInput, onCheck)
@@ -10,7 +9,6 @@ import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
 import Table exposing (defaultCustomizations)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
-
 import Material
 import Material.Scheme
 import Material.Options as Options
@@ -37,15 +35,17 @@ initModel =
     { mdl = Material.model
     , addRoles = AddRoles.init
     , roles = initRoles
-    , tableState =(Table.initialSort "Role")
+    , tableState = (Table.initialSort "Role")
     , query = ""
     , dialogOpened = NoDialog
     , breakdown = False
     }
 
-init : (Model, Cmd Msg)
+
+init : ( Model, Cmd Msg )
 init =
     ( initModel, Cmd.none )
+
 
 
 -- UPDATE
@@ -64,10 +64,12 @@ type Msg
     | AddRolesMsg AddRoles.Msg
     | Breakdown
 
+
 type Dialog
     = AddDialog
     | EditDialog
     | NoDialog
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -94,14 +96,20 @@ update msg model =
 
         SetQuery newQuery ->
             ( { model | query = newQuery }
-            , Cmd.none )
+            , Cmd.none
+            )
 
         ToggleDialog dialog ->
             let
-                toggleDialog = if dialog == model.dialogOpened then NoDialog else dialog
+                toggleDialog =
+                    if dialog == model.dialogOpened then
+                        NoDialog
+                    else
+                        dialog
             in
                 ( { model | dialogOpened = toggleDialog }
-                , Cmd.none )
+                , Cmd.none
+                )
 
         ToggleSelected id ->
             ( { model | roles = List.map (toggle id) model.roles }
@@ -118,36 +126,39 @@ update msg model =
             , Cmd.none
             )
 
-
         AddRolesMsg subMsg ->
-                let
-                    _ = Debug.log "model: " model
-                    ( updatedAddRolesModel, addRolesCmd ) =
-                        AddRoles.update subMsg model.addRoles
-                in
-                    ( { model | addRoles = updatedAddRolesModel }
-                    , Cmd.map AddRolesMsg addRolesCmd
-                    )
+            let
+                _ =
+                    Debug.log "model: " model
+
+                ( updatedAddRolesModel, addRolesCmd ) =
+                    AddRoles.update subMsg model.addRoles
+            in
+                ( { model | addRoles = updatedAddRolesModel }
+                , Cmd.map AddRolesMsg addRolesCmd
+                )
 
         AddRoles ->
             let
-                rs = addIdToRoles (model.roles ++ AddRoles.toRoles(model.addRoles))
+                rs =
+                    addIdToRoles (model.roles ++ AddRoles.toRoles (model.addRoles))
             in
                 ( { model | roles = rs }
                 , Cmd.none
                 )
 
-        EditRoles string->
+        EditRoles string ->
             let
                 -- updateRoles = { x | role = string }
-                updateRoles = List.map
-                     (\x -> if x.selected == True then
-                                { x | role = string  }
+                updateRoles =
+                    List.map
+                        (\x ->
+                            if x.selected == True then
+                                { x | role = string }
                             else
                                 x
-                     )
-                     model.roles
-
+                        )
+                        model.roles
             in
                 ( { model | roles = updateRoles }
                 , Cmd.none
@@ -155,10 +166,13 @@ update msg model =
 
         Breakdown ->
             ( { model | breakdown = not model.breakdown }
-            , Cmd.none)
+            , Cmd.none
+            )
 
-        -- _ ->
-        --     (model, Cmd.none)
+
+
+-- _ ->
+--     (model, Cmd.none)
 
 
 toggleAll : Bool -> List Role -> List Role
@@ -166,23 +180,23 @@ toggleAll bool roles =
     List.map (\x -> { x | selected = bool }) roles
 
 
-
 toggle : String -> Role -> Role
 toggle id role =
-  if role.id == id then
-    { role | selected = not role.selected }
+    if role.id == id then
+        { role | selected = not role.selected }
+    else
+        role
 
-  else
-    role
+
 
 -- VIEW
 
 
 view : Model -> Html Msg
 view model =
-    Material.Scheme.top
-        <| Dashboard.makePanel
-            (Just {title = "Skin 2017-01-01", rightItem= Nothing})
+    Material.Scheme.top <|
+        Dashboard.makePanel
+            (Just { title = "Skin 2017-01-01", rightItem = Nothing })
             (panelBody model)
             (Just (panelFooter model.mdl))
 
@@ -191,28 +205,27 @@ panelFooter : Material.Model -> Html Msg
 panelFooter mdl =
     div []
         [ Button.render Mdl
-              [ 4 ]
-              mdl
-              [ Button.ripple
-              , Button.accent
-              , Options.onClick Breakdown
-              ]
-              [ text "Breakdown" ]
+            [ 4 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            , Options.onClick Breakdown
+            ]
+            [ text "Breakdown" ]
         , Button.render Mdl
-              [ 5 ]
-              mdl
-              [ Button.ripple
-              , Button.accent
-              ]
-              [ text "Export CSV" ]
-
+            [ 5 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            ]
+            [ text "Export CSV" ]
         , Button.render Mdl
-              [ 4 ]
-              mdl
-              [ Button.ripple
-              , Button.accent
-              ]
-              [ text "Wrap Skin" ]
+            [ 4 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            ]
+            [ text "Wrap Skin" ]
         ]
 
 
@@ -220,7 +233,9 @@ panelBody : Model -> Html Msg
 panelBody model =
     div []
         [ viewAddRoles model.dialogOpened model.addRoles
-        , viewTableWithSearch model ]
+        , viewTableWithSearch model
+        ]
+
 
 viewAddRoles : Dialog -> AddRoles.Model -> Html Msg
 viewAddRoles dialog addRolessModel =
@@ -239,30 +254,39 @@ viewAddRoles dialog addRolessModel =
 
 
 viewEditRoles : Html Msg
-viewEditRoles  =
+viewEditRoles =
     div []
         [ text "Edit Role"
         , input [ placeholder "Edit Role", onInput EditRoles ] []
         ]
+
 
 acceptableRoles : String -> List Role -> List Role
 acceptableRoles query roles =
     let
         lowerQuery =
             String.join "" << String.words <| String.toLower query
-        _ = Debug.log "lowerQuery" lowerQuery
+
+        _ =
+            Debug.log "lowerQuery" lowerQuery
     in
         roles
             |> List.filter
-               (String.contains lowerQuery
+                (String.contains lowerQuery
                     << String.join ""
                     << String.words
                     << String.toLower
-                    << roleToString)
+                    << roleToString
+                )
 
 
 viewTableWithSearch : Model -> Html Msg
+
+
+
 -- viewTableWithSearch breakdown roles tableState query =
+
+
 viewTableWithSearch model =
     let
         checkedAll =
@@ -273,46 +297,50 @@ viewTableWithSearch model =
             , viewTable model.breakdown model.tableState (acceptableRoles model.query model.roles)
             ]
 
+
 topButtons : Material.Model -> Bool -> Html Msg
 topButtons mdl checkedAll =
-    div  []
+    div []
         [ input
-              [ type_ "checkbox"
-              , onCheck ToggleSelectedAll
-              , checked checkedAll
+            [ type_ "checkbox"
+            , onCheck ToggleSelectedAll
+            , checked checkedAll
               -- Hackish style
               -- TODO: Use thead options in Customizations
-              , style [ ("position", "relative")
-                      , ("top", "30px")
-                      , ("left", "3px")]
-              ]
-              []
+            , style
+                [ ( "position", "relative" )
+                , ( "top", "30px" )
+                , ( "left", "3px" )
+                ]
+            ]
+            []
         , Textfield.render Mdl
-              [ 0 ]
-              mdl
-              [ Textfield.label "Search by Role"
-              , Textfield.floatingLabel
-              , Options.dispatch Batch
-              , Options.onInput SetQuery
-              ]
-              []
+            [ 0 ]
+            mdl
+            [ Textfield.label "Search by Role"
+            , Textfield.floatingLabel
+            , Options.dispatch Batch
+            , Options.onInput SetQuery
+            ]
+            []
         , Button.render Mdl
-              [ 1 ]
-              mdl
-              [ Button.ripple
-              , Button.accent
-              , Options.onClick (ToggleDialog AddDialog)
-              ]
-              [ text "ADD" ]
+            [ 1 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            , Options.onClick (ToggleDialog AddDialog)
+            ]
+            [ text "ADD" ]
         , Button.render Mdl
-              [ 2 ]
-              mdl
-              [ Button.ripple
-              , Button.accent
-              , Options.onClick (ToggleDialog EditDialog)
-              ]
-              [ text "Edit" ]
+            [ 2 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            , Options.onClick (ToggleDialog EditDialog)
+            ]
+            [ text "Edit" ]
         ]
+
 
 viewTable : Bool -> Table.State -> List Role -> Html Msg
 viewTable bool tableState roles =
@@ -324,29 +352,31 @@ viewTable bool tableState roles =
 
 sortBreakdown : List Role -> List Role
 sortBreakdown roles =
-    List.sortBy .pay
-        <| List.sortBy .lunchStart
-        <| List.sortBy .lunchLength
-        <| List.sortBy .clockIn
-        <| List.sortBy .clockOut
-        <| roles
+    List.sortBy .pay <|
+        List.sortBy .lunchStart <|
+            List.sortBy .lunchLength <|
+                List.sortBy .clockIn <|
+                    List.sortBy .clockOut <|
+                        roles
+
 
 compareBreakdown : Role -> Role -> Bool
 compareBreakdown x y =
     (x.pay == y.pay) && (x.lunchStart == y.lunchStart) && (x.lunchLength == y.lunchLength) && (x.clockIn == y.clockIn) && (x.clockOut == y.clockOut)
 
 
-flatListRole : List (List Role) -> List (Role)
-flatListRole listRoles=
+flatListRole : List (List Role) -> List Role
+flatListRole listRoles =
     case listRoles of
-        (x::xs) ->
+        x :: xs ->
             let
-                role = Maybe.withDefault emptyRole (List.head x)
+                role =
+                    Maybe.withDefault emptyRole (List.head x)
             in
-             [{ role | sum = toString(List.length x) }] ++ flatListRole xs
+                [ { role | sum = toString (List.length x) } ] ++ flatListRole xs
+
         [] ->
             []
-
 
 
 viewTableBreakdown : Table.State -> List Role -> Html Msg
@@ -354,82 +384,98 @@ viewTableBreakdown tableState roles =
     let
         acceptableRole =
             groupWhile (compareBreakdown) (sortBreakdown roles)
-        _ = Debug.log "groupWhile: " (List.map (\x -> List.length x) acceptableRole)
-        d = Debug.log "groupWhile: " (List.map (\x -> x.first) roles)
+
+        _ =
+            Debug.log "groupWhile: " (List.map (\x -> List.length x) acceptableRole)
+
+        d =
+            Debug.log "groupWhile: " (List.map (\x -> x.first) roles)
     in
         Table.view configBreakdown tableState (flatListRole acceptableRole)
 
+
+
 -- Pay, Lunch Start, Lunch Length, Clock In, Clock Out
+
 
 configBreakdown : Table.Config Role Msg
 configBreakdown =
-  Table.customConfig
-    { toId = .id
-    , toMsg = SetTableState
-    , columns =
-        [ checkboxColumn
-        , Table.stringColumn "Sum" .sum
-        , Table.stringColumn "Pay" .pay
-        , Table.stringColumn "Lunch Start" .lunchStart
-        , Table.stringColumn "Lunch length" .lunchLength
-        , Table.stringColumn "In" .clockIn
-        , Table.stringColumn "Out" .clockOut
-        ]
-    , customizations =
-        { defaultCustomizations | rowAttrs = toRowAttrs }
-    }
+    Table.customConfig
+        { toId = .id
+        , toMsg = SetTableState
+        , columns =
+            [ checkboxColumn
+            , Table.stringColumn "Sum" .sum
+            , Table.stringColumn "Pay" .pay
+            , Table.stringColumn "Lunch Start" .lunchStart
+            , Table.stringColumn "Lunch length" .lunchLength
+            , Table.stringColumn "In" .clockIn
+            , Table.stringColumn "Out" .clockOut
+            ]
+        , customizations =
+            { defaultCustomizations | rowAttrs = toRowAttrs }
+        }
 
 
 config : Table.Config Role Msg
 config =
-  Table.customConfig
-    { toId = .id
-    , toMsg = SetTableState
-    , columns =
-        [ checkboxColumn
-        , Table.stringColumn "Role" .role
-        , Table.stringColumn "First" .first
-        , Table.stringColumn "Last" .last
-        , Table.stringColumn "Call Start" .callStart
-        , Table.stringColumn "Pay" .pay
-        , Table.stringColumn "Lunch Start" .lunchStart
-        , Table.stringColumn "Lunch length" .lunchLength
-        , Table.stringColumn "In" .clockIn
-        , Table.stringColumn "Out" .clockOut
-        , Table.stringColumn "Call End" .callEnd
-        , Table.stringColumn "Email" .email
-        ]
-    , customizations =
-        { defaultCustomizations | rowAttrs = toRowAttrs }
-    }
+    Table.customConfig
+        { toId = .id
+        , toMsg = SetTableState
+        , columns =
+            [ checkboxColumn
+            , Table.stringColumn "Role" .role
+            , Table.stringColumn "First" .first
+            , Table.stringColumn "Last" .last
+            , Table.stringColumn "Call Start" .callStart
+            , Table.stringColumn "Pay" .pay
+            , Table.stringColumn "Lunch Start" .lunchStart
+            , Table.stringColumn "Lunch length" .lunchLength
+            , Table.stringColumn "In" .clockIn
+            , Table.stringColumn "Out" .clockOut
+            , Table.stringColumn "Call End" .callEnd
+            , Table.stringColumn "Email" .email
+            ]
+        , customizations =
+            { defaultCustomizations | rowAttrs = toRowAttrs }
+        }
+
 
 checkboxColumn : Table.Column Role Msg
 checkboxColumn =
-  Table.veryCustomColumn
-    { name = ""
-    , viewData = viewCheckbox
-    , sorter = Table.unsortable
-    }
+    Table.veryCustomColumn
+        { name = ""
+        , viewData = viewCheckbox
+        , sorter = Table.unsortable
+        }
+
 
 viewCheckbox : Role -> Table.HtmlDetails Msg
-viewCheckbox {selected} =
-  Table.HtmlDetails []
-    [ input [ type_ "checkbox", checked selected ] []
-    ]
+viewCheckbox { selected } =
+    Table.HtmlDetails []
+        [ input [ type_ "checkbox", checked selected ] []
+        ]
 
 
 toRowAttrs : Role -> List (Attribute Msg)
 toRowAttrs role =
-  [ onClick (ToggleSelected role.id)
-  , style [ ("background", if role.selected then "#CEFAF8" else "white") ]
-  ]
+    [ onClick (ToggleSelected role.id)
+    , style
+        [ ( "background"
+          , if role.selected then
+                "#CEFAF8"
+            else
+                "white"
+          )
+        ]
+    ]
+
 
 viewLink : String -> Html msg
 viewLink name =
     li [] [ a [ href ("#" ++ name) ] [ text name ] ]
 
 
+
 -- PORTS
-
-
 -- SUBSCRIPTIONS
