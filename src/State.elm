@@ -26,9 +26,7 @@ init location =
     ( { history = [ location ]
       , currentImg = Nothing
       , currentDate = Nothing
-      , currentViewState = LoginView
-      , extraPortalModel = (ExtraPortal.initModel defaultUserID)
-      , paPortalModel = (PAState.initModel "word")
+      , currentViewState = Login
       , title = "Yo"
       , mdl = Material.model
       }
@@ -61,17 +59,23 @@ update msg model =
       ChangeView viewState ->
           case viewState of
               LoginView ->
-                  ( { model | currentViewState = viewState }, Cmd.none )
+                  ( { model | currentViewState = Login }, Cmd.none )
 
               ExtraPortalView ->
                   let
-                      ( extraPortalModel, cmd ) =
-                          ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
+                      ( extraPortalModel, epCmd ) =
+                          ExtraPortal.initModel defaultUserID model.currentDate
                   in
-                      ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
+                      ( { model | currentViewState = ExtraPortal extraPortalModel }
+                        , Cmd.map (\b -> ChildMsg (ExtraPortalMsg b)) epCmd
+                      )
 
               PAPortalView ->
-                  ( { model | currentViewState = viewState }, Cmd.none )
+                let
+                  paModel = PAState.initModel defaultUserID
+                in
+                  ( { model | currentViewState = PAPortal paModel }, Cmd.none )
+
 
       UrlChange location ->
           ( { model | history = location :: model.history }
@@ -81,19 +85,32 @@ update msg model =
       LoginMsg loginMsg ->
           ( model, Cmd.none )
 
-      ExtraPortalMsg epMsg ->
-          let
-              ( extraPortalModel, epCmd ) =
-                  ExtraPortal.update epMsg model.extraPortalModel
-          in
-              ( { model | extraPortalModel = extraPortalModel }, Cmd.map (\b -> ExtraPortalMsg b) epCmd )
+      ChildMsg subMsg->
+        case subMsg of
+          ExtraPortalMsg epMsg ->
+            case model.currentViewState of
+              Login -> (model, Cmd.none)
+              ExtraPortal curModel ->
+                let
+                    ( epModel, epCmd ) = ExtraPortal.update epMsg curModel
+                in
+                    ( { model | currentViewState = ExtraPortal epModel }
+                      , Cmd.map (\b -> (ChildMsg (ExtraPortalMsg b))) epCmd )
+              PAPortal curModel ->
+                (model, Cmd.none)
 
-      PAPortalMsg paMsg ->
-          let
-              ( paPortalModel, paCmd ) =
-                  PAState.update paMsg model.paPortalModel
-          in
-              ( { model | paPortalModel = paPortalModel }, Cmd.map (\b -> PAPortalMsg b) paCmd )
+          PAPortalMsg paMsg ->
+              case model.currentViewState of
+                Login -> (model, Cmd.none)
+                PAPortal curModel ->
+                  let
+                      ( paPortalModel, paCmd ) = PAState.update paMsg curModel
+                  in
+                      ( { model | currentViewState = PAPortal paPortalModel }
+                        , Cmd.map (\b -> (ChildMsg (PAPortalMsg b))) paCmd )
+                ExtraPortal curModel ->
+                  (model, Cmd.none)
+
 
       ToggleNotifications ->
           ( model, Cmd.none )
@@ -109,7 +126,12 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Time.every hour Tick
-        , Sub.map PAPortalMsg (PAState.subscriptions model.paPortalModel)
-        , Sub.map ExtraPortalMsg (ExtraPortal.subscriptions model.extraPortalModel)
+        , case model.currentViewState of
+            ExtraPortal epModel ->
+              Sub.map (\b -> ChildMsg (ExtraPortalMsg b)) (ExtraPortal.subscriptions epModel)
+            PAPortal paModel ->
+              Sub.map (\b -> ChildMsg (PAPortalMsg b)) (PAState.subscriptions paModel)
+            Login ->
+              Sub.none
         , Material.subscriptions Mdl model
         ]

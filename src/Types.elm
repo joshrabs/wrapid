@@ -13,31 +13,32 @@ type alias Model =
     { history : List Nav.Location
     , currentDate: Maybe Date
     , currentImg : Maybe String
-    , currentViewState : ViewState
-    , extraPortalModel : ExtraPortal.Model
-    , paPortalModel : PAPortal.Model
+    , currentViewState : ViewModelState
     , title : String
     , mdl : Material.Model
     }
 
+type ViewModelState
+    = Login
+    | ExtraPortal ExtraPortal.Model
+    | PAPortal PAPortal.Model
+
+type ViewMsg = LoginView | PAPortalView | ExtraPortalView
 
 type Msg
     = UrlChange Nav.Location
     | Tick Time
     | SetDate Date
     | LoginMsg Login.Msg
-    | ChangeView ViewState
-    | ExtraPortalMsg ExtraPortal.Msg
-    | PAPortalMsg PAPortal.Msg
+    | ChangeView ViewMsg
+    | ChildMsg ChildPortalMsg
     | ToggleNotifications
     | SelectNotification String
     | Mdl (Material.Msg Msg)
 
+type ChildPortalMsg = ExtraPortalMsg ExtraPortal.Msg | PAPortalMsg PAPortal.Msg
 
-type ViewState
-    = LoginView
-    | ExtraPortalView
-    | PAPortalView
+
 
 
 type alias Url =

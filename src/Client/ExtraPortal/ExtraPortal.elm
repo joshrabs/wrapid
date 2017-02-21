@@ -11,28 +11,31 @@ import Client.ExtraPortal.Pages.ProfileWizard as Wizard
 import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor)
 
 import Client.ExtraPortal.Types exposing (..)
+import Date exposing (Date)
+import Task exposing (perform, succeed)
 
 -- MODEL
 type RemoteData a = Loading | Success a
 
 type alias Model =
-    { currentView: Pages
+    { currentDate: Maybe Date
+    , currentView: Pages
     , wizardModel : Wizard.Model
     , userId: UserID
     , extraInfo: RemoteData ExtraInfo
     }
 
-initModel: String -> Model
-initModel userId =
+initModel: String -> Maybe Date -> (Model, Cmd Msg)
+initModel userId currentDate =
   (
-    { currentView = DailyMonitor
+    { currentDate = currentDate
+    , currentView = DailyMonitor
     , wizardModel = Wizard.init
     , userId = userId
     , extraInfo = Loading
-    })
-
-
-
+    }
+    , Task.perform (always LoadRemoteData) (Task.succeed ())
+  )
 
 type Pages = ProfileWizard | FormStatus | DailyMonitor
 

@@ -24,22 +24,14 @@ view : Model -> Html Msg
 view model =
     div []
         [ case model.currentViewState of
-            LoginView ->
+            Login ->
                 Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
 
-            ExtraPortalView ->
-                Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
+            ExtraPortal epModel ->
+                  Html.map (\b -> (ChildMsg (ExtraPortalMsg b))) (ExtraPortal.viewExtraPortal epModel)
+            PAPortal paModel ->
+                Html.map (\b -> (ChildMsg (PAPortalMsg b))) (PAPortal.viewPAPortal paModel)
 
-            PAPortalView ->
-                div
-                    []
-                    [ navbar
-                        model.mdl
-                        Nothing
-                        [ "Check in at 9:00", "Lunch at 12:30" ]
-                    , Html.map PAPortalMsg
-                        (PAPortal.viewPAPortal model.paPortalModel)
-                    ]
         , div [ style [ ( "position", "fixed" ), ( "top", "0px" ), ( "right", "0px" ), ( "border", "1px solid black" ) ] ]
             [ button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
             , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
