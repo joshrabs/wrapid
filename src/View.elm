@@ -22,42 +22,30 @@ import Navigation as Nav
 -}
 view : Model -> Html Msg
 view model =
-    let
-        navbarConfig =
-            { toggleMenuMsg = ToggleNotifications
-            , selectItemMsg = SelectNotification
-            }
+    div []
+        [ case model.currentViewState of
+            LoginView ->
+                Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
 
-        navbarContext =
-            { isOpen = False
-            }
-    in
-        div []
-            [ case model.currentViewState of
-                LoginView ->
-                    Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
+            ExtraPortalView ->
+                Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
 
-                ExtraPortalView ->
-                    Html.map ExtraPortalMsg (ExtraPortal.viewExtraPortal model.extraPortalModel)
-
-                PAPortalView ->
-                    div
-                        []
-                        [ navbar
-                            model.mdl
-                            navbarConfig
-                            navbarContext
-                            Nothing
-                            [ "Check in at 9:00", "Lunch at 12:30" ]
-                        , Html.map PAPortalMsg
-                            (PAPortal.viewPAPortal model.paPortalModel)
-                        ]
-            , div [ style [ ( "position", "fixed" ), ( "top", "0px" ), ( "right", "0px" ), ( "border", "1px solid black" ) ] ]
-                [ button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
-                , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
-                , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
-                ]
+            PAPortalView ->
+                div
+                    []
+                    [ navbar
+                        model.mdl
+                        Nothing
+                        [ "Check in at 9:00", "Lunch at 12:30" ]
+                    , Html.map PAPortalMsg
+                        (PAPortal.viewPAPortal model.paPortalModel)
+                    ]
+        , div [ style [ ( "position", "fixed" ), ( "top", "0px" ), ( "right", "0px" ), ( "border", "1px solid black" ) ] ]
+            [ button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
+            , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
+            , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
             ]
+        ]
 
 
 {-| Not sure what these are for. They're not used in the view function, and
