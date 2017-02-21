@@ -1,6 +1,5 @@
 module Client.PAPortal.View exposing (..)
 
-import Client.Generic.Dashboard.Dashboard as Dashboard
 import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
@@ -13,12 +12,7 @@ import Html.Events exposing (..)
 viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
-        [ let
-            rightItems =
-                { avatar = Just model.user.url }
-          in
-            Dashboard.view { navbar = { rightItems = Just rightItems } }
-        , viewHeader model.currentView
+        [ viewHeader model.currentView
         , viewCalendar Nothing
         , case model.currentView of
             LiveMonitor ->

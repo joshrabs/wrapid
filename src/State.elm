@@ -1,5 +1,6 @@
 module State exposing (..)
 
+import Material
 import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
@@ -9,12 +10,22 @@ import Client.ExtraPortal.ExtraPortal as ExtraPortal
 
 import Client.PAPortal.State as PAState
 
-defaultUserID: String
-defaultUserID = "ciykqvsynnqo60127o3illsce"
+
+defaultUserID : String
+defaultUserID =
+    "ciykqvsynnqo60127o3illsce"
+
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing LoginView (ExtraPortal.initModel defaultUserID) (PAState.initModel "word") "Yo"
+    ( { history = [ location ]
+      , currentImg = Nothing
+      , currentViewState = LoginView
+      , extraPortalModel = (ExtraPortal.initModel defaultUserID)
+      , paPortalModel = (PAState.initModel "word")
+      , title = "Yo"
+      , mdl = Material.model
+      }
     , Cmd.none
     )
 
@@ -28,10 +39,11 @@ update msg model =
                     ( { model | currentViewState = viewState }, Cmd.none )
 
                 ExtraPortalView ->
-                  let
-                    (extraPortalModel, cmd) = ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
-                  in
-                    ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
+                    let
+                        ( extraPortalModel, cmd ) =
+                            ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
+                    in
+                        ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
 
                 PAPortalView ->
                     ( { model | currentViewState = viewState }, Cmd.none )
@@ -58,10 +70,20 @@ update msg model =
             in
                 ( { model | paPortalModel = paPortalModel }, Cmd.map (\b -> PAPortalMsg b) paCmd )
 
+        ToggleNotifications ->
+            ( model, Cmd.none )
+
+        SelectNotification _ ->
+            ( model, Cmd.none )
+
+        Mdl message_ ->
+            Material.update Mdl message_ model
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Sub.map (\pas -> PAPortalMsg pas) (PAState.subscriptions model.paPortalModel)
-        , Sub.map (\eps -> ExtraPortalMsg eps) (ExtraPortal.subscriptions model.extraPortalModel)
+        [ Sub.map PAPortalMsg (PAState.subscriptions model.paPortalModel)
+        , Sub.map ExtraPortalMsg (ExtraPortal.subscriptions model.extraPortalModel)
+        , Material.subscriptions Mdl model
         ]
