@@ -22,6 +22,8 @@ type Msg
     | ChangeView ViewState
     | ExtraPortalMsg ExtraPortal.Msg
     | PAPortalMsg PAPortal.Msg
+    | ToggleNotifications
+    | SelectNotification String
 
 
 type ViewState

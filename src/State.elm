@@ -9,8 +9,11 @@ import Client.ExtraPortal.ExtraPortal as ExtraPortal
 
 import Client.PAPortal.State as PAState
 
-defaultUserID: String
-defaultUserID = "ciykqvsynnqo60127o3illsce"
+
+defaultUserID : String
+defaultUserID =
+    "ciykqvsynnqo60127o3illsce"
+
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
@@ -28,10 +31,11 @@ update msg model =
                     ( { model | currentViewState = viewState }, Cmd.none )
 
                 ExtraPortalView ->
-                  let
-                    (extraPortalModel, cmd) = ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
-                  in
-                    ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
+                    let
+                        ( extraPortalModel, cmd ) =
+                            ExtraPortal.update ExtraPortal.LoadRemoteData model.extraPortalModel
+                    in
+                        ( { model | extraPortalModel = extraPortalModel, currentViewState = viewState }, cmd )
 
                 PAPortalView ->
                     ( { model | currentViewState = viewState }, Cmd.none )
@@ -57,6 +61,12 @@ update msg model =
                     PAState.update paMsg model.paPortalModel
             in
                 ( { model | paPortalModel = paPortalModel }, Cmd.map (\b -> PAPortalMsg b) paCmd )
+
+        ToggleNotifications ->
+            ( model, Cmd.none )
+
+        SelectNotification _ ->
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

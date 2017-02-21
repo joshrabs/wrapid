@@ -2,17 +2,29 @@ module Common.Navbar exposing (navbar)
 
 import Html exposing (Html, div, img, span, text)
 import Html.Attributes exposing (src, style)
+import Html.Events exposing (onClick)
 import Svg exposing (svg)
 import Svg.Attributes exposing (d, fill, height, id, path, stroke, viewBox, width)
 import Common.Styles as Styles
 import Common.WrapidLogo exposing (logo)
 
 
-navbar : Maybe String -> List String -> Html msg
-navbar avatarUrl notifications =
+type alias Config msg =
+    { toggleMenuMsg : msg
+    , selectItemMsg : String -> msg
+    }
+
+
+type alias Context =
+    { isOpen : Bool
+    }
+
+
+navbar : Config msg -> Context -> Maybe String -> List String -> Html msg
+navbar config context avatarUrl notifications =
     let
         rightMenu =
-            [ notifier notifications
+            [ notifier config context notifications
             , avatar avatarUrl
             , hamburgerMenu
             ]
@@ -39,12 +51,7 @@ avatar mStr =
             "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
         url =
-            case mStr of
-                Just string ->
-                    string
-
-                Nothing ->
-                    defaultAvatarUrl
+            Maybe.withDefault defaultAvatarUrl mStr
     in
         img [ style [ ( "width", "40px" ), ( "border-radius", "50%" ) ], src url ] []
 
@@ -72,9 +79,9 @@ hamburgerBarItem =
         []
 
 
-notifier : List String -> Html msg
-notifier notifications =
-    div []
+notifier : Config msg -> Context -> List String -> Html msg
+notifier config context notifications =
+    div [ onClick config.toggleMenuMsg ]
         [ div [ Html.Attributes.style [ ( "position", "relative" ) ] ]
             [ div
                 [ Html.Attributes.style
