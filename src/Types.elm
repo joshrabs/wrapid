@@ -1,5 +1,6 @@
 module Types exposing (..)
 
+import Material
 import Navigation as Nav
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.Types as PAPortal
@@ -13,6 +14,7 @@ type alias Model =
     , extraPortalModel : ExtraPortal.Model
     , paPortalModel : PAPortal.Model
     , title : String
+    , mdl : Material.Model
     }
 
 
@@ -24,6 +26,7 @@ type Msg
     | PAPortalMsg PAPortal.Msg
     | ToggleNotifications
     | SelectNotification String
+    | Mdl (Material.Msg Msg)
 
 
 type ViewState

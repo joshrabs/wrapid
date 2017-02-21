@@ -1,5 +1,6 @@
 module State exposing (..)
 
+import Material
 import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
@@ -17,7 +18,14 @@ defaultUserID =
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model [ location ] Nothing LoginView (ExtraPortal.initModel defaultUserID) (PAState.initModel "word") "Yo"
+    ( { history = [ location ]
+      , currentImg = Nothing
+      , currentViewState = LoginView
+      , extraPortalModel = (ExtraPortal.initModel defaultUserID)
+      , paPortalModel = (PAState.initModel "word")
+      , title = "Yo"
+      , mdl = Material.model
+      }
     , Cmd.none
     )
 
@@ -68,10 +76,14 @@ update msg model =
         SelectNotification _ ->
             ( model, Cmd.none )
 
+        Mdl message_ ->
+            Material.update Mdl message_ model
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ Sub.map (\pas -> PAPortalMsg pas) (PAState.subscriptions model.paPortalModel)
-        , Sub.map (\eps -> ExtraPortalMsg eps) (ExtraPortal.subscriptions model.extraPortalModel)
+        [ Sub.map PAPortalMsg (PAState.subscriptions model.paPortalModel)
+        , Sub.map ExtraPortalMsg (ExtraPortal.subscriptions model.extraPortalModel)
+        , Material.subscriptions Mdl model
         ]

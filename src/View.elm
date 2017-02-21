@@ -44,6 +44,7 @@ view model =
                     div
                         []
                         [ navbar
+                            model.mdl
                             navbarConfig
                             navbarContext
                             Nothing
