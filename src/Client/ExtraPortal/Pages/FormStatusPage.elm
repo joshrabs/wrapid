@@ -7,6 +7,8 @@ import Html.Events exposing (onClick)
 import Assets.Icons.CheckedCircleIcon exposing (viewCheckedCircle)
 import Assets.Icons.ForwardArrow exposing (viewForwardArrow)
 
+import Animation exposing (px)
+
 defaultImgSrc = "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciz8vkq0f0jdc0168aoxv5h3w"
 
 type alias FormStatuses = List FormStatus
@@ -18,8 +20,8 @@ type alias FormStatus =
    ,imgSrc: String
   }
 
-viewFormStatusPage: msg -> FormStatuses -> Html msg
-viewFormStatusPage msg statuses =
+viewFormStatusPage: msg -> FormStatuses ->  List (Attribute msg) -> Html msg
+viewFormStatusPage msg statuses animStyle =
   div [style [("margin", "8px")]]
     [
       div [style [
@@ -30,6 +32,7 @@ viewFormStatusPage msg statuses =
           ("font-family", "Roboto-Bold")
           ,("font-size", "32px")
           ,("color", "#282C35")
+          ,("margin-top", "8px")
           ,("letter-spacing", "0")
         ]]
         [text "Your Completed Forms"]
@@ -45,7 +48,7 @@ viewFormStatusPage msg statuses =
         ,("margin", "8px 0px 4px 0px")
        ]]
        [text "Go to daily tasks", viewForwardArrow "24" "24"]
-      ,div [] (List.map (\item -> viewFormStatusIcon item) statuses)
+      ,div animStyle (List.map (\item -> viewFormStatusIcon item) statuses)
     ]
 
 

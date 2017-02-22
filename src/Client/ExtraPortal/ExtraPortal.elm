@@ -166,8 +166,7 @@ viewExtraPortal model =
                       [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
               FormStatus ->
-                div (Animation.render model.animStyle)
-                  [viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus]
+                viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus (Animation.render model.animStyle)
 
       ]
 
