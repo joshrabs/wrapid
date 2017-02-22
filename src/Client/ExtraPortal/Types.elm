@@ -15,6 +15,8 @@ type alias TimeCard =
   , clockoutTs: Maybe String
   }
 
+type PunchAction = PunchIn | PunchOut
+
 type alias UserID = String
 type alias Schedule = List ScheduleItem
 type alias ScheduleItem =

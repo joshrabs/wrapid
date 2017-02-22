@@ -7,12 +7,9 @@ import Html.Events exposing (onClick)
 import Svg exposing (svg, g, node)
 import Svg.Attributes exposing (d, viewBox, id, height, width, fill, fillRule, stroke, strokeWidth, transform, points)
 
-import Client.ExtraPortal.Types exposing (TimeCard, Schedule)
+import Client.ExtraPortal.Types exposing (TimeCard, Schedule, PunchAction(..))
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 
-
---UPDATE
-type PunchAction = PunchIn | PunchOut
 
 --VIEW
 type ClockinStatus = NotClockedIn | ClockedInNotOut | ClockedOut

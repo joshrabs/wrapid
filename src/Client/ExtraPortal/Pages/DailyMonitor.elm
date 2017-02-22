@@ -6,9 +6,9 @@ import Html.Attributes exposing (style)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Client.ExtraPortal.ExtraWardrobeStatus exposing (..)
 import Client.ExtraPortal.NotificationBar as NotificationBar exposing (convertSchedule, viewNotificationBarPanel, NotificationIcon(..), NotificationBarItem)
-import Client.ExtraPortal.Schedule exposing (viewSchedulePanel, PunchAction(..))
+import Client.ExtraPortal.Schedule exposing (viewSchedulePanel)
 
-import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
+import Client.ExtraPortal.Types exposing (Schedule, TimeCard, PunchAction(..))
 import Date exposing (Date, day, month, year, dayOfWeek)
 
 -- MODEL

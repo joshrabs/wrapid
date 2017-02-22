@@ -8,7 +8,7 @@ import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard
-import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor)
+import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor, Msg(..))
 
 import Client.ExtraPortal.Types exposing (..)
 import Date exposing (Date)
@@ -16,6 +16,7 @@ import Task exposing (perform, succeed)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
 import Animation exposing (px)
+import Time exposing (Time)
 
 -- MODEL
 type RemoteData a = Loading | Success a
@@ -62,11 +63,15 @@ type Msg =
     | TimeCardUpdate TimeCard
     | Animate Animation.Msg
     | FadeInUpMsg
+    | ClockIn Time
 
 
 fadeInUpMsg: Cmd Msg
 fadeInUpMsg = Task.perform (always FadeInUpMsg) (Task.succeed ())
 
+submitClockin: Cmd Msg
+submitClockin =
+  Task.perform ClockIn Time.now
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -120,10 +125,21 @@ update msg model =
                 ( { model | wizardModel = updatedWizardModel }
                 , Cmd.none
                 )
+        ClockIn curTime ->
+          ( model
+          , case model.extraInfo of
+              Success extraInfo -> clockinExtra(extraInfo.timecard.id, curTime |> toString)
+              Loading -> Cmd.none
+          )
         DailyMonitorMsg dmMsg ->
-            ( model
-            , clockinExtra("cizbke6ld32du0152funy1fe3", "10:00am")
-            )
+          case dmMsg of
+            TimeCardMsg punchAction ->
+              case punchAction of
+                PunchIn -> (model, submitClockin)
+                PunchOut ->
+                  ( model
+                  , clockinExtra("cizbke6ld32du0152funy1fe3", "10:00am")
+                  )
 
         NoOp -> (model, Cmd.none)
 
