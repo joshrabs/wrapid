@@ -1,7 +1,7 @@
 module Client.PAPortal.View exposing (..)
 
 import Client.PAPortal.Types exposing (..)
-import Client.PAPortal.HorizontalCalendar exposing (viewCalendar)
+import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Html exposing (..)
@@ -13,18 +13,13 @@ viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
         [ viewHeader model.currentView
-        , viewCalendar Nothing
+        ,  case model.selectedDate of
+            Just selectedDate -> viewCalendar SetSelectedDate selectedDate
+            Nothing -> div [] []
         , case model.currentView of
             LiveMonitor ->
                 div []
                     [ viewLiveMonitor LiveMonitor.initModel
-                    , button [ onClick GetAllProfiles ] [ text "Get All Profiles" ]
-                    , case model.extras of
-                        [] ->
-                            div [] [ text "No extras!" ]
-
-                        extras ->
-                            div [] (List.map viewExtras extras)
                     ]
 
             SkinManager ->

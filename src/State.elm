@@ -72,7 +72,7 @@ update msg model =
 
               PAPortalView ->
                 let
-                  paModel = PAState.initModel defaultUserID
+                  paModel = PAState.initModel defaultUserID model.currentDate Nothing
                 in
                   ( { model | currentViewState = PAPortal paModel }, Cmd.none )
 

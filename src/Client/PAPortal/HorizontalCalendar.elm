@@ -1,12 +1,12 @@
 module Client.PAPortal.HorizontalCalendar exposing (..)
 
 import Date exposing (Date, day, month)
-import Date.Extra.Core exposing (nextDay)
 import Date.Extra.Utils exposing (dayList)
 import Date.Extra.Period exposing (add, Period(..))
 import Date.Extra.Compare as DateCompare exposing (is, Compare2)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 
 type alias Context =
   {
@@ -22,6 +22,7 @@ defaultDay: Date
 defaultDay =
   Date.fromString "2017/5/1" |> Result.withDefault (Date.fromTime 0)
 
+fakeToday: Date
 fakeToday = add Day 2 defaultDay
 
 defaultContext: Context
@@ -33,38 +34,35 @@ defaultContext =
   }
 
 
-defaultCalender: HorizontalCalendar
-defaultCalender =
-  (dayList 4 defaultDay)
-    |> List.map calendarItem
+defaultCalendar: Date -> HorizontalCalendar
+defaultCalendar selectedDate =
+  (dayList 4 (add Day -2 selectedDate))
+    |> List.map (calendarItem selectedDate)
 
-calendarItem: Date -> HorizontalCalendarItem
-calendarItem d =
+calendarItem: Date -> Date -> HorizontalCalendarItem
+calendarItem selectedDay d =
   let
-      isSelected = DateCompare.is DateCompare.Same d fakeToday
+      isSelected = DateCompare.is DateCompare.Same d selectedDay
   in
     {day = d, isSelected=isSelected}
 
-viewCalendar: Maybe HorizontalCalendar -> Html msg
-viewCalendar calendar =
+viewCalendar: (Date -> msg) -> Date -> Html msg
+viewCalendar setDateMsg selectedDate =
   let
-    model =
-      case calendar of
-        Just calendar -> calendar
-        Nothing -> defaultCalender
+    model = defaultCalendar selectedDate
   in
     div [style [
-      ("display", "flex")
-      ,("box-shadow", "0 8px 30px 0 rgba(0,0,0,0.04)")
-      ,("background", "#FFFFFF")
-      ,("margin-top", "8px")
-    ]]
-    (List.map (\item -> viewCalendarItem item) model)
+        ("display", "flex")
+        ,("box-shadow", "0 8px 30px 0 rgba(0,0,0,0.04)")
+        ,("background", "#FFFFFF")
+        ,("margin-top", "8px")
+      ]]
+    (List.map (\item -> viewCalendarItem setDateMsg item selectedDate) model)
 
 
-viewCalendarItem: HorizontalCalendarItem -> Html msg
-viewCalendarItem item =
-  div [style [
+viewCalendarItem: (Date -> msg) -> HorizontalCalendarItem -> Date -> Html msg
+viewCalendarItem setDateMsg item selectedDate=
+  div [onClick (setDateMsg item.day), style [
      ("display", "flex")
     ,("flex-direction", "column")
     ,("height", "120px")
@@ -72,7 +70,7 @@ viewCalendarItem item =
     ,("font-family", "Helvetica-Light")
     ,("font-size", "7px")
     , ("opacity",
-          if DateCompare.is DateCompare.After item.day fakeToday
+          if DateCompare.is DateCompare.After item.day selectedDate
             then "0.2" else "1.0")
   ]]
   [

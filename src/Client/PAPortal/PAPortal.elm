@@ -15,7 +15,9 @@ import Client.PAPortal.Pages.Wrap as WrapPage
 
 type alias Model =
   {
-    user: Profile
+    currentDate: Maybe Date
+  , selectedDate: Maybe Date
+  , user: Profile
   , extras: Maybe (List Profile)
   , currentView: ViewState
   , skinModel : Skin.Model
@@ -27,8 +29,8 @@ type alias Profile =
     , url : Maybe String
     }
 
-initModel: String -> Model
-initModel userId =
+initModel: String -> Maybe Date -> Model
+initModel userId currentDate =
   let
     user =
       {id=userId
@@ -38,6 +40,8 @@ initModel userId =
   in
   { user = user
   , extras = Nothing
+  , currentDate = currentDate
+  , selectedDate = currentDate
   , currentView = LiveMonitor
   , skinModel = Skin.initModel
   }
@@ -47,6 +51,7 @@ type ViewState = LiveMonitor | SkinManager | Wrap
 -- UPDATE
 type Msg =
     ChangeView ViewState
+  | SetSelectedDate Date
   | GetAllProfiles
   | Profiles (List Profile)
   | SkinMsg Skin.Msg
@@ -56,6 +61,8 @@ update msg model =
   case msg of
     ChangeView view ->
       ({model | currentView = view}, Cmd.none)
+    SetSelectedDate newDate ->
+      (initModel model.user newDate, Cmd.none)
     GetAllProfiles ->
       let _ = Debug.log "Running get all profiles!"
       in
@@ -89,7 +96,9 @@ viewPAPortal model =
           in
             Dashboard.view {navbar = {rightItems = Just rightItems}}
         , viewHeader model.currentView
-        , viewCalendar Nothing
+        , case model.selectedDate of
+            Just selectedDate -> viewCalendar SetSelectedDate (selectedDate)
+            Nothing -> viewCalendar SetSelectedDate Nothing
         ,
           case model.currentView of
             LiveMonitor ->

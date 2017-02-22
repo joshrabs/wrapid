@@ -4,7 +4,6 @@ import Types exposing (..)
 import Client.Generic.Authentication.Login.View as Login
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.View as PAPortal
-import Common.Navbar exposing (navbar)
 import Html exposing (Html, a, button, div, h1, h4, img, li, p, text, ul)
 import Html.Attributes exposing (href, src, style)
 import Html.Events exposing (onClick)
