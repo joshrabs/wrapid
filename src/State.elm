@@ -72,7 +72,8 @@ update msg model =
 
               PAPortalView ->
                 let
-                  (paModel, paCmd) = PAState.initModel defaultUserID model.currentDate Nothing
+                  (paModel, paCmd) =
+                    PAState.initModel defaultUserID model.currentDate Nothing model.mdl
                 in
                   ( { model | currentViewState = PAPortal paModel }
                   , Cmd.map (\b -> ChildMsg (PAPortalMsg b)) paCmd

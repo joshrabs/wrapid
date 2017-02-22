@@ -6,9 +6,10 @@ import Ports exposing (..)
 
 import Date exposing (Date)
 import Task exposing (perform, succeed)
+import Material
 
-initModel: String -> Maybe Date -> Maybe SelectedDate -> (Model, Cmd Msg)
-initModel userId currentDate selectedDate =
+initModel: String -> Maybe Date -> Maybe SelectedDate -> Material.Model -> (Model, Cmd Msg)
+initModel userId currentDate selectedDate materialModel =
   let
     user =
       {id=userId
@@ -27,6 +28,7 @@ initModel userId currentDate selectedDate =
           Nothing -> currentDate
     , currentView = LiveMonitor
     , skinModel = Skin.initModel
+    , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
     )
@@ -39,7 +41,7 @@ update msg model =
         LoadRemoteData ->
           (model, getAllExtraInfo("2014"))
         SetSelectedDate newDate ->
-          initModel model.user.id (model.currentDate) (Just (Just newDate))
+          initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         Profiles profs ->
           ({model | extras = Success (Just profs)}, Cmd.none)
         SkinMsg subMsg ->

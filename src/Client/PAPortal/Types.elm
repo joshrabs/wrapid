@@ -2,6 +2,7 @@ module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 
 import Date exposing (Date)
+import Material
 
 type RemoteData a = Loading | Success a
 
@@ -13,6 +14,7 @@ type alias Model =
   , extras: RemoteData ExtraInfo
   , currentView: ViewState
   , skinModel : Skin.Model
+  , mdl : Material.Model
   }
 
 type alias ExtraInfo = Maybe (List Profile)
