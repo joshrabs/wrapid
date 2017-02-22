@@ -21,7 +21,7 @@ import Navigation as Nav
 -}
 view : Model -> Html Msg
 view model =
-    div []
+    div [style [("height", "100vh")]]
         [ case model.currentViewState of
             Login ->
                 Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))

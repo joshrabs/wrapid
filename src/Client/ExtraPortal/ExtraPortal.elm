@@ -13,6 +13,7 @@ import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDaily
 import Client.ExtraPortal.Types exposing (..)
 import Date exposing (Date)
 import Task exposing (perform, succeed)
+import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
 -- MODEL
 type RemoteData a = Loading | Success a
@@ -100,7 +101,7 @@ update msg model =
 viewExtraPortal: Model -> Html Msg
 viewExtraPortal model =
   case model.extraInfo of
-    Loading -> div [] [text "Loading"]
+    Loading -> viewLoadingScreen
     Success extraInfo ->
       div []
         [
