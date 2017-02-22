@@ -3,17 +3,19 @@ import Client.PAPortal.Pages.SkinManager as Skin
 
 import Date exposing (Date)
 
+type RemoteData a = Loading | Success a
+
 type alias Model =
   {
     currentDate: Maybe Date
   , selectedDate: SelectedDate
   , user: Profile
-  , extras: Maybe (List Profile)
+  , extras: RemoteData ExtraInfo
   , currentView: ViewState
   , skinModel : Skin.Model
   }
 
-
+type alias ExtraInfo = Maybe (List Profile)
 type alias SelectedDate = Maybe Date
 
 type ViewState

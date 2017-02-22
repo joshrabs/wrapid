@@ -8,6 +8,7 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (..)
 
+import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
 viewPAPortal : Model -> Html Msg
 viewPAPortal model =
@@ -18,9 +19,12 @@ viewPAPortal model =
             Nothing -> div [] []
         , case model.currentView of
             LiveMonitor ->
-                div []
-                    [ viewLiveMonitor (LiveMonitor.initModel model.extras)
-                    ]
+              case model.extras of
+                Loading -> viewLoadingScreen
+                Success extras ->
+                  div []
+                      [ viewLiveMonitor (LiveMonitor.initModel extras)
+                      ]
 
             SkinManager ->
                 div []

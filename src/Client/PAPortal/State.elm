@@ -19,7 +19,7 @@ initModel userId currentDate selectedDate =
   in
     (
     { user = user
-    , extras = Nothing
+    , extras = Loading
     , currentDate = currentDate
     , selectedDate =
         case selectedDate of
@@ -41,7 +41,7 @@ update msg model =
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate))
         Profiles profs ->
-          ({model | extras = Just profs}, Cmd.none)
+          ({model | extras = Success (Just profs)}, Cmd.none)
         SkinMsg subMsg ->
             let
                 ( updatedSkinModel, skinCmd ) =
