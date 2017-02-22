@@ -104,7 +104,8 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
         console.log(extra)
         const {id, baseprofile} = extra;
         const {firstName, lastName, avatar} = baseprofile
-        return {id, firstName, lastName, avatarSrc: avatar.url}
+        const avatarSrc = avatar ? avatar.url : null
+        return {id, firstName, lastName, avatarSrc}
       }
       const extraInfo = allUsers.map(mapInfo)
       console.log(extraInfo)
