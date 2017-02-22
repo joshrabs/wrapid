@@ -72,9 +72,11 @@ update msg model =
 
               PAPortalView ->
                 let
-                  paModel = PAState.initModel defaultUserID model.currentDate Nothing
+                  (paModel, paCmd) = PAState.initModel defaultUserID model.currentDate Nothing
                 in
-                  ( { model | currentViewState = PAPortal paModel }, Cmd.none )
+                  ( { model | currentViewState = PAPortal paModel }
+                  , Cmd.map (\b -> ChildMsg (PAPortalMsg b)) paCmd
+                  )
 
 
       UrlChange location ->

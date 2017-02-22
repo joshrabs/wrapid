@@ -19,7 +19,7 @@ viewPAPortal model =
         , case model.currentView of
             LiveMonitor ->
                 div []
-                    [ viewLiveMonitor LiveMonitor.initModel
+                    [ viewLiveMonitor (LiveMonitor.initModel model.extras)
                     ]
 
             SkinManager ->

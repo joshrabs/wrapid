@@ -10,27 +10,27 @@ console.log(app)
 
 // client.getAllProfiles();
 
-app.ports.getAllProfiles.subscribe(function () {
-  client.getAllProfiles()
-    .then(result => {
-      console.log(result);
-      const frmt = result.data.allBaseProfiles.map(e => {
-        let obj = {
-          id: e.id,
-          firstName: e.firstName
-        };
-
-        obj.url = e.file ? e.file.url : null;
-
-        return obj;
-      });
-      console.log(frmt);
-      app.ports.receiveNames.send(frmt);
-    })
-    .catch(error => {
-      console.log(error);
-    });
-});
+// app.ports.getAllProfiles.subscribe(function () {
+//   client.getAllProfiles()
+//     .then(result => {
+//       console.log(result);
+//       const frmt = result.data.allBaseProfiles.map(e => {
+//         let obj = {
+//           id: e.id,
+//           firstName: e.firstName
+//         };
+//
+//         obj.url = e.file ? e.file.url : null;
+//
+//         return obj;
+//       });
+//       console.log(frmt);
+//       app.ports.receiveNames.send(frmt);
+//     })
+//     .catch(error => {
+//       console.log(error);
+//     });
+// });
 
 
 app.ports.getExtraInfo.subscribe(function (userDay) {
@@ -91,3 +91,26 @@ app.ports.createExtraSchedule.subscribe(function (scheduleParams) {
       console.log(error);
     });
 });
+
+
+app.ports.getAllExtraInfo.subscribe(function(params) {
+  const d = params[0]
+  console.log(d);
+  client.getAllExtraInfo(d)
+    .then(result => {
+      const allUsers = result.data.allUsers
+      console.log(result.data.allUsers)
+      const mapInfo = function(extra) {
+        console.log(extra)
+        const {id, baseprofile} = extra;
+        const {firstName, lastName, avatar} = baseprofile
+        return {id, firstName, lastName, avatarSrc: avatar.url}
+      }
+      const extraInfo = allUsers.map(mapInfo)
+      console.log(extraInfo)
+      app.ports.receiveAllExtraInfo.send(extraInfo);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+})

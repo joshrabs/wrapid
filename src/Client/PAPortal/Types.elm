@@ -23,6 +23,7 @@ type ViewState
 
 type Msg
     = ChangeView ViewState
+    | LoadRemoteData
     | SetSelectedDate Date
     | Profiles (List Profile)
     | SkinMsg Skin.Msg
@@ -30,5 +31,6 @@ type Msg
 type alias Profile =
     { id : String
     , firstName : String
-    , url : Maybe String
+    , lastName: String
+    , avatarSrc : Maybe String
     }

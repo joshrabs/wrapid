@@ -142,9 +142,28 @@ const createTimecard = gql`mutation createTimecard($userId:ID!, $clockinTs:Strin
   }
 }`
 
+
+
+const paLiveMonitorAllExtraInfo = gql`query {
+  allUsers(filter: {employeeType: Extra}){
+    id
+    baseprofile{
+      firstName
+      lastName
+      avatar {url}
+    }
+  }
+}`
+
 export default {
 
   // Queries
+  getAllExtraInfo: function(date) {
+    const query = paLiveMonitorAllExtraInfo;
+    console.log("QUERY!", query)
+    const variables = {};
+    return client.query({ query, variables });
+  },
 
   clockoutExtra: function(id, clockoutTs){
     const query = clockinExtra;

@@ -5,6 +5,8 @@ import Html.Attributes exposing (style, src)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 
+import Client.PAPortal.Types exposing (Profile)
+
 type alias Model =
     { extraSnapStat : ExtrasSnapStatModel
     , table : LiveExtraTable
@@ -18,7 +20,7 @@ type alias LiveExtraTable =
 type alias ExtraInfoItem =
     { firstName : String
     , lastName: String
-    , imgSrc : String
+    , imgSrc : Maybe String
     , isClockedIn : Bool
     }
 
@@ -44,17 +46,22 @@ fakeImg =
     "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 
-fakeTable : LiveExtraTable
-fakeTable =
-    [ { firstName = "Steven", lastName="MacCoun", imgSrc = fakeImg, isClockedIn = True }
-    , { firstName = "Josh", lastName="Weinberg", imgSrc = fakeImg, isClockedIn = True }
-    ]
+
+liveTable: Maybe (List Profile) -> LiveExtraTable
+liveTable profs =
+  case profs of
+    Just extras ->
+      (List.map (\prof ->
+        {firstName=prof.firstName, lastName=prof.lastName, imgSrc=prof.avatarSrc, isClockedIn=True}
+      )
+      extras)
+    Nothing -> []
 
 
-initModel : Model
-initModel =
+initModel : Maybe (List Profile) -> Model
+initModel profs=
     { extraSnapStat = fakeSnapStateModel
-    , table = fakeTable
+    , table = liveTable profs
     }
 
 
@@ -66,7 +73,7 @@ viewLiveMonitor : Model -> Html msg
 viewLiveMonitor model =
     div []
         [ viewExtrasSnapStats model.extraSnapStat
-        , viewLiveTable fakeTable
+        , viewLiveTable model.table
         ]
 
 
@@ -140,6 +147,11 @@ viewSearch =
 viewLiveTableItems items =
     div [] (List.map (\item -> viewLiveTableItem item) items)
 
+getImgSrc: Maybe String -> String
+getImgSrc imgSrc =
+  case imgSrc of
+    Just src -> src
+    Nothing -> fakeImg
 
 viewLiveTableItem : ExtraInfoItem -> Html msg
 viewLiveTableItem item =
@@ -155,13 +167,13 @@ viewLiveTableItem item =
             , ("margin", "8px 8px 8px 8px")
             ] ]
             [ img
-                [ src item.imgSrc
-                , style
-                    [ ( "border-radius", "50%" )
-                    , ( "height", "36px" )
-                    ]
-                ]
-                []
+                  [ src (getImgSrc item.imgSrc)
+                  , style
+                      [ ( "border-radius", "50%" )
+                      , ( "height", "36px" )
+                      ]
+                  ]
+                  []
             , div [style [
                 ("display", "flex")
                 , ("flex-direction", "column")
