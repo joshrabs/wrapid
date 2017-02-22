@@ -3,6 +3,8 @@ module Client.Generic.Status.Loading exposing (..)
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 
+import Material.Spinner as Loading
+
 viewLoadingScreen: Html msg
 viewLoadingScreen =
   div [style [
@@ -13,4 +15,6 @@ viewLoadingScreen =
   ]]
   [
     text "Loading..."
+    ,Loading.spinner
+      [ Loading.active False ]
   ]

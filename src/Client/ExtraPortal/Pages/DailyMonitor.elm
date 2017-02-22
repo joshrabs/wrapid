@@ -25,27 +25,31 @@ type alias Model =
 type Msg = TimeCardMsg PunchAction
 
 --VIEW
-viewDailyMonitor: Model -> Html Msg
-viewDailyMonitor model =
+viewDailyMonitor: Model -> List (Attribute Msg) -> Html Msg
+viewDailyMonitor model animStyle =
   div []
       [
         viewHeader {firstName=model.firstName, production="RunabetterSet Productions", date=model.currentDate}
-      , viewNotificationBarPanel (NotificationBar.convertSchedule model.schedule)
-      , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
-      ,
-         let
-           panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
-           panelBody = (viewWardrobeStatus NotCheckedIn)
-           footer = Nothing
-         in
-           Dashboard.makePanel panelHeader panelBody footer
-      ,
-         let
-           panelHeader = Just {title ="Contact Info", rightItem=Nothing}
-           panelBody = (viewCrewInfoItems defaultCrewInfoItems)
-           footer = Nothing
-         in
-           Dashboard.makePanel panelHeader panelBody footer
+      , div animStyle
+      [
+          viewNotificationBarPanel (NotificationBar.convertSchedule model.schedule)
+        , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
+        ,
+           let
+             panelHeader = Just {title ="Wardrobe", rightItem=Nothing}
+             panelBody = (viewWardrobeStatus NotCheckedIn)
+             footer = Nothing
+           in
+             Dashboard.makePanel panelHeader panelBody footer
+        ,
+           let
+             panelHeader = Just {title ="Contact Info", rightItem=Nothing}
+             panelBody = (viewCrewInfoItems defaultCrewInfoItems)
+             footer = Nothing
+           in
+             Dashboard.makePanel panelHeader panelBody footer
+      ]
+
       ]
 
 

@@ -4,6 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
+import Material
+
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
@@ -20,6 +22,7 @@ import Time exposing (Time)
 
 -- MODEL
 type RemoteData a = Loading | Success a
+type Pages = ProfileWizard | FormStatus | DailyMonitor
 
 type alias Model =
     { currentDate: Maybe Date
@@ -28,10 +31,11 @@ type alias Model =
     , userId: UserID
     , extraInfo: RemoteData ExtraInfo
     , animStyle: Animation.State
+    , mdl: Material.Model
     }
 
-initModel: String -> Maybe Date -> (Model, Cmd Msg)
-initModel userId currentDate =
+initModel: String -> Maybe Date -> Material.Model -> (Model, Cmd Msg)
+initModel userId currentDate mdlModel =
   (
     { currentDate = currentDate
     , currentView = DailyMonitor
@@ -39,6 +43,7 @@ initModel userId currentDate =
     , userId = userId
     , extraInfo = Loading
     , animStyle = initAnimStyle
+    , mdl = mdlModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
   )
@@ -49,7 +54,7 @@ initAnimStyle =
       , Animation.opacity 0.0
       ]
 
-type Pages = ProfileWizard | FormStatus | DailyMonitor
+
 
 -- UPDATE
 
@@ -174,8 +179,7 @@ viewExtraPortal model =
                       , schedule=extraInfo.schedule
                       }
                 in
-                  div (Animation.render model.animStyle)
-                    [Html.map DailyMonitorMsg (viewDailyMonitor dmModel)]
+                  Html.map DailyMonitorMsg (viewDailyMonitor dmModel (Animation.render model.animStyle))
 
               ProfileWizard ->
                   div []

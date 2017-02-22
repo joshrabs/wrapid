@@ -64,7 +64,7 @@ update msg model =
               ExtraPortalView ->
                   let
                       ( extraPortalModel, epCmd ) =
-                          ExtraPortal.initModel defaultUserID model.currentDate
+                          ExtraPortal.initModel defaultUserID model.currentDate model.mdl
                   in
                       ( { model | currentViewState = ExtraPortal extraPortalModel }
                         , Cmd.map (\b -> ChildMsg (ExtraPortalMsg b)) epCmd
