@@ -15,6 +15,8 @@ import Date exposing (Date)
 import Task exposing (perform, succeed)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
+import Animation exposing (px)
+
 -- MODEL
 type RemoteData a = Loading | Success a
 
@@ -24,6 +26,7 @@ type alias Model =
     , wizardModel : Wizard.Model
     , userId: UserID
     , extraInfo: RemoteData ExtraInfo
+    , animStyle: Animation.State
     }
 
 initModel: String -> Maybe Date -> (Model, Cmd Msg)
@@ -34,6 +37,11 @@ initModel userId currentDate =
     , wizardModel = Wizard.init
     , userId = userId
     , extraInfo = Loading
+    , animStyle =
+          Animation.style
+              [ Animation.translate (px 0) (px 100)
+              , Animation.opacity 0.0
+              ]
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
   )
@@ -50,18 +58,45 @@ type Msg =
     | LoadRemoteData
     | ExtraInfoRetrieved ExtraInfo
     | TimeCardUpdate TimeCard
+    | Animate Animation.Msg
+    | FadeInFadeOut
 
-update: Msg -> Model -> (Model, Cmd msg)
+
+fadeInUpMsg: Cmd Msg
+fadeInUpMsg = Task.perform (always FadeInFadeOut) (Task.succeed ())
+
+update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         ChangePage page ->
-            ({model | currentView = page}, Cmd.none)
+            ({model | currentView = page}, fadeInUpMsg)
+
+        FadeInFadeOut ->
+          let
+            newStyle =
+                Animation.interrupt
+                    [ Animation.to
+                          [ Animation.translate (px 0) (px 0)
+                          , Animation.opacity 1.0
+                          ]
+                    ]
+                    model.animStyle
+          in
+              ({ model
+                  | animStyle = newStyle
+              }, Cmd.none)
 
         LoadRemoteData ->
-            (model, getExtraInfo((model.userId, "2017-02-18")))
+            (model, Cmd.batch [getExtraInfo((model.userId, "2017-02-18"))])
 
         ExtraInfoRetrieved extraInfo ->
             ({model | extraInfo = Success extraInfo}, Cmd.none)
+
+        Animate animMsg ->
+          ({ model
+              | animStyle = Animation.update animMsg model.animStyle
+          }
+          ,Cmd.none)
 
         TimeCardUpdate timecard ->
           let
@@ -126,10 +161,11 @@ viewExtraPortal model =
                       , schedule=extraInfo.schedule
                       }
                 in
-                  Html.map DailyMonitorMsg (viewDailyMonitor dmModel)
+                  div (Animation.render model.animStyle)
+                    [Html.map DailyMonitorMsg (viewDailyMonitor dmModel)]
 
               ProfileWizard ->
-                  div []
+                  div (Animation.render model.animStyle)
                       [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
               FormStatus ->
@@ -227,6 +263,7 @@ subscriptions model =
     Sub.batch
     [receiveExtraInfo ExtraInfoRetrieved
     ,receiveTimecardUpdate TimeCardUpdate
+    ,Animation.subscription Animate [ model.animStyle ]
     ]
 
 --SAMPLE data
