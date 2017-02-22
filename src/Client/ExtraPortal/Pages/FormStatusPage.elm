@@ -41,6 +41,7 @@ viewFormStatusPage msg statuses =
         ,("font-size", "16px")
         ,("letter-spacing", "0")
         ,("line-height", "20px")
+        ,("margin-top", "8px")
         ,("margin", "8px 0px 4px 0px")
        ]]
        [text "Go to daily tasks", viewForwardArrow "24" "24"]

@@ -37,14 +37,16 @@ initModel userId currentDate =
     , wizardModel = Wizard.init
     , userId = userId
     , extraInfo = Loading
-    , animStyle =
-          Animation.style
-              [ Animation.translate (px 0) (px 100)
-              , Animation.opacity 0.0
-              ]
+    , animStyle = initAnimStyle
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
   )
+
+initAnimStyle =
+  Animation.style
+      [ Animation.translate (px 0) (px 100)
+      , Animation.opacity 0.0
+      ]
 
 type Pages = ProfileWizard | FormStatus | DailyMonitor
 
@@ -59,11 +61,12 @@ type Msg =
     | ExtraInfoRetrieved ExtraInfo
     | TimeCardUpdate TimeCard
     | Animate Animation.Msg
-    | FadeInFadeOut
+    | FadeInUpMsg
 
 
 fadeInUpMsg: Cmd Msg
-fadeInUpMsg = Task.perform (always FadeInFadeOut) (Task.succeed ())
+fadeInUpMsg = Task.perform (always FadeInUpMsg) (Task.succeed ())
+
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -71,7 +74,7 @@ update msg model =
         ChangePage page ->
             ({model | currentView = page}, fadeInUpMsg)
 
-        FadeInFadeOut ->
+        FadeInUpMsg ->
           let
             newStyle =
                 Animation.interrupt
@@ -80,17 +83,18 @@ update msg model =
                           , Animation.opacity 1.0
                           ]
                     ]
-                    model.animStyle
+                    initAnimStyle
           in
               ({ model
                   | animStyle = newStyle
-              }, Cmd.none)
+              }, Cmd.none
+              )
 
         LoadRemoteData ->
-            (model, Cmd.batch [getExtraInfo((model.userId, "2017-02-18"))])
+            (model, getExtraInfo((model.userId, "2017-02-18")))
 
         ExtraInfoRetrieved extraInfo ->
-            ({model | extraInfo = Success extraInfo}, Cmd.none)
+            ({model | extraInfo = Success extraInfo}, fadeInUpMsg)
 
         Animate animMsg ->
           ({ model
@@ -120,13 +124,6 @@ update msg model =
             ( model
             , clockinExtra("cizbke6ld32du0152funy1fe3", "10:00am")
             )
-            -- ( model
-            -- , createExtraSchedule("2017-02-18", "Schedule!", "08:00am")
-            -- )
-              -- let
-              --     (updatedDailyMonitorModel, dmCmd) =
-              --       DailyMonitor.update dmMsg model.extraInfo
-              -- in
 
         NoOp -> (model, Cmd.none)
 
@@ -165,11 +162,12 @@ viewExtraPortal model =
                     [Html.map DailyMonitorMsg (viewDailyMonitor dmModel)]
 
               ProfileWizard ->
-                  div (Animation.render model.animStyle)
+                  div []
                       [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
               FormStatus ->
-                  viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus
+                div (Animation.render model.animStyle)
+                  [viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus]
 
       ]
 
