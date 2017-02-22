@@ -119,7 +119,8 @@ viewExtraPortal model =
               DailyMonitor ->
                 let
                     dmModel =
-                      { timecard = extraInfo.timecard
+                      { currentDate = model.currentDate
+                      , timecard = extraInfo.timecard
                       , firstName=extraInfo.profile.firstName
                       , schedule=extraInfo.schedule
                       }

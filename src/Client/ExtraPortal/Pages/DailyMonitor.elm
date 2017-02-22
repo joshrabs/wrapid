@@ -9,14 +9,15 @@ import Client.ExtraPortal.NotificationBar as NotificationBar exposing (convertSc
 import Client.ExtraPortal.Schedule exposing (viewSchedulePanel, PunchAction(..))
 
 import Client.ExtraPortal.Types exposing (Schedule, TimeCard)
+import Date exposing (Date, day, month, year, dayOfWeek)
 
 -- MODEL
 
 type alias Model =
-  {
-    firstName: String
-    ,timecard: TimeCard
-    ,schedule: Schedule
+  {currentDate: Maybe Date
+  ,firstName: String
+  ,timecard: TimeCard
+  ,schedule: Schedule
   }
 
 
@@ -28,7 +29,7 @@ viewDailyMonitor: Model -> Html Msg
 viewDailyMonitor model =
   div []
       [
-        viewHeader {firstName=model.firstName, production="RunabetterSet Productions"}
+        viewHeader {firstName=model.firstName, production="RunabetterSet Productions", date=model.currentDate}
       , viewNotificationBarPanel (NotificationBar.convertSchedule model.schedule)
       , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
       ,
@@ -48,12 +49,22 @@ viewDailyMonitor model =
       ]
 
 
-type alias Header = {firstName: String, production: String}
+type alias Header = {firstName: String, production: String, date: Maybe Date}
 viewHeader: Header -> Html msg
 viewHeader header =
   div [style [("display", "flex"), ("flex-direction", "column"),("margin", "8px 4px 16px 16px")]]
   [
-     span [] [text "Monday May 25th, 2017"]
+     span []
+      [text
+        (case header.date of
+          Just date ->
+            let
+                toStr unit = date |> unit |> toString
+            in
+                (toStr dayOfWeek) ++ " " ++ (toStr month) ++ " " ++ (toStr day) ++ ", " ++ (toStr year)
+          Nothing -> ""
+        )
+      ]
     , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
     ,span [] [text (header.production)]
   ]
@@ -65,6 +76,7 @@ headerTitleStyle =
   ,("font-size", "32px")
   ,("color", "#282C35")
   ,("letter-spacing", "0")
+  ,("margin", "4px 0px 8px 0px")
   ]
 
 headerProductionStyle : List ( String, String )
