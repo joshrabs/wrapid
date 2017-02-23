@@ -5,6 +5,8 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict, toList)
 
+import Common.Styles.TextStyles exposing (regularLight, regularBolder)
+
 --MODEL
 type alias Model =
   {currentStep: StepNum
@@ -77,7 +79,16 @@ viewWrapStep stepItem currentStep =
 
 viewWrapStepBody: Step -> Html msg
 viewWrapStepBody step =
-  div [] [text "current step!!!"]
+  div [style [
+    ("display", "flex")
+    ,("flex-direction", "column")
+    ,("background", "#F8FAFF")
+    ,("padding", "16px")
+  ]]
+  [
+    span [style (regularLight 12)] [text "Monday May 25, 2016"]
+    ,span [style (regularBolder 16)] [text "RUNABETTERSET Productions"]
+  ]
 
 viewWrapStepHeader: StepNum -> String -> Html msg
 viewWrapStepHeader stepNum stepName =
