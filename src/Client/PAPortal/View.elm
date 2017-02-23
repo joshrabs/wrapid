@@ -1,13 +1,14 @@
 module Client.PAPortal.View exposing (..)
 
-import Client.PAPortal.Types exposing (..)
-import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
-import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
-import Client.PAPortal.Pages.SkinManager as Skin
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (..)
 
+import Client.PAPortal.Types exposing (..)
+import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
+import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
+import Client.PAPortal.Pages.SkinManager as Skin
+import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
 viewPAPortal : Model -> Html Msg
@@ -29,6 +30,8 @@ viewPAPortal model =
             SkinManager ->
                 div []
                     [ Html.map SkinMsg (Skin.view model.skinModel) ]
+            Wrap ->
+              div [style [("margin-top", "16px")]] [viewWrap]
         ]
 
 
@@ -54,6 +57,11 @@ viewHeader currentView =
                     , style (getTabStyle SkinManager)
                     ]
                     [ text "Skin Manager" ]
+                , div
+                    [ onClick (ChangeView Wrap)
+                    , style (getTabStyle Wrap)
+                    ]
+                    [ text "Wrap" ]
                 ]
             ]
 

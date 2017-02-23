@@ -23,6 +23,7 @@ type alias SelectedDate = Maybe Date
 type ViewState
     = LiveMonitor
     | SkinManager
+    | Wrap
 
 
 type Msg
