@@ -7,6 +7,7 @@ import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 import Material
 import Material.Icon as Icon
 import Material.Textfield as Textfield
+import Material.Options as Options
 
 import Client.PAPortal.Types exposing (Profile)
 
@@ -215,7 +216,7 @@ viewLiveTableItem item =
               ("margin-right", "8px")
               ,("display", "flex")
             ]]
-            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.i "watch_later"]
+            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "watch_later" [Options.css "color" "rgb(255, 93, 0)"]]
             ,span [] [Icon.i "loyalty"]
             ]
         ]
