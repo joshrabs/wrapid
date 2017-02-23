@@ -1,5 +1,6 @@
 module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
+import Client.PAPortal.Pages.Wrap as Wrap
 
 import Date exposing (Date)
 import Material
@@ -14,6 +15,7 @@ type alias Model =
   , extras: RemoteData ExtraInfo
   , currentView: ViewState
   , skinModel : Skin.Model
+  , wrapModel : Wrap.Model
   , mdl : Material.Model
   }
 
@@ -32,6 +34,7 @@ type Msg
     | SetSelectedDate Date
     | Profiles (List Profile)
     | SkinMsg Skin.Msg
+    | WrapMsg Wrap.Msg
 
 type alias Profile =
     { id : String

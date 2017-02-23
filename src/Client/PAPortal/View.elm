@@ -31,7 +31,8 @@ viewPAPortal model =
                 div []
                     [ Html.map SkinMsg (Skin.view model.skinModel) ]
             Wrap ->
-              div [style [("margin-top", "16px")]] [viewWrap]
+              div [style [("margin-top", "16px")]]
+                [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
         ]
 
 

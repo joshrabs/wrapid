@@ -2,6 +2,7 @@ module Client.PAPortal.State exposing (..)
 
 import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
+import Client.PAPortal.Pages.Wrap as Wrap
 import Ports exposing (..)
 
 import Date exposing (Date)
@@ -28,6 +29,7 @@ initModel userId currentDate selectedDate materialModel =
           Nothing -> currentDate
     , currentView = LiveMonitor
     , skinModel = Skin.initModel
+    , wrapModel = Wrap.initModel
     , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
@@ -52,6 +54,14 @@ update msg model =
                 ( { model | skinModel = updatedSkinModel }
                 , Cmd.none
                 )
+        WrapMsg subMsg ->
+          let
+              updatedWrapModel =
+                  Wrap.update subMsg model.wrapModel
+          in
+              ( { model | wrapModel = updatedWrapModel }
+              , Cmd.none
+              )
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
