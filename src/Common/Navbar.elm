@@ -98,8 +98,9 @@ notifier mdl notifications =
                 [ div
                     [ style
                         [ ( "position", "absolute" )
-                        , ( "top", "-9px" )
-                        , ( "right", "-7px" )
+                        , ( "top", "-6px" )
+                        , ( "right", "1px" )
+                        , ( "z-index", "5" )
                         , ( "background-color", "red" )
                         , ( "color", "white" )
                         , ( "font-size", "0.8em" )

@@ -157,7 +157,7 @@ viewRightItems rightItems =
                             div [] [ text "not showing an avatar?!" ]
 
                 Nothing ->
-                    div [] [ text "No right items!" ]
+                    div [] []
             )
         , rightItemBox viewHamburgerMenu
         ]
