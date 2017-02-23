@@ -31,13 +31,21 @@ view model =
             PAPortal paModel ->
                 Html.map (\b -> (ChildMsg (PAPortalMsg b))) (PAPortal.viewPAPortal paModel)
 
-        , div [ style [ ( "position", "fixed" ), ( "top", "0px" ), ( "right", "0px" ), ( "border", "1px solid black" ) ] ]
-            [ button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
-            , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
-            , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
-            ]
+        , if model.shouldShowPortalSwitcher then
+                viewPortalSwitcher
+            else div [onClick (ShowPortalSwitcher True), style [ ( "position", "fixed" ), ( "bottom", "0px" ), ( "left", "0px" ), ("min-height", "20px"), ("width", "100%"), ("background", "transparent") ]] []
         ]
 
+viewPortalSwitcher: Html Msg
+viewPortalSwitcher =
+  div [
+    style [ ( "position", "fixed" ), ( "bottom", "0px" ), ( "left", "0px" ), ( "border", "1px solid black" ) ] ]
+  [
+    button [ style [("background", "orange")], onClick (ShowPortalSwitcher False)] [text "-"]
+  , button [ onClick (ChangeView ExtraPortalView) ] [ text "Extra Portal" ]
+  , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
+  , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
+  ]
 
 {-| Not sure what these are for. They're not used in the view function, and
     they're not exported, so no other modules should be using them.

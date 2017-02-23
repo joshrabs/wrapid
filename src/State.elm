@@ -29,6 +29,7 @@ init location =
       , currentViewState = Login
       , title = "Yo"
       , mdl = Material.model
+      , shouldShowPortalSwitcher = True
       }
     , now
     )
@@ -41,6 +42,7 @@ now =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+      ShowPortalSwitcher bool -> ({model | shouldShowPortalSwitcher = bool}, Cmd.none)
       SetDate newDate ->
         ({model | currentDate = Just newDate}, Cmd.none)
       Tick newTime ->

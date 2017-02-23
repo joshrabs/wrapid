@@ -16,6 +16,7 @@ type alias Model =
     , currentViewState : ViewModelState
     , title : String
     , mdl : Material.Model
+    , shouldShowPortalSwitcher: Bool --Note this is only for development!
     }
 
 type ViewModelState
@@ -35,6 +36,7 @@ type Msg
     | ToggleNotifications
     | SelectNotification String
     | Mdl (Material.Msg Msg)
+    | ShowPortalSwitcher Bool
 
 type ChildPortalMsg = ExtraPortalMsg ExtraPortal.Msg | PAPortalMsg PAPortal.Msg
 
