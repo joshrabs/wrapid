@@ -4,10 +4,10 @@ import Types exposing (..)
 import Client.Generic.Authentication.Login.View as Login
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.View as PAPortal
+import Common.Navbar exposing (navbar)
 import Html exposing (Html, a, button, div, h1, h4, img, li, p, text, ul)
 import Html.Attributes exposing (href, src, style)
 import Html.Events exposing (onClick)
-import Navigation as Nav
 
 
 {-| For the PAPortal view, the navbar has been moved to the top level view
@@ -21,16 +21,23 @@ import Navigation as Nav
 -}
 view : Model -> Html Msg
 view model =
-    div [style [("height", "100vh")]]
+    div [ style [ ( "height", "100vh" ) ] ]
         [ case model.currentViewState of
             Login loginModel->
                 Html.map LoginMsg (Login.loginView loginModel)
 
             ExtraPortal epModel ->
-                  Html.map (\b -> (ChildMsg (ExtraPortalMsg b))) (ExtraPortal.viewExtraPortal epModel)
-            PAPortal paModel ->
-                Html.map (\b -> (ChildMsg (PAPortalMsg b))) (PAPortal.viewPAPortal paModel)
+                Html.map (\b -> (ChildMsg (ExtraPortalMsg b))) (ExtraPortal.viewExtraPortal epModel)
 
+            PAPortal paModel ->
+                div
+                    []
+                    [ navbar
+                        model.mdl
+                        Nothing
+                        [ "Check in at 9:00", "Lunch at 12:30" ]
+                    , Html.map (\b -> (ChildMsg (PAPortalMsg b))) (PAPortal.viewPAPortal paModel)
+                    ]
         , if model.shouldShowPortalSwitcher then
                 viewPortalSwitcher
             else div [onClick (ShowPortalSwitcher True), style [ ( "position", "fixed" ), ( "bottom", "0px" ), ( "left", "0px" ), ("min-height", "20px"), ("width", "100%"), ("background", "transparent") ]] []
@@ -46,15 +53,3 @@ viewPortalSwitcher =
   , button [ onClick (ChangeView PAPortalView) ] [ text "PA Portal" ]
   , button [ onClick (ChangeView LoginView) ] [ text "Login" ]
   ]
-
-{-| Not sure what these are for. They're not used in the view function, and
-    they're not exported, so no other modules should be using them.
--}
-viewLink : String -> Html msg
-viewLink name =
-    li [] [ a [ href ("#" ++ name) ] [ text name ] ]
-
-
-viewLocation : Nav.Location -> Html msg
-viewLocation location =
-    li [] [ text (location.pathname ++ location.hash) ]

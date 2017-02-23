@@ -94,9 +94,9 @@ notifier mdl notifications =
         div
             []
             [ div
-                [ Html.Attributes.style [ ( "position", "relative" ) ] ]
+                [ style [ ( "position", "relative" ) ] ]
                 [ div
-                    [ Html.Attributes.style
+                    [ style
                         [ ( "position", "absolute" )
                         , ( "top", "-9px" )
                         , ( "right", "-7px" )
@@ -108,7 +108,7 @@ notifier mdl notifications =
                         , ( "border", "1px solid red" )
                         ]
                     ]
-                    [ Html.text (notifications |> List.length |> toString) ]
+                    [ text (notifications |> List.length |> toString) ]
                 ]
             , menu
             ]
