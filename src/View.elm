@@ -23,8 +23,8 @@ view : Model -> Html Msg
 view model =
     div [style [("height", "100vh")]]
         [ case model.currentViewState of
-            Login ->
-                Html.map LoginMsg (Login.loginView (Login.initModel Nothing Nothing))
+            Login loginModel->
+                Html.map LoginMsg (Login.loginView loginModel)
 
             ExtraPortal epModel ->
                   Html.map (\b -> (ChildMsg (ExtraPortalMsg b))) (ExtraPortal.viewExtraPortal epModel)

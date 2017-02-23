@@ -20,7 +20,7 @@ type alias Model =
     }
 
 type ViewModelState
-    = Login
+    = Login Login.Model
     | ExtraPortal ExtraPortal.Model
     | PAPortal PAPortal.Model
 

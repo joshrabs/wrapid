@@ -14,21 +14,23 @@ import Task exposing (perform)
 -- import Client.PAPortal.Types as PATypes
 
 import Client.PAPortal.State as PAState
+import Client.Generic.Authentication.Login.State as LoginState
 
 
 defaultUserID : String
 defaultUserID =
     "ciykqvsynnqo60127o3illsce"
 
+mdlModel = Material.model
 
 init : Nav.Location -> ( Model, Cmd Msg )
 init location =
     ( { history = [ location ]
       , currentImg = Nothing
       , currentDate = Nothing
-      , currentViewState = Login
+      , currentViewState = Login (LoginState.initModel Nothing Nothing mdlModel)
       , title = "Yo"
-      , mdl = Material.model
+      , mdl = mdlModel
       , shouldShowPortalSwitcher = True
       }
     , now
@@ -61,7 +63,13 @@ update msg model =
       ChangeView viewState ->
           case viewState of
               LoginView ->
-                  ( { model | currentViewState = Login }, Cmd.none )
+                  let
+                      loginModel =
+                          LoginState.initModel Nothing Nothing model.mdl
+                  in
+                      ( { model | currentViewState = Login loginModel}
+                        , Cmd.none
+                      )
 
               ExtraPortalView ->
                   let
@@ -94,7 +102,7 @@ update msg model =
         case subMsg of
           ExtraPortalMsg epMsg ->
             case model.currentViewState of
-              Login -> (model, Cmd.none)
+              Login loginModel -> (model, Cmd.none)
               ExtraPortal curModel ->
                 let
                     ( epModel, epCmd ) = ExtraPortal.update epMsg curModel
@@ -106,7 +114,6 @@ update msg model =
 
           PAPortalMsg paMsg ->
               case model.currentViewState of
-                Login -> (model, Cmd.none)
                 PAPortal curModel ->
                   let
                       ( paPortalModel, paCmd ) = PAState.update paMsg curModel
@@ -115,6 +122,7 @@ update msg model =
                         , Cmd.map (\b -> (ChildMsg (PAPortalMsg b))) paCmd )
                 ExtraPortal curModel ->
                   (model, Cmd.none)
+                Login loginModel -> (model, Cmd.none)
 
 
       ToggleNotifications ->
@@ -136,7 +144,7 @@ subscriptions model =
               Sub.map (\b -> ChildMsg (ExtraPortalMsg b)) (ExtraPortal.subscriptions epModel)
             PAPortal paModel ->
               Sub.map (\b -> ChildMsg (PAPortalMsg b)) (PAState.subscriptions paModel)
-            Login ->
+            Login loginModel ->
               Sub.none
         , Material.subscriptions Mdl model
         ]

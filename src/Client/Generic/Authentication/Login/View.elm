@@ -1,4 +1,4 @@
-module Client.Generic.Authentication.Login.View exposing (loginView, initModel)
+module Client.Generic.Authentication.Login.View exposing (loginView)
 
 import Client.Generic.Authentication.Login.Types exposing (Model, Msg, Mdl)
 import Client.Generic.Dashboard.Dashboard as Dashboard
@@ -19,14 +19,6 @@ loginView model =
 
 
 -- TODO: Refactor this (ND)
-
-
-initModel : Maybe String -> Maybe String -> Model
-initModel email password =
-    { email = email
-    , password = password
-    , mdl = Material.model
-    }
 
 
 viewLoginPanel : Model -> Html Msg

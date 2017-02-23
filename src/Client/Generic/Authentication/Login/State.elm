@@ -3,6 +3,12 @@ module Client.Generic.Authentication.Login.State exposing (..)
 import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
 import Material
 
+initModel : Maybe String -> Maybe String -> Material.Model -> Model
+initModel email password mdlModel =
+    { email = email
+    , password = password
+    , mdl = mdlModel
+    }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -18,7 +24,3 @@ update msg model =
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
-
-
-type alias Mdl =
-    Material.Model
