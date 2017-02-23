@@ -23,7 +23,7 @@ viewPAPortal model =
                 Loading -> viewLoadingScreen
                 Success extras ->
                   div []
-                      [ viewLiveMonitor (LiveMonitor.initModel extras)
+                      [ viewLiveMonitor (LiveMonitor.initModel extras model.mdl)
                       ]
 
             SkinManager ->

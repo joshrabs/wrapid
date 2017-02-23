@@ -8,7 +8,6 @@ import Common.Styles as Styles
 import Common.WrapidLogo exposing (logo)
 import Types exposing (Msg(..))
 
-
 type alias Config msg =
     { toggleMenuMsg : msg
     , selectItemMsg : String -> msg

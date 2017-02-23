@@ -4,12 +4,15 @@ import Html exposing (Html, div, text, input, button, img, span)
 import Html.Attributes exposing (style, src)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
+import Material
+import Material.Icon as Icon
 
 import Client.PAPortal.Types exposing (Profile)
 
 type alias Model =
     { extraSnapStat : ExtrasSnapStatModel
     , table : LiveExtraTable
+    , mdl : Material.Model
     }
 
 
@@ -58,10 +61,11 @@ liveTable profs =
     Nothing -> []
 
 
-initModel : Maybe (List Profile) -> Model
-initModel profs=
+initModel : Maybe (List Profile) -> Material.Model -> Model
+initModel profs mdlModel =
     { extraSnapStat = fakeSnapStateModel
     , table = liveTable profs
+    , mdl = mdlModel
     }
 
 
@@ -197,6 +201,13 @@ viewLiveTableItem item =
                   ]]
                   [text "Extra"]
               ]
+            ]
+          ,div [style [
+              ("margin-right", "8px")
+              ,("display", "flex")
+            ]]
+            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.i "watch_later"]
+            ,span [] [Icon.i "loyalty"]
             ]
         ]
 
