@@ -14,7 +14,6 @@ viewLoadingScreen =
     ,("height", "100%")
   ]]
   [
-    text "Loading..."
-    ,Loading.spinner
-      [ Loading.active False ]
+    Loading.spinner
+      [ Loading.active True ]
   ]
