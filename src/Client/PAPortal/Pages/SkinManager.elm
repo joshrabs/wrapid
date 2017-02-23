@@ -154,11 +154,10 @@ update msg model =
 
         EditConfirm ->
             let
-                -- updateRoles = { x | role = string }
                 updateRoles =
                     List.map
                         (\x ->
-                            if x.selected == True then
+                            if x.selected == True && (String.length model.editRole > 0) then
                                 { x | role = model.editRole }
                             else
                                 x
@@ -168,7 +167,6 @@ update msg model =
                 ( { model | roles = updateRoles }
                 , Cmd.none
                 )
-
 
         Breakdown ->
             ( { model | breakdown = not model.breakdown }
@@ -258,6 +256,7 @@ viewAddRoles mdl dialog addRolessModel =
         _ ->
             div [] []
 
+
 viewEditRoles : Material.Model -> (String -> Msg) -> Html Msg
 viewEditRoles mdl msg =
     div []
@@ -286,7 +285,6 @@ acceptableRoles query roles =
     let
         lowerQuery =
             String.join "" << String.words <| String.toLower query
-
     in
         roles
             |> List.filter
