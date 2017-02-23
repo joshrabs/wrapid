@@ -238,13 +238,13 @@ panelFooter mdl =
 panelBody : Model -> Html Msg
 panelBody model =
     div []
-        [ viewAddRoles model.dialogOpened model.addRoles
+        [ viewAddRoles model.mdl model.dialogOpened model.addRoles
         , viewTableWithSearch model
         ]
 
 
-viewAddRoles : Dialog -> AddRoles.Model -> Html Msg
-viewAddRoles dialog addRolessModel =
+viewAddRoles : Material.Model -> Dialog -> AddRoles.Model -> Html Msg
+viewAddRoles mdl dialog addRolessModel =
     case dialog of
         AddDialog ->
             div []
@@ -253,17 +253,31 @@ viewAddRoles dialog addRolessModel =
                 ]
 
         EditDialog ->
-            viewEditRoles EditRoles
+            viewEditRoles mdl EditRoles
 
         _ ->
             div [] []
 
-viewEditRoles : (String -> Msg) -> Html Msg
-viewEditRoles  msg =
+viewEditRoles : Material.Model -> (String -> Msg) -> Html Msg
+viewEditRoles mdl msg =
     div []
-        [ text "Edit Role"
-        , input [ placeholder "Edit Role", onInput msg] []
-        , button [ onClick EditConfirm ] []
+        [ Textfield.render Mdl
+            [ 1, 0 ]
+            mdl
+            [ Textfield.label "Edit role"
+            , Textfield.floatingLabel
+            , Options.dispatch Batch
+            , Options.onInput msg
+            ]
+            []
+        , Button.render Mdl
+            [ 1 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            , Options.onClick EditConfirm
+            ]
+            [ text "Confirm" ]
         ]
 
 
