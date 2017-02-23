@@ -22,6 +22,7 @@ import Material.Button as Button
 type alias Model =
     { mdl : Material.Model
     , addRoles : AddRoles.Model
+    , editRole : String
     , roles : List Role
     , tableState : Table.State
     , query : String
@@ -34,6 +35,7 @@ initModel : Model
 initModel =
     { mdl = Material.model
     , addRoles = AddRoles.init
+    , editRole = ""
     , roles = initRoles
     , tableState = (Table.initialSort "Role")
     , query = ""
@@ -61,6 +63,7 @@ type Msg
     | ToggleDialog Dialog
     | AddRoles
     | EditRoles String
+    | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | Breakdown
 
@@ -145,13 +148,18 @@ update msg model =
                 )
 
         EditRoles string ->
+            ( { model | editRole = string }
+            , Cmd.none
+            )
+
+        EditConfirm ->
             let
                 -- updateRoles = { x | role = string }
                 updateRoles =
                     List.map
                         (\x ->
                             if x.selected == True then
-                                { x | role = string }
+                                { x | role = model.editRole }
                             else
                                 x
                         )
@@ -160,6 +168,7 @@ update msg model =
                 ( { model | roles = updateRoles }
                 , Cmd.none
                 )
+
 
         Breakdown ->
             ( { model | breakdown = not model.breakdown }
@@ -244,17 +253,17 @@ viewAddRoles dialog addRolessModel =
                 ]
 
         EditDialog ->
-            viewEditRoles
+            viewEditRoles EditRoles
 
         _ ->
             div [] []
 
-
-viewEditRoles : Html Msg
-viewEditRoles =
+viewEditRoles : (String -> Msg) -> Html Msg
+viewEditRoles  msg =
     div []
         [ text "Edit Role"
-        , input [ placeholder "Edit Role", onInput EditRoles ] []
+        , input [ placeholder "Edit Role", onInput msg] []
+        , button [ onClick EditConfirm ] []
         ]
 
 
