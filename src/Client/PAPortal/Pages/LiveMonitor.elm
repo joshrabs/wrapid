@@ -6,6 +6,7 @@ import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 import Material
 import Material.Icon as Icon
+import Material.Textfield as Textfield
 
 import Client.PAPortal.Types exposing (Profile)
 
@@ -77,19 +78,19 @@ viewLiveMonitor : Model -> Html msg
 viewLiveMonitor model =
     div []
         [ viewExtrasSnapStats model.extraSnapStat
-        , viewLiveTable model.table
+        , viewLiveTable model.table model.mdl
         ]
 
 
-viewLiveTable : LiveExtraTable -> Html msg
-viewLiveTable table =
+viewLiveTable : LiveExtraTable -> Material.Model -> Html msg
+viewLiveTable table mdlModel =
     let
         panelHeader =
             Just { title = "Extras", rightItem = Nothing }
 
         panelBody =
             div []
-                [ viewSearchTaskBar
+                [ viewSearchTaskBar mdlModel
                 , (viewLiveTableItems table)
                 ]
 
@@ -99,8 +100,8 @@ viewLiveTable table =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewSearchTaskBar: Html msg
-viewSearchTaskBar =
+viewSearchTaskBar: Material.Model -> Html msg
+viewSearchTaskBar mdlModel =
   div [style
     [
       ("display", "flex")
@@ -112,7 +113,7 @@ viewSearchTaskBar =
     , ("border-bottom", "1px solid #EFF3F7")
     ]]
     [
-        viewSearch
+        viewSearch mdlModel
       , div [style [
           ("display", "flex")
           ,("justify-content", "center")
@@ -130,12 +131,12 @@ viewSearchTaskBar =
       [text "Tasks"]
     ]
 
-viewSearch : Html msg
-viewSearch =
-  div [style [("margin-left", "16px"), ("position", "relative")]]
-  [
-    input [style [("height", "16px")]] []
-    ,div [style [("position", "absolute"), ("left", "2px"), ("top", "-2px"),("display", "flex"), ("align-items", "center")]]
+
+
+viewSearch : Material.Model -> Html msg
+viewSearch mdlModel =
+  div [style [("margin-left", "16px")]]
+  [ div [style [("display", "flex"), ("align-items", "center")]]
       [
         span [style [("margin-top", "4px")]] [viewSearchIcon]
        ,span [style
@@ -146,6 +147,14 @@ viewSearch =
           ]]
          [text "Search"]
       ]
+      -- , Textfield.render Material.Textfi
+      --     [ 10, 0 ]
+      --     mdlModel
+      --     [ Textfield.label "Enter email"
+      --     , Textfield.floatingLabel
+      --     , Textfield.email
+      --     ]
+      --     []
   ]
 
 viewLiveTableItems items =
