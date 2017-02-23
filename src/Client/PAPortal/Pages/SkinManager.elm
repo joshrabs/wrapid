@@ -169,7 +169,10 @@ update msg model =
                 )
 
         Breakdown ->
-            ( { model | breakdown = not model.breakdown }
+            ( { model
+                | breakdown = not model.breakdown
+                , roles = toggleAll False model.roles
+              }
             , Cmd.none
             )
 
