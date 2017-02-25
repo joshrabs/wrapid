@@ -9,6 +9,7 @@ import Client.ExtraPortal.NotificationBar as NotificationBar exposing (convertSc
 import Client.ExtraPortal.Schedule exposing (viewSchedulePanel)
 
 import Client.ExtraPortal.Types exposing (Schedule, TimeCard, PunchAction(..))
+import Common.Styles.TextStyles exposing (headerTitleStyle)
 import Date exposing (Date, day, month, year, dayOfWeek)
 
 -- MODEL
@@ -32,6 +33,8 @@ viewDailyMonitor model animStyle =
         viewHeader {firstName=model.firstName, production="RunabetterSet Productions", date=model.currentDate}
       , div animStyle
       [
+        div [style [("margin", "8px")]]
+        [
           viewNotificationBarPanel (NotificationBar.convertSchedule model.schedule)
         , Html.map TimeCardMsg (viewSchedulePanel model.schedule (Just model.timecard))
         ,
@@ -48,6 +51,7 @@ viewDailyMonitor model animStyle =
              footer = Nothing
            in
              Dashboard.makePanel panelHeader panelBody footer
+        ]
       ]
 
       ]
@@ -71,16 +75,6 @@ viewHeader header =
       ]
     , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
     ,span [] [text (header.production)]
-  ]
-
-headerTitleStyle : List ( String, String )
-headerTitleStyle =
-  [
-  ("font-family", "Roboto-Bold")
-  ,("font-size", "32px")
-  ,("color", "#282C35")
-  ,("letter-spacing", "0")
-  ,("margin", "4px 0px 8px 0px")
   ]
 
 headerProductionStyle : List ( String, String )

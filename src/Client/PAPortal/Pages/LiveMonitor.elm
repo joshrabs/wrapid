@@ -90,7 +90,7 @@ viewLiveTable table mdlModel =
             Just { title = "Extras", rightItem = Nothing }
 
         panelBody =
-            div []
+            div [style [("margin", "8px")]]
                 [ viewSearchTaskBar mdlModel
                 , (viewLiveTableItems table)
                 ]

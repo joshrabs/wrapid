@@ -49,7 +49,7 @@ viewWrap model =
   div [style [
     ("margin", "4px 8px 24px 4px")
   ]]
-  [div [style (List.concat [headerTitleStyle, [("margin-bottom", "16px")]])] [text "Review"]
+  [div [style (List.concat [headerTitleStyle, [("margin", "16px 0px 16px 0px")]])] [text "Review"]
   ,viewWrapWizard model
   ]
 

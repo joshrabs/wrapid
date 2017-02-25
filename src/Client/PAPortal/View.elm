@@ -18,7 +18,7 @@ viewPAPortal model =
         ,  case model.selectedDate of
             Just selectedDate -> viewCalendar SetSelectedDate selectedDate
             Nothing -> div [] []
-        , div [style [("padding", "24px"), ("overflow-y", "scroll")]]
+        , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
           [case model.currentView of
             LiveMonitor ->
               case model.extras of
