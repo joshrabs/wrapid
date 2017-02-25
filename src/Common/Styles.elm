@@ -60,7 +60,6 @@ navContainer =
     , ( "width", "100vw" )
     , ( "z-index", "1030" )
     , ( "height", "56px" )
-    , ( "margin-bottom", "8px" )
     , ( "background", "#FFFFFF" )
     , ( "box-shadow", "0 4px 8px 0 #D2D6DF" )
     ]

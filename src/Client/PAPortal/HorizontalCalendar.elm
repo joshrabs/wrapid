@@ -53,9 +53,8 @@ viewCalendar setDateMsg selectedDate =
   in
     div [style [
         ("display", "flex")
-        ,("box-shadow", "0 8px 30px 0 rgba(0,0,0,0.04)")
+        ,( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" )
         ,("background", "#FFFFFF")
-        ,("margin-top", "8px")
       ]]
     (List.map (\item -> viewCalendarItem setDateMsg item selectedDate) model)
 
