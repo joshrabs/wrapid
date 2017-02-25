@@ -16,6 +16,7 @@ import Client.ExtraPortal.Types exposing (..)
 import Date exposing (Date)
 import Task exposing (perform, succeed)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
+import Common.Styles.TextStyles exposing (headerTitleStyle)
 
 import Animation exposing (px)
 import Time exposing (Time)

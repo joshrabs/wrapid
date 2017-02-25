@@ -122,8 +122,7 @@ panelContainerStyle =
     ]
 
 panelBodyStyle =
-    [ ( "margin", "4px 8px 4px 8px" )
-    , ( "background", "#FFFFFF" )
+    [ ( "background", "#FFFFFF" )
     , ( "box-shadow", "0 2px 4px 0 #D2D6DF" )
     ]
 

@@ -22,3 +22,13 @@ regularBolder fontSize =
       , ( "color", "#282C35" )
       , ( "letter-spacing", "0" )
       ]
+
+headerTitleStyle : List ( String, String )
+headerTitleStyle =
+  [
+  ("font-family", "Roboto-Bold")
+  ,("font-size", "32px")
+  ,("color", "#282C35")
+  ,("letter-spacing", "0")
+  ,("margin", "4px 0px 8px 0px")
+  ]

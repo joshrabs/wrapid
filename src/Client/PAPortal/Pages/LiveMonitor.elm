@@ -243,13 +243,12 @@ viewExtrasSnapStats model =
           , {num=formRatio, text ="Missing Forms"}
           ]
     in
-        div [ style [ ( "display", "flex" ), ("justify-content", "center"), ("margin", "12px 16px 12px 16px") ] ]
+        div [ style [ ( "display", "flex" ) ] ]
           (List.map
             (\r ->
               div [style [
                   ("display", "flex")
                   , ("flex-direction", "column")
-                  , ("margin", "0px 12px 0px 4px")
                   , ("padding-right", "24px")
                   , ("border-right", "1px solid #EFF3F7")
                 ]]

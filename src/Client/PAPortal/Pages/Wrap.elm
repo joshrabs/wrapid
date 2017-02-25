@@ -5,7 +5,7 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Dict exposing (Dict, toList)
 
-import Common.Styles.TextStyles exposing (regularLight, regularBolder)
+import Common.Styles.TextStyles exposing (regularLight, regularBolder, headerTitleStyle)
 import Common.Styles.ButtonStyles exposing (blackButtonStyle)
 
 --MODEL
@@ -47,12 +47,11 @@ incrementStep model =
 viewWrap: Model -> Html Msg
 viewWrap model =
   div [style [
-    ("display", "flex")
-    ,("justify-content", "center")
-    ,("align-items", "center")
-    ,("margin", "4px 8px 24px 4px")
+    ("margin", "4px 8px 24px 4px")
   ]]
-  [viewWrapWizard model]
+  [div [style (List.concat [headerTitleStyle, [("margin-bottom", "16px")]])] [text "Review"]
+  ,viewWrapWizard model
+  ]
 
 
 viewWrapWizard: Model -> Html Msg
