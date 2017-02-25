@@ -53,7 +53,7 @@ viewLoginPanel model =
             Just { title = "Login", rightItem = Nothing }
 
         panelBody =
-            div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ("margin-left", "8px") ] ]
+            div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ("margin", "8px") ] ]
                 [ Textfield.render Mdl
                     [ 10, 0 ]
                     model.mdl
@@ -80,7 +80,7 @@ viewLoginPanel model =
               [span [style loginButtonTextStyle] [text "Sign In"]]
             ])
     in
-        Dashboard.makePanel panelHeader panelBody footer
+        div [style [("margin", "8px"), ("width", "360px")]] [Dashboard.makePanel panelHeader panelBody footer]
 
 
 

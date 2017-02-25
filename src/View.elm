@@ -34,7 +34,7 @@ view model =
                     []
                     [ navbar
                         model.mdl
-                        Nothing
+                        (Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/cizlua8ye0s1s0187rsrj1yn5")
                         [ "Check in at 9:00", "Lunch at 12:30" ]
                     , Html.map (\b -> (ChildMsg (PAPortalMsg b))) (PAPortal.viewPAPortal paModel)
                     ]

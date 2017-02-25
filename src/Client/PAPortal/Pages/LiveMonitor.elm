@@ -77,7 +77,7 @@ initModel profs mdlModel =
 
 viewLiveMonitor : Model -> Html msg
 viewLiveMonitor model =
-    div []
+    div [style [("margin", "8px 4px 8px 4px")]]
         [ viewExtrasSnapStats model.extraSnapStat
         , viewLiveTable model.table model.mdl
         ]
