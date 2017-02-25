@@ -7,7 +7,8 @@ import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
 import Html.Events exposing (onClick, onInput, onCheck)
 import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
-import Table exposing (defaultCustomizations)
+import Client.PAPortal.Pages.Table as Table
+import Client.PAPortal.Pages.Table exposing (defaultCustomizations)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Material
 import Material.Scheme
@@ -28,6 +29,7 @@ type alias Model =
     , query : String
     , dialogOpened : Dialog
     , breakdown : Bool
+    , editableField : ( String, String )
     }
 
 
@@ -41,6 +43,7 @@ initModel =
     , query = ""
     , dialogOpened = NoDialog
     , breakdown = False
+    , editableField = ( "", "" )
     }
 
 
@@ -63,6 +66,7 @@ type Msg
     | ToggleDialog Dialog
     | AddRoles
     | EditRoles String
+    | ChangeEditableField ( String, String )
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | Breakdown
@@ -151,6 +155,18 @@ update msg model =
             ( { model | editRole = string }
             , Cmd.none
             )
+
+        ChangeEditableField ( id, fieldName ) ->
+            let
+                _ =
+                    Debug.log "EditRole msg: " msg
+
+                x =
+                    Debug.log "model.editableField : " model.editableField
+            in
+                ( { model | editableField = ( id, fieldName ) }
+                , Cmd.none
+                )
 
         EditConfirm ->
             let
@@ -313,7 +329,7 @@ viewTableWithSearch model =
     in
         div []
             [ topButtons model.mdl checkedAll
-            , viewTable model.breakdown model.tableState (acceptableRoles model.query model.roles)
+            , viewTable model.editableField model.breakdown model.tableState (acceptableRoles model.query model.roles)
             ]
 
 
@@ -361,12 +377,12 @@ topButtons mdl checkedAll =
         ]
 
 
-viewTable : Bool -> Table.State -> List Role -> Html Msg
-viewTable bool tableState roles =
+viewTable : ( String, String ) -> Bool -> Table.State -> List Role -> Html Msg
+viewTable ( id, name ) bool tableState roles =
     if bool then
         viewTableBreakdown tableState roles
     else
-        Table.view config tableState roles
+        Table.view (config ( id, name )) tableState roles
 
 
 sortBreakdown : List Role -> List Role
@@ -430,24 +446,26 @@ configBreakdown =
         }
 
 
-config : Table.Config Role Msg
-config =
+config : ( String, String ) -> Table.Config Role Msg
+config ( id, name ) =
     Table.customConfig
         { toId = .id
         , toMsg = SetTableState
         , columns =
             [ checkboxColumn
+            , roleColumn id
+              -- , roleEditColumn
             , Table.stringColumn "Role" .role
             , Table.stringColumn "First" .first
             , Table.stringColumn "Last" .last
             , Table.stringColumn "Call Start" .callStart
             , Table.stringColumn "Pay" .pay
-            , Table.stringColumn "Lunch Start" .lunchStart
-            , Table.stringColumn "Lunch length" .lunchLength
-            , Table.stringColumn "In" .clockIn
-            , Table.stringColumn "Out" .clockOut
-            , Table.stringColumn "Call End" .callEnd
             , Table.stringColumn "Email" .email
+              -- , Table.stringColumn "Lunch Start" .lunchStart
+              -- , Table.stringColumn "Lunch length" .lunchLength
+              -- , Table.stringColumn "In" .clockIn
+              -- , Table.stringColumn "Out" .clockOut
+              -- , Table.stringColumn "Call End" .callEnd
             ]
         , customizations =
             { defaultCustomizations | rowAttrs = toRowAttrs }
@@ -464,16 +482,60 @@ checkboxColumn =
 
 
 viewCheckbox : Role -> Table.HtmlDetails Msg
-viewCheckbox { selected } =
-    Table.HtmlDetails []
-        [ input [ type_ "checkbox", checked selected ] []
+viewCheckbox { id, selected } =
+    Table.HtmlDetails [ onClick (ToggleSelected id) ]
+        [ input
+            [ type_ "checkbox"
+            , checked selected
+            ]
+            []
         ]
+
+
+roleColumn : String -> Table.Column Role Msg
+roleColumn id =
+    Table.veryCustomColumn
+        { name = "Role Editable"
+        , viewData = viewRoleColumn id
+        , sorter = Table.unsortable
+        }
+
+
+viewRoleColumn : String -> Role -> Table.HtmlDetails Msg
+viewRoleColumn fid { id, selected, role } =
+    let
+        _ =
+            Debug.log "viewRoleColumn: " fid
+    in
+        if fid == id then
+            Table.HtmlDetails
+                []
+                [ input [] [ text "bla bla" ] ]
+        else
+            Table.HtmlDetails
+                [ onClick
+                    (ChangeEditableField ( id, "role" ))
+                ]
+                [ p [] [ text role ] ]
+
+
+
+-- roleColumn : Table.Column Role Msg
+-- roleColumn =
+--     Table.veryCustomColumn
+--         { name = "Role Editable"
+--         , viewData = viewRoleColumn
+--         , sorter = Table.unsortable
+--         }
+-- viewRoleColumn : Role -> Table.HtmlDetails Msg
+-- viewRoleColumn { id, selected, role } =
+--     Table.HtmlDetails [ onClick (EditRole id "role") ]
+--         [ p [] [ text role ] ]
 
 
 toRowAttrs : Role -> List (Attribute Msg)
 toRowAttrs role =
-    [ onClick (ToggleSelected role.id)
-    , style
+    [ style
         [ ( "background"
           , if role.selected then
                 "#CEFAF8"
