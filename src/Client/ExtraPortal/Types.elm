@@ -1,10 +1,13 @@
 module Client.ExtraPortal.Types exposing (..)
 
+import Dict exposing (Dict)
+
+import Client.Generic.WebForm.Types exposing (FieldInput)
+
 type alias ExtraInfo =
-  {
-    timecard: TimeCard
-    ,profile: Profile
-    ,schedule: Schedule
+  { timecard: TimeCard
+  , profile: Profile
+  , schedule: Schedule
   }
 
 
@@ -26,12 +29,24 @@ type alias ScheduleItem =
   , endTm: Maybe String
   }
 
-type alias Profile =
-  { avatar: Avatar --Should be URL
-  , firstName: String
-  , lastName: String
-  }
 
 type alias Avatar =
   {url: Maybe String --Should be URL
+  }
+
+-- type FieldId =
+--     FirstName | LastName | MI | Phone | Email
+--   | Address1 | Address2
+--
+-- type alias EnumFieldId =
+--   [FirstName, LastName, MI, Phone, Email
+--   , Address1, Address2
+--   ]
+
+-- type alias Profile = Dict FieldId Field
+
+type alias Profile =
+  { avatar: Avatar
+  , firstName: FieldInput
+  , lastName: FieldInput
   }
