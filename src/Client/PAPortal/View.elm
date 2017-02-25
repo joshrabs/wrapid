@@ -72,10 +72,13 @@ viewHeader currentView =
 baseTabStyle : List ( String, String )
 baseTabStyle =
     [ ( "padding", "8px" )
-    , ( "font-size", "14px" )
-    , ( "font-family", "Roboto-Regular" )
+    , ( "font-size", "12px" )
     , ( "font-family", "Roboto-Regular" )
     , ( "color", "#6D717A" )
+    , ("width", "125px")
+    , ("display", "flex")
+    , ("justify-content", "center")
+    , ("align-items", "center")
     ]
 
 
@@ -83,9 +86,9 @@ selectedTabStyle : List ( String, String )
 selectedTabStyle =
     List.concat
         [ baseTabStyle
-        , [ ( "border-bottom", "2px solid black" )
-          , ( "color", "black" )
-          , ( "font-family", "Roboto-Medium" )
+        , [ ( "border-bottom", "2px solid #0043FF" )
+          , ( "color", "#0043FF" )
+          , ( "font-family", "Roboto-Bold" )
           ]
         ]
 
