@@ -18,7 +18,8 @@ viewPAPortal model =
         ,  case model.selectedDate of
             Just selectedDate -> viewCalendar SetSelectedDate selectedDate
             Nothing -> div [] []
-        , case model.currentView of
+        , div [style [("margin-top", "16px"), ("overflow-y", "scroll")]]
+          [case model.currentView of
             LiveMonitor ->
               case model.extras of
                 Loading -> viewLoadingScreen
@@ -31,8 +32,9 @@ viewPAPortal model =
                 div []
                     [ Html.map SkinMsg (Skin.view model.skinModel) ]
             Wrap ->
-              div [style [("margin-top", "16px")]]
+              div []
                 [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
+          ]
         ]
 
 

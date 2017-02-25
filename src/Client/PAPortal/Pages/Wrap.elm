@@ -6,6 +6,7 @@ import Html.Events exposing (onClick)
 import Dict exposing (Dict, toList)
 
 import Common.Styles.TextStyles exposing (regularLight, regularBolder)
+import Common.Styles.ButtonStyles exposing (blackButtonStyle)
 
 --MODEL
 type alias Model =
@@ -49,6 +50,7 @@ viewWrap model =
     ("display", "flex")
     ,("justify-content", "center")
     ,("align-items", "center")
+    ,("margin", "4px 8px 24px 4px")
   ]]
   [viewWrapWizard model]
 
@@ -57,7 +59,6 @@ viewWrapWizard: Model -> Html Msg
 viewWrapWizard model =
   div [style [
     ("width", "387px")
-    ,("height", "286px")
     ,("background", "#FFFFFF")
     ,("box-shadow", "0 8px 8px 0 rgba(40,44,52,0.20)")
     ]]
@@ -79,6 +80,13 @@ viewWrapStep stepItem currentStep =
 
 viewWrapStepBody: Step -> Html msg
 viewWrapStepBody step =
+  case step of
+    ReviewAndSave -> viewWrapStepSkin
+    SignAll -> viewWrapStepSignAll
+    Submit -> viewWrapSubmitDownload
+
+viewWrapStepSkin: Html msg
+viewWrapStepSkin =
   div [style [
     ("display", "flex")
     ,("flex-direction", "column")
@@ -88,6 +96,36 @@ viewWrapStepBody step =
   [
     span [style (regularLight 12)] [text "Monday May 25, 2016"]
     ,span [style (regularBolder 16)] [text "RUNABETTERSET Productions"]
+    ,div [style [("margin", "8px 0px 8px 0px"), ("display", "flex")]]
+      [div [style (List.concat [(blackButtonStyle True), [("margin-right", "8px")]])] [text "View Skin"]
+      ,div [style (blackButtonStyle False)] [text "Save and Wrap"]
+      ]
+
+  ]
+
+viewWrapStepSignAll: Html msg
+viewWrapStepSignAll =
+  div [style [
+    ("display", "flex")
+    ,("flex-direction", "column")
+    ,("background", "#F8FAFF")
+    ,("padding", "16px")
+  ]]
+  [
+    span [style (regularBolder 14)]
+    [text "I have reviewed the document and the Information Supplied is True to the Best of my Knowledge"]
+    ,div [style (blackButtonStyle True)] [text "Sign All Forms"]
+  ]
+
+viewWrapSubmitDownload: Html msg
+viewWrapSubmitDownload =
+  div [style [
+    ("display", "flex")
+    ,("flex-direction", "column")
+    ,("background", "#F8FAFF")
+    ,("padding", "16px")
+  ]]
+  [div [style (blackButtonStyle True)] [text "Download"]
   ]
 
 viewWrapStepHeader: StepNum -> String -> Html msg

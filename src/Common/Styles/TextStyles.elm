@@ -7,8 +7,7 @@ fontSizeToPx s = (s |> toString) ++ "px"
 
 regularLight: Int -> Style
 regularLight fontSize =
-  [ ( "padding", "8px" )
-  , ( "font-size", fontSizeToPx fontSize )
+  [( "font-size", fontSizeToPx fontSize )
   , ( "font-family", "Roboto-Regular" )
   , ( "font-family", "Roboto-Regular" )
   , ( "color", "#6D717A" )
