@@ -16,6 +16,7 @@ import Client.ExtraPortal.Types exposing (..)
 import Date exposing (Date)
 import Task exposing (perform, succeed)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
+import Client.Generic.WebForm.Utils exposing (..)
 
 import Animation exposing (px)
 import Time exposing (Time)
@@ -191,76 +192,7 @@ viewExtraPortal model =
       ]
 
 
-type alias Header = {firstName: String, production: String}
-viewHeader: Header -> Html Msg
-viewHeader header =
-  div [style [("display", "flex"), ("flex-direction", "column"),("margin", "28px 4px 16px 16px")]]
-  [
-     span [style [
-      ("font-family", "Roboto-Regular")
-      ,("font-size", "12px")
-      ,("color", "#6D717A")
-      ,("letter-spacing", "0")
-      ,("line-height", "20px")]] [text "Monday May 25th, 2017"]
-    , span [style headerTitleStyle] [text ("Welcome " ++ header.firstName)]
-    ,span [style [
-        ("font-family", "Roboto-Regular")
-        ,("font-size", "16px")
-        ,("color", "#282C35")
-        ,("letter-spacing", "0")
-        ,("line-height", "20px")]]
-      [text (header.production)]
-  ]
-headerTitleStyle : List ( String, String )
-headerTitleStyle =
-  [
-  ("font-family", "Roboto-Bold")
-  ,("font-size", "32px")
-  ,("color", "#282C35")
-  ,("margin", "4px 0px 4px 0px")
-  ,("letter-spacing", "0")
-  ]
 
-headerProductionStyle : List ( String, String )
-headerProductionStyle =
-  [
-  ("font-family", "Roboto-Regular")
-  ,("font-size", "16px")
-  ,("color", "#282C35")
-  ,("letter-spacing", "0")
-  ,("line-height", "20px")
-  ]
-
-
-
-type alias CrewInfoItem = {name: String, role: String}
-viewCrewInfoItems: List CrewInfoItem -> Html Msg
-viewCrewInfoItems prodContacts =
-  div []
-  [
-    let
-      listItems = List.map (\s -> (
-          div [style [("display", "flex"), ("flex-direction", "column"), ("margin-left", "8px")]]
-          [
-            span [style [
-               ("font-family", "Roboto-Medium")
-              ,("font-size", "12px")
-              ,("color", "#282C35")
-              ,("letter-spacing", "0")
-              ,("line-height", "24px")
-            ]] [text s.name]
-           , span [style [
-              ("font-family", "Roboto")
-             ,("font-size", "16px")
-             ,("color", "#6D717A")
-             ,("letter-spacing", "0")
-             ,("line-height", "24px")
-           ]][text s.role]
-          ]
-      )) prodContacts
-    in
-      div [style [("display", "flex"), ("flex-direction", "column")]] listItems
-  ]
 
 
 --PORTS
