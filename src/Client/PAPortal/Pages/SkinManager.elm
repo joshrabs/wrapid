@@ -456,15 +456,15 @@ configBreakdown =
 
 
 config : ( String, String ) -> Table.Config Role Msg
-config ( id, name ) =
+config ( fid, fname ) =
     Table.customConfig
         { toId = .id
         , toMsg = SetTableState
         , columns =
             [ checkboxColumn
-            , roleColumn id
+            , roleColumn "Role" ( fid, fname ) .role .role
               -- , roleEditColumn
-            , Table.stringColumn "Role" .role
+              -- , Table.stringColumn "Role" .role
             , Table.stringColumn "First" .first
             , Table.stringColumn "Last" .last
             , Table.stringColumn "Call Start" .callStart
@@ -501,27 +501,27 @@ viewCheckbox { id, selected } =
         ]
 
 
-roleColumn : String -> Table.Column Role Msg
-roleColumn id =
+roleColumn : String -> ( String, String ) -> (Role -> comparable) -> (Role -> String) -> Table.Column Role Msg
+roleColumn name ( fid, fname ) toComparable toStr =
     Table.veryCustomColumn
-        { name = "Role Editable"
-        , viewData = viewRoleColumn id
-        , sorter = Table.unsortable
+        { name = "Role"
+        , viewData = viewRoleColumn name ( fid, fname ) toStr
+        , sorter = Table.increasingOrDecreasingBy toComparable
         }
 
 
-viewRoleColumn : String -> Role -> Table.HtmlDetails Msg
-viewRoleColumn fid { id, selected, role } =
+viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> Role -> Table.HtmlDetails Msg
+viewRoleColumn name ( fid, fname ) toStr role =
     let
         _ =
-            Debug.log "viewRoleColumn: " fid
+            Debug.log "viewRoleColumn: " ( fid, fname )
     in
-        if fid == id then
+        if fid == role.id && fname == name then
             Table.HtmlDetails
                 []
                 [ input
-                    [ onInput (UpdateRoleField id)
-                    , Html.Attributes.value role
+                    [ onInput (UpdateRoleField role.id)
+                    , Html.Attributes.value (toStr role)
                     , onBlur (ChangeEditableField ( "", "" ))
                     ]
                     []
@@ -529,9 +529,9 @@ viewRoleColumn fid { id, selected, role } =
         else
             Table.HtmlDetails
                 [ onDoubleClick
-                    (ChangeEditableField ( id, "role" ))
+                    (ChangeEditableField ( role.id, name ))
                 ]
-                [ p [] [ text role ] ]
+                [ p [] [ text (toStr role) ] ]
 
 
 
