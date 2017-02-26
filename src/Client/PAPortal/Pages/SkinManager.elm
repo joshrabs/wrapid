@@ -4,11 +4,10 @@ import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
 import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
-import Html.Events exposing (onClick, onInput, onCheck)
+import Html.Events exposing (onClick, onInput, onCheck, onDoubleClick, onBlur)
 import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
-import Client.PAPortal.Pages.Table as Table
-import Client.PAPortal.Pages.Table exposing (defaultCustomizations)
+import Table exposing (defaultCustomizations)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Material
 import Material.Scheme
@@ -67,6 +66,7 @@ type Msg
     | AddRoles
     | EditRoles String
     | ChangeEditableField ( String, String )
+    | UpdateRoleField String String
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | Breakdown
@@ -157,14 +157,23 @@ update msg model =
             )
 
         ChangeEditableField ( id, fieldName ) ->
-            let
-                _ =
-                    Debug.log "EditRole msg: " msg
+            ( { model | editableField = ( id, fieldName ) }
+            , Cmd.none
+            )
 
-                x =
-                    Debug.log "model.editableField : " model.editableField
+        UpdateRoleField id value ->
+            let
+                updateRoles =
+                    List.map
+                        (\x ->
+                            if x.id == id then
+                                { x | role = value }
+                            else
+                                x
+                        )
+                        model.roles
             in
-                ( { model | editableField = ( id, fieldName ) }
+                ( { model | roles = updateRoles }
                 , Cmd.none
                 )
 
@@ -510,10 +519,16 @@ viewRoleColumn fid { id, selected, role } =
         if fid == id then
             Table.HtmlDetails
                 []
-                [ input [] [ text "bla bla" ] ]
+                [ input
+                    [ onInput (UpdateRoleField id)
+                    , Html.Attributes.value role
+                    , onBlur (ChangeEditableField ( "", "" ))
+                    ]
+                    []
+                ]
         else
             Table.HtmlDetails
-                [ onClick
+                [ onDoubleClick
                     (ChangeEditableField ( id, "role" ))
                 ]
                 [ p [] [ text role ] ]
