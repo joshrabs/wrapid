@@ -4,7 +4,7 @@ import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
 import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
-import Html.Events exposing (onClick, onInput, onCheck)
+import Html.Events exposing (onClick, onInput, onCheck, onDoubleClick, onBlur)
 import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
 import Table exposing (defaultCustomizations)
@@ -22,11 +22,13 @@ import Material.Button as Button
 type alias Model =
     { mdl : Material.Model
     , addRoles : AddRoles.Model
+    , editRole : String
     , roles : List Role
     , tableState : Table.State
     , query : String
     , dialogOpened : Dialog
     , breakdown : Bool
+    , editableField : ( String, String )
     }
 
 
@@ -34,11 +36,13 @@ initModel : Model
 initModel =
     { mdl = Material.model
     , addRoles = AddRoles.init
+    , editRole = ""
     , roles = initRoles
     , tableState = (Table.initialSort "Role")
     , query = ""
     , dialogOpened = NoDialog
     , breakdown = False
+    , editableField = ( "", "" )
     }
 
 
@@ -61,6 +65,9 @@ type Msg
     | ToggleDialog Dialog
     | AddRoles
     | EditRoles String
+    | ChangeEditableField ( String, String )
+    | UpdateField (String -> Role -> Role) String String
+    | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | Breakdown
 
@@ -145,13 +152,38 @@ update msg model =
                 )
 
         EditRoles string ->
+            ( { model | editRole = string }
+            , Cmd.none
+            )
+
+        ChangeEditableField ( id, fieldName ) ->
+            ( { model | editableField = ( id, fieldName ) }
+            , Cmd.none
+            )
+
+        UpdateField f id value ->
             let
-                -- updateRoles = { x | role = string }
                 updateRoles =
                     List.map
                         (\x ->
-                            if x.selected == True then
-                                { x | role = string }
+                            if x.id == id then
+                                f value x
+                            else
+                                x
+                        )
+                        model.roles
+            in
+                ( { model | roles = updateRoles }
+                , Cmd.none
+                )
+
+        EditConfirm ->
+            let
+                updateRoles =
+                    List.map
+                        (\x ->
+                            if x.selected == True && (String.length model.editRole > 0) then
+                                { x | role = model.editRole }
                             else
                                 x
                         )
@@ -162,7 +194,10 @@ update msg model =
                 )
 
         Breakdown ->
-            ( { model | breakdown = not model.breakdown }
+            ( { model
+                | breakdown = not model.breakdown
+                , roles = toggleAll False model.roles
+              }
             , Cmd.none
             )
 
@@ -229,13 +264,13 @@ panelFooter mdl =
 panelBody : Model -> Html Msg
 panelBody model =
     div []
-        [ viewAddRoles model.dialogOpened model.addRoles
+        [ viewAddRoles model.mdl model.dialogOpened model.addRoles
         , viewTableWithSearch model
         ]
 
 
-viewAddRoles : Dialog -> AddRoles.Model -> Html Msg
-viewAddRoles dialog addRolessModel =
+viewAddRoles : Material.Model -> Dialog -> AddRoles.Model -> Html Msg
+viewAddRoles mdl dialog addRolessModel =
     case dialog of
         AddDialog ->
             div []
@@ -244,17 +279,32 @@ viewAddRoles dialog addRolessModel =
                 ]
 
         EditDialog ->
-            viewEditRoles
+            viewEditRoles mdl EditRoles
 
         _ ->
             div [] []
 
 
-viewEditRoles : Html Msg
-viewEditRoles =
+viewEditRoles : Material.Model -> (String -> Msg) -> Html Msg
+viewEditRoles mdl msg =
     div []
-        [ text "Edit Role"
-        , input [ placeholder "Edit Role", onInput EditRoles ] []
+        [ Textfield.render Mdl
+            [ 1, 0 ]
+            mdl
+            [ Textfield.label "Edit role"
+            , Textfield.floatingLabel
+            , Options.dispatch Batch
+            , Options.onInput msg
+            ]
+            []
+        , Button.render Mdl
+            [ 1 ]
+            mdl
+            [ Button.ripple
+            , Button.accent
+            , Options.onClick EditConfirm
+            ]
+            [ text "Confirm" ]
         ]
 
 
@@ -263,7 +313,6 @@ acceptableRoles query roles =
     let
         lowerQuery =
             String.join "" << String.words <| String.toLower query
-
     in
         roles
             |> List.filter
@@ -289,7 +338,7 @@ viewTableWithSearch model =
     in
         div []
             [ topButtons model.mdl checkedAll
-            , viewTable model.breakdown model.tableState (acceptableRoles model.query model.roles)
+            , viewTable model.editableField model.breakdown model.tableState (acceptableRoles model.query model.roles)
             ]
 
 
@@ -337,12 +386,12 @@ topButtons mdl checkedAll =
         ]
 
 
-viewTable : Bool -> Table.State -> List Role -> Html Msg
-viewTable bool tableState roles =
+viewTable : ( String, String ) -> Bool -> Table.State -> List Role -> Html Msg
+viewTable ( id, name ) bool tableState roles =
     if bool then
         viewTableBreakdown tableState roles
     else
-        Table.view config tableState roles
+        Table.view (config ( id, name )) tableState roles
 
 
 sortBreakdown : List Role -> List Role
@@ -406,24 +455,19 @@ configBreakdown =
         }
 
 
-config : Table.Config Role Msg
-config =
+config : ( String, String ) -> Table.Config Role Msg
+config ( fid, fname ) =
     Table.customConfig
         { toId = .id
         , toMsg = SetTableState
         , columns =
             [ checkboxColumn
-            , Table.stringColumn "Role" .role
-            , Table.stringColumn "First" .first
-            , Table.stringColumn "Last" .last
-            , Table.stringColumn "Call Start" .callStart
-            , Table.stringColumn "Pay" .pay
-            , Table.stringColumn "Lunch Start" .lunchStart
-            , Table.stringColumn "Lunch length" .lunchLength
-            , Table.stringColumn "In" .clockIn
-            , Table.stringColumn "Out" .clockOut
-            , Table.stringColumn "Call End" .callEnd
-            , Table.stringColumn "Email" .email
+            , roleColumn "Role" ( fid, fname ) .role .role updateFieldRole
+            , roleColumn "First" ( fid, fname ) .first .first updateFieldFirst
+            , roleColumn "Last" ( fid, fname ) .last .last updateFieldLast
+            , roleColumn "Call" ( fid, fname ) .callStart .callStart updateFieldCallStart
+            , roleColumn "Pay" ( fid, fname ) .pay .pay updateFieldPay
+            , roleColumn "Email" ( fid, fname ) .email .email updateFieldEmail
             ]
         , customizations =
             { defaultCustomizations | rowAttrs = toRowAttrs }
@@ -440,16 +484,87 @@ checkboxColumn =
 
 
 viewCheckbox : Role -> Table.HtmlDetails Msg
-viewCheckbox { selected } =
-    Table.HtmlDetails []
-        [ input [ type_ "checkbox", checked selected ] []
+viewCheckbox { id, selected } =
+    Table.HtmlDetails [ onClick (ToggleSelected id) ]
+        [ input
+            [ type_ "checkbox"
+            , checked selected
+            ]
+            []
         ]
+
+
+roleColumn : String -> ( String, String ) -> (Role -> comparable) -> (Role -> String) -> (String -> Role -> Role) -> Table.Column Role Msg
+roleColumn name ( fid, fname ) toComparable toStr updateField =
+    Table.veryCustomColumn
+        { name = name
+        , viewData = viewRoleColumn name ( fid, fname ) toStr updateField
+        , sorter = Table.increasingOrDecreasingBy toComparable
+        }
+
+
+viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> (String -> Role -> Role) -> Role -> Table.HtmlDetails Msg
+viewRoleColumn name ( fid, fname ) toStr updateField role =
+    let
+        _ =
+            Debug.log "viewRoleColumn: " ( fid, fname )
+    in
+        if fid == role.id && fname == name then
+            Table.HtmlDetails
+                []
+                [ input
+                    [ onInput
+                        (UpdateField updateField role.id)
+                    , Html.Attributes.value (toStr role)
+                    , onBlur (ChangeEditableField ( "", "" ))
+                    ]
+                    []
+                ]
+        else
+            Table.HtmlDetails
+                [ onDoubleClick
+                    (ChangeEditableField ( role.id, name ))
+                ]
+                [ p [] [ text (toStr role) ] ]
+
+
+
+-- Update Fields
+
+
+updateFieldRole : String -> Role -> Role
+updateFieldRole str role =
+    { role | role = str }
+
+
+updateFieldFirst : String -> Role -> Role
+updateFieldFirst str role =
+    { role | first = str }
+
+
+updateFieldLast : String -> Role -> Role
+updateFieldLast str role =
+    { role | last = str }
+
+
+updateFieldCallStart : String -> Role -> Role
+updateFieldCallStart str role =
+    { role | callStart = str }
+
+
+updateFieldPay : String -> Role -> Role
+updateFieldPay str role =
+    { role | pay = str }
+
+
+updateFieldEmail : String -> Role -> Role
+updateFieldEmail str role =
+    { role | email = str }
 
 
 toRowAttrs : Role -> List (Attribute Msg)
 toRowAttrs role =
-    [ onClick (ToggleSelected role.id)
-    , style
+    [ style
         [ ( "background"
           , if role.selected then
                 "#CEFAF8"
