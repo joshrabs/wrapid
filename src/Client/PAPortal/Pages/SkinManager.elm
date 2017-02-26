@@ -66,7 +66,7 @@ type Msg
     | AddRoles
     | EditRoles String
     | ChangeEditableField ( String, String )
-    | UpdateRoleField String String
+    | UpdateField (String -> Role -> Role) String String
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | Breakdown
@@ -161,13 +161,13 @@ update msg model =
             , Cmd.none
             )
 
-        UpdateRoleField id value ->
+        UpdateField f id value ->
             let
                 updateRoles =
                     List.map
                         (\x ->
                             if x.id == id then
-                                { x | role = value }
+                                f value x
                             else
                                 x
                         )
@@ -462,19 +462,12 @@ config ( fid, fname ) =
         , toMsg = SetTableState
         , columns =
             [ checkboxColumn
-            , roleColumn "Role" ( fid, fname ) .role .role
-              -- , roleEditColumn
-              -- , Table.stringColumn "Role" .role
-            , Table.stringColumn "First" .first
-            , Table.stringColumn "Last" .last
-            , Table.stringColumn "Call Start" .callStart
-            , Table.stringColumn "Pay" .pay
-            , Table.stringColumn "Email" .email
-              -- , Table.stringColumn "Lunch Start" .lunchStart
-              -- , Table.stringColumn "Lunch length" .lunchLength
-              -- , Table.stringColumn "In" .clockIn
-              -- , Table.stringColumn "Out" .clockOut
-              -- , Table.stringColumn "Call End" .callEnd
+            , roleColumn "Role" ( fid, fname ) .role .role updateFieldRole
+            , roleColumn "First" ( fid, fname ) .first .first updateFieldFirst
+            , roleColumn "Last" ( fid, fname ) .last .last updateFieldLast
+            , roleColumn "Call" ( fid, fname ) .callStart .callStart updateFieldCallStart
+            , roleColumn "Pay" ( fid, fname ) .pay .pay updateFieldPay
+            , roleColumn "Email" ( fid, fname ) .email .email updateFieldEmail
             ]
         , customizations =
             { defaultCustomizations | rowAttrs = toRowAttrs }
@@ -501,17 +494,17 @@ viewCheckbox { id, selected } =
         ]
 
 
-roleColumn : String -> ( String, String ) -> (Role -> comparable) -> (Role -> String) -> Table.Column Role Msg
-roleColumn name ( fid, fname ) toComparable toStr =
+roleColumn : String -> ( String, String ) -> (Role -> comparable) -> (Role -> String) -> (String -> Role -> Role) -> Table.Column Role Msg
+roleColumn name ( fid, fname ) toComparable toStr updateField =
     Table.veryCustomColumn
-        { name = "Role"
-        , viewData = viewRoleColumn name ( fid, fname ) toStr
+        { name = name
+        , viewData = viewRoleColumn name ( fid, fname ) toStr updateField
         , sorter = Table.increasingOrDecreasingBy toComparable
         }
 
 
-viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> Role -> Table.HtmlDetails Msg
-viewRoleColumn name ( fid, fname ) toStr role =
+viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> (String -> Role -> Role) -> Role -> Table.HtmlDetails Msg
+viewRoleColumn name ( fid, fname ) toStr updateField role =
     let
         _ =
             Debug.log "viewRoleColumn: " ( fid, fname )
@@ -520,7 +513,8 @@ viewRoleColumn name ( fid, fname ) toStr role =
             Table.HtmlDetails
                 []
                 [ input
-                    [ onInput (UpdateRoleField role.id)
+                    [ onInput
+                        (UpdateField updateField role.id)
                     , Html.Attributes.value (toStr role)
                     , onBlur (ChangeEditableField ( "", "" ))
                     ]
@@ -535,17 +529,37 @@ viewRoleColumn name ( fid, fname ) toStr role =
 
 
 
--- roleColumn : Table.Column Role Msg
--- roleColumn =
---     Table.veryCustomColumn
---         { name = "Role Editable"
---         , viewData = viewRoleColumn
---         , sorter = Table.unsortable
---         }
--- viewRoleColumn : Role -> Table.HtmlDetails Msg
--- viewRoleColumn { id, selected, role } =
---     Table.HtmlDetails [ onClick (EditRole id "role") ]
---         [ p [] [ text role ] ]
+-- Update Fields
+
+
+updateFieldRole : String -> Role -> Role
+updateFieldRole str role =
+    { role | role = str }
+
+
+updateFieldFirst : String -> Role -> Role
+updateFieldFirst str role =
+    { role | first = str }
+
+
+updateFieldLast : String -> Role -> Role
+updateFieldLast str role =
+    { role | last = str }
+
+
+updateFieldCallStart : String -> Role -> Role
+updateFieldCallStart str role =
+    { role | callStart = str }
+
+
+updateFieldPay : String -> Role -> Role
+updateFieldPay str role =
+    { role | pay = str }
+
+
+updateFieldEmail : String -> Role -> Role
+updateFieldEmail str role =
+    { role | email = str }
 
 
 toRowAttrs : Role -> List (Attribute Msg)
