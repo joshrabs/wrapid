@@ -14,6 +14,8 @@ import Material.Scheme
 import Material.Options as Options
 import Material.Textfield as Textfield
 import Material.Button as Button
+import Touch exposing (TouchEvent(..), Touch)
+import SingleTouch exposing (SingleTouch, onSingleTouch)
 
 
 -- MODEL
@@ -505,27 +507,25 @@ roleColumn name ( fid, fname ) toComparable toStr updateField =
 
 viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> (String -> Role -> Role) -> Role -> Table.HtmlDetails Msg
 viewRoleColumn name ( fid, fname ) toStr updateField role =
-    let
-        _ =
-            Debug.log "viewRoleColumn: " ( fid, fname )
-    in
-        if fid == role.id && fname == name then
-            Table.HtmlDetails
+    if fid == role.id && fname == name then
+        Table.HtmlDetails
+            []
+            [ input
+                [ onInput
+                    (UpdateField updateField role.id)
+                , Html.Attributes.value (toStr role)
+                , onBlur (ChangeEditableField ( "", "" ))
+                ]
                 []
-                [ input
-                    [ onInput
-                        (UpdateField updateField role.id)
-                    , Html.Attributes.value (toStr role)
-                    , onBlur (ChangeEditableField ( "", "" ))
-                    ]
-                    []
-                ]
-        else
-            Table.HtmlDetails
-                [ onDoubleClick
-                    (ChangeEditableField ( role.id, name ))
-                ]
-                [ p [] [ text (toStr role) ] ]
+            ]
+    else
+        Table.HtmlDetails
+            [ onDoubleClick
+                (ChangeEditableField ( role.id, name ))
+            , onSingleTouch TouchStart Touch.preventAndStop <|
+                (\x -> ChangeEditableField ( role.id, name ))
+            ]
+            [ p [] [ text (toStr role) ] ]
 
 
 
