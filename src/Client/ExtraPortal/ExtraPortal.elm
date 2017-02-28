@@ -24,18 +24,22 @@ type RemoteData a
     | Success a
 
 
-type Pages
-    = ProfileWizard
-    | FormStatus
-    | DailyMonitor
+type ViewState
+    = Initializing
+    | PageView Page
 
+
+type Page =
+    ProfileWizard
+  | FormStatus
+  | DailyMonitor
 
 type alias Model =
     { currentDate : Maybe Date
-    , currentView : Pages
+    , currentView : ViewState
+    , extraInfo : Maybe ExtraInfo
     , wizardModel : Wizard.Model
     , userId : UserID
-    , extraInfo : RemoteData ExtraInfo
     , animStyle : Animation.State
     , mdl : Material.Model
     }
@@ -44,10 +48,10 @@ type alias Model =
 initModel : String -> Maybe Date -> Material.Model -> ( Model, Cmd Msg )
 initModel userId currentDate mdlModel =
     ( { currentDate = currentDate
-      , currentView = DailyMonitor
+      , currentView = Initializing
       , wizardModel = Wizard.init
       , userId = userId
-      , extraInfo = Loading
+      , extraInfo = Nothing
       , animStyle = initAnimStyle
       , mdl = mdlModel
       }
@@ -68,7 +72,7 @@ initAnimStyle =
 
 type Msg
     = NoOp
-    | ChangePage Pages
+    | ChangeView ViewState
     | WizardMsg Wizard.Msg
     | DailyMonitorMsg DailyMonitor.Msg
     | LoadRemoteData
@@ -88,12 +92,14 @@ submitClockin : Cmd Msg
 submitClockin =
     Task.perform ClockIn Time.now
 
+isProfileComplete : Profile -> Bool
+isProfileComplete profile = False
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ChangePage page ->
-            ( { model | currentView = page }, fadeInUpMsg )
+        ChangeView view ->
+            ( { model | currentView = view }, fadeInUpMsg )
 
         FadeInUpMsg ->
             let
@@ -116,7 +122,12 @@ update msg model =
             ( model, getExtraInfo (( model.userId, "2017-02-18" )) )
 
         ExtraInfoRetrieved extraInfo ->
-            ( { model | extraInfo = Success extraInfo }, fadeInUpMsg )
+          let
+              nextView =
+                if isProfileComplete extraInfo.profile
+                  then DailyMonitor else ProfileWizard
+          in
+            ( { model | currentView=PageView nextView, extraInfo = Just extraInfo }, fadeInUpMsg )
 
         Animate animMsg ->
             ( { model
@@ -132,10 +143,9 @@ update msg model =
 
                 newExtraInfo =
                     case oldInfo of
-                        Success a ->
-                            Success { a | timecard = timecard }
-
-                        Loading ->
+                        Just a ->
+                            Just { a | timecard = timecard }
+                        Nothing ->
                             oldInfo
             in
                 ( { model | extraInfo = newExtraInfo }, Cmd.none )
@@ -152,10 +162,10 @@ update msg model =
         ClockIn curTime ->
             ( model
             , case model.extraInfo of
-                Success extraInfo ->
+                Just extraInfo ->
                     clockinExtra ( extraInfo.timecard.id, curTime |> toString )
 
-                Loading ->
+                Nothing ->
                     Cmd.none
             )
 
@@ -174,53 +184,52 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-
-
 --VIEW
 
 
 viewExtraPortal : Model -> Html Msg
 viewExtraPortal model =
-    case model.extraInfo of
-        Loading ->
+    case model.currentView of
+        Initializing ->
             viewLoadingScreen
 
-        Success extraInfo ->
-            div []
-                [ div [ style [ ( "margin-bottom", "8px" ), ( "background-color", "orange" ), ( "display", "inline-flex" ) ] ]
-                    [ button [ onClick (ChangePage ProfileWizard) ] [ text "Profile Wizard" ]
-                    , button [ onClick (ChangePage FormStatus) ] [ text "Form Status" ]
-                    , button [ onClick (ChangePage DailyMonitor) ] [ text "DailyMonitor" ]
-                    ]
-                , let
-                    avatar =
-                        extraInfo.profile.avatar.url
+        PageView page ->
+          case model.extraInfo of
+            Nothing -> viewLoadingScreen
+            Just extraInfo ->
+              div []
+                  [ div [ style [ ( "margin-bottom", "8px" ), ( "background-color", "orange" ), ( "display", "inline-flex" ) ] ]
+                      [ button [ onClick (ChangeView (PageView ProfileWizard)) ] [ text "Profile Wizard" ]
+                      , button [ onClick (ChangeView (PageView FormStatus)) ] [ text "Form Status" ]
+                      , button [ onClick (ChangeView (PageView DailyMonitor))][ text "DailyMonitor" ]
+                      ]
+                  , let
+                      avatar =
+                          extraInfo.profile.avatar.url
 
-                    rightItems =
-                        { avatar = Just avatar }
-                  in
-                    Dashboard.view { navbar = { rightItems = Just rightItems } }
-                , case model.currentView of
-                    DailyMonitor ->
+                      rightItems =
+                          { avatar = Just avatar }
+                    in
+                      Dashboard.view { navbar = { rightItems = Just rightItems } }
+                  , case page of
+                      DailyMonitor ->
                         let
-                            dmModel =
-                                { currentDate = model.currentDate
-                                , timecard = extraInfo.timecard
-                                , firstName = extraInfo.profile.firstName
-                                , schedule = extraInfo.schedule
-                                }
+                          dmModel =
+                             { currentDate = model.currentDate
+                              , timecard = extraInfo.timecard
+                              , firstName = extraInfo.profile.firstName
+                              , schedule = extraInfo.schedule
+                            }
                         in
-                            Html.map DailyMonitorMsg (viewDailyMonitor dmModel (Animation.render model.animStyle))
+                          Html.map DailyMonitorMsg (viewDailyMonitor dmModel (Animation.render model.animStyle))
 
-                    ProfileWizard ->
-                        div []
-                            [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
+                      ProfileWizard->
+                          div []
+                              [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
-                    FormStatus ->
-                        viewFormStatusPage (ChangePage DailyMonitor) defaultFormStatus (Animation.render model.animStyle)
-                ]
-
-
+                      FormStatus ->
+                          viewFormStatusPage (ChangeView (PageView DailyMonitor)) defaultFormStatus (Animation.render model.animStyle)
+                  ]
 
 --PORTS
 

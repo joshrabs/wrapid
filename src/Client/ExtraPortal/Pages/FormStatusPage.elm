@@ -11,6 +11,7 @@ import Animation exposing (px)
 
 defaultImgSrc = "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciz8vkq0f0jdc0168aoxv5h3w"
 
+type alias Model = FormStatuses
 type alias FormStatuses = List FormStatus
 
 type alias FormStatus =
