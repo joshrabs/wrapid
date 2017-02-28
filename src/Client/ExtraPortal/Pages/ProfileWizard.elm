@@ -10,6 +10,7 @@ import Material.Textfield as Textfield
 import Material.Card as Card
 import Material.Button as Button
 
+import Debug exposing (log)
 
 
 -- MODEL
@@ -25,7 +26,6 @@ type alias WizardStep =
     { step : Int
     , display : Display
     , title : String
-    , last : Bool
     , fields : List Field
     }
 
@@ -68,20 +68,19 @@ createSteps : Int -> List ( String, List String ) -> List WizardStep
 createSteps step list =
     case list of
         x :: [] ->
-            [ createStep step x True ]
+            [ createStep step x ]
 
         x :: xs ->
-            [ createStep step x False ] ++ createSteps (step + 1) xs
+            [ createStep step x ] ++ createSteps (step + 1) xs
 
         [] ->
             []
 
 
-createStep : Int -> ( String, List String ) -> Bool -> WizardStep
-createStep step ( title, fs ) last =
+createStep : Int -> ( String, List String ) -> WizardStep
+createStep step ( title, fs )  =
     { step = step
     , title = title
-    , last = last
     , display =
         if step == 0 then
             Active
@@ -163,11 +162,34 @@ updateFields i str fields =
             []
 
 
+isFieldComplete: Field -> Bool
+isFieldComplete field =
+  let
+    log = Debug.log "isFieldComplete" (field.value |> String.isEmpty |> not)
+  in
+    if
+      String.isEmpty field.value
+    then False
+    else True
+
+isStepComplete: WizardStep -> Bool
+isStepComplete step =
+  let
+    firstMissing =
+      step.fields
+      |> List.filter (\field -> not (isFieldComplete field))
+      |> List.head
+  in
+      case firstMissing of
+        Nothing -> True
+        Just missing -> False
+
+
 getNextStep : List WizardStep -> Int
 getNextStep wizard =
     let
         step =
-            List.head (List.filter (\x -> x.display == Active) wizard)
+            completedSteps wizard |> List.reverse |> List.head
     in
         case step of
             Just s ->
@@ -176,6 +198,9 @@ getNextStep wizard =
             Nothing ->
                 -1
 
+completedSteps: List WizardStep -> List WizardStep
+completedSteps steps =
+      List.filter (\x -> isStepComplete x) steps
 
 nextStep : List WizardStep -> List WizardStep
 nextStep wizard =
@@ -238,12 +263,7 @@ viewStep model ws step =
                     , Button.accent
                     , Options.onClick NextStep
                     ]
-                    [ text
-                        (if ws.last == True then
-                            "Finish"
-                         else
-                            "NEXT"
-                        )
+                    [ text "Next"
                     ]
                 ]
             ]
