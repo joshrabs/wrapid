@@ -1,4 +1,4 @@
-module Client.ExtraPortal.Pages.ProfileWizard exposing (Model, init, Msg, initEmpty, update, view)
+module Client.ExtraPortal.Pages.ProfileWizard exposing (Model, init, Msg(..), initEmpty, update, view)
 
 import Html exposing (Html, h3, text)
 import Html.Attributes exposing (class, style)
@@ -11,7 +11,7 @@ import Material.Card as Card
 import Material.Button as Button
 
 import Debug exposing (log)
-
+import Task exposing (succeed)
 
 -- MODEL
 
@@ -99,7 +99,12 @@ type Msg
     | Batch (List Msg)
     | Upd ( Int, Int ) String
     | NextStep
+    | SubmitProfile (List WizardStep)
 
+
+submitProfile: List WizardStep -> Cmd Msg
+submitProfile profile =
+  Task.perform (always (SubmitProfile profile)) (Task.succeed ())
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -111,8 +116,22 @@ update msg model =
             ( { model | steps = updateSteps tuple str model.steps }, Cmd.none )
 
         NextStep ->
-            ( { model | steps = nextStep model.steps }, Cmd.none )
+          let
+              checkNextStep = nextStep model.steps
+              allComplete = areAllStepsComplete model.steps
+              log = Debug.log "ALL COMPLETE ??" allComplete
+              cmd =
+                if allComplete
+                  then submitProfile model.steps
+                  else Cmd.none
+          in
+            ( { model | steps = nextStep model.steps }, cmd )
 
+        SubmitProfile profile ->
+          let
+            log2 = Debug.log "CMD!" "SUBMITTING PROFILE!!!"
+          in
+            (model, Cmd.none)
         Batch listOfMsg ->
             let
                 ( finalModel, listOfFx ) =
@@ -184,6 +203,15 @@ isStepComplete step =
         Nothing -> True
         Just missing -> False
 
+areAllStepsComplete: List WizardStep -> Bool
+areAllStepsComplete steps =
+  let
+      firstMissingStep =
+        steps |> List.filter (\step -> not (isStepComplete step)) |> List.head
+  in
+      case firstMissingStep of
+        Just step -> False
+        Nothing -> True
 
 getNextStep : List WizardStep -> Int
 getNextStep wizard =

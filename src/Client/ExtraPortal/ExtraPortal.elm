@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import Material
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
-import Client.ExtraPortal.Pages.ProfileWizard as Wizard
+import Client.ExtraPortal.Pages.ProfileWizard as Wizard exposing (Msg(..))
 import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor, Msg(..))
 import Client.ExtraPortal.Types exposing (..)
 import Date exposing (Date)
@@ -95,6 +95,16 @@ submitClockin =
 isProfileComplete : Profile -> Bool
 isProfileComplete profile = False
 
+requestNextView: ViewState -> Cmd Msg
+requestNextView view =
+  Task.perform (always (ChangeView view)) (Task.succeed ())
+
+mapWizardCmd: Wizard.Msg -> Msg
+mapWizardCmd msg =
+  case msg of
+    SubmitProfile profile -> ChangeView (PageView FormStatus)
+    _ -> NoOp
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -154,9 +164,11 @@ update msg model =
             let
                 ( updatedWizardModel, wizardCmd ) =
                     Wizard.update subMsg model.wizardModel
+
+                log2 = Debug.log "Wizard CMD" wizardCmd
             in
                 ( { model | wizardModel = updatedWizardModel }
-                , Cmd.none
+                , Cmd.map mapWizardCmd wizardCmd
                 )
 
         ClockIn curTime ->
