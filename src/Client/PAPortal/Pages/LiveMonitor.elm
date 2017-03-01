@@ -1,7 +1,7 @@
 module Client.PAPortal.Pages.LiveMonitor exposing (..)
 
 import Html exposing (Html, div, text, input, button, img, span)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (style, src, placeholder)
 import Html.Events exposing (onClick)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
@@ -125,7 +125,13 @@ viewTaskPanel =
         , ("height", "74px")
         , ("background", "yellow")
       ]]
-      [text "Task!"]
+      [div [] [input [placeholder "Role"] []]
+      ,div []
+        [input [placeholder "Start Tm"] []
+        ,input [placeholder "End Tm"] []
+        ]
+      , button [] [text "Submit!"]
+      ]
 
 viewSearchTaskBar: Material.Model -> Html Msg
 viewSearchTaskBar mdlModel =
