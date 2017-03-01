@@ -34,6 +34,13 @@ type alias Avatar =
   {url: Maybe String --Should be URL
   }
 
+type alias UserId =
+    String
+
+
+type alias Day =
+    String
+
 -- type FieldId =
 --     FirstName | LastName | MI | Phone | Email
 --   | Address1 | Address2

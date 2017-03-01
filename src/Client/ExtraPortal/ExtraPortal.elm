@@ -15,6 +15,7 @@ import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Animation exposing (px)
 import Time exposing (Time)
 
+import Server.API.Queries.ExtraPortalQueries exposing (fetchReqExtraInfo, fetchReceiveExtraInfo)
 
 -- MODEL
 
@@ -129,7 +130,7 @@ update msg model =
                 )
 
         LoadRemoteData ->
-            ( model, getExtraInfo (( model.userId, "2017-02-18" )) )
+            ( model, fetchReqExtraInfo (( model.userId, "2017-02-18" )) )
 
         ExtraInfoRetrieved extraInfo ->
           let
@@ -245,25 +246,10 @@ viewExtraPortal model =
 
 --PORTS
 
-
-type alias UserId =
-    String
-
-
-type alias Day =
-    String
-
-
-port getExtraInfo : ( String, Day ) -> Cmd msg
-
-
 port clockinExtra : ( String, String ) -> Cmd msg
 
 
 port createExtraSchedule : ( String, String, String ) -> Cmd msg
-
-
-port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
 
 
 port receiveTimecardUpdate : (TimeCard -> msg) -> Sub msg
@@ -276,7 +262,7 @@ port receiveTimecardUpdate : (TimeCard -> msg) -> Sub msg
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ receiveExtraInfo ExtraInfoRetrieved
+        [ fetchReceiveExtraInfo ExtraInfoRetrieved
         , receiveTimecardUpdate TimeCardUpdate
         , Animation.subscription Animate [ model.animStyle ]
         ]
