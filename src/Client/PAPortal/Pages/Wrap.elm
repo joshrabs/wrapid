@@ -8,6 +8,8 @@ import Dict exposing (Dict, toList)
 import Common.Styles.TextStyles exposing (regularLight, regularBolder, headerTitleStyle)
 import Common.Styles.ButtonStyles exposing (blackButtonStyle)
 
+import Material.Icon as Icon exposing (view)
+
 --MODEL
 type alias Model =
   {currentStep: StepNum
@@ -121,10 +123,12 @@ viewWrapSubmitDownload =
   div [style [
     ("display", "flex")
     ,("flex-direction", "column")
+    ,("align-items", "center")
     ,("background", "#F8FAFF")
     ,("padding", "16px")
   ]]
-  [div [style (blackButtonStyle True)] [text "Download"]
+  [Icon.view "cloud_download" [Icon.size48]
+  ,div [style (blackButtonStyle True)] [text "Download"]
   ]
 
 viewWrapStepHeader: StepNum -> String -> Html msg
