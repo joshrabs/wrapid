@@ -18,25 +18,11 @@ type alias Context =
 type alias HorizontalCalendar = List HorizontalCalendarItem
 type alias HorizontalCalendarItem = {day: Date, isSelected: Bool}
 
-defaultDay: Date
-defaultDay =
-  Date.fromString "2017/5/1" |> Result.withDefault (Date.fromTime 0)
-
-fakeToday: Date
-fakeToday = add Day 2 defaultDay
-
-defaultContext: Context
-defaultContext =
-  {
-    selectedDay = fakeToday
-    ,daysPrevious = 3
-    ,daysNext = 3
-  }
 
 
 defaultCalendar: Date -> HorizontalCalendar
 defaultCalendar selectedDate =
-  (dayList 4 (add Day -2 selectedDate))
+  (dayList 20 (add Day -2 selectedDate))
     |> List.map (calendarItem selectedDate)
 
 calendarItem: Date -> Date -> HorizontalCalendarItem
@@ -55,6 +41,7 @@ viewCalendar setDateMsg selectedDate =
         ("display", "flex")
         ,( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" )
         ,("background", "#FFFFFF")
+        ,("overflow-x", "scroll")
       ]]
     (List.map (\item -> viewCalendarItem setDateMsg item selectedDate) model)
 
@@ -65,6 +52,7 @@ viewCalendarItem setDateMsg item selectedDate=
      ("display", "flex")
     ,("flex-direction", "column")
     ,("height", "120px")
+    ,("min-width", "120px")
     ,("width", "120px")
     ,("font-family", "Helvetica-Light")
     ,("font-size", "7px")
