@@ -2,6 +2,7 @@ module Client.PAPortal.Pages.LiveMonitor exposing (..)
 
 import Html exposing (Html, div, text, input, button, img, span)
 import Html.Attributes exposing (style, src)
+import Html.Events exposing (onClick)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 import Material
@@ -9,11 +10,16 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
-import Client.PAPortal.Types exposing (Profile)
+type alias Profile =
+    { id : String
+    , firstName : String
+    , lastName: String
+    , avatarSrc : Maybe String
+    }
+
 
 type alias Model =
-    { extraSnapStat : ExtrasSnapStatModel
-    , table : LiveExtraTable
+    { isAddingTask: Bool
     , mdl : Material.Model
     }
 
@@ -63,28 +69,35 @@ liveTable profs =
     Nothing -> []
 
 
-initModel : Maybe (List Profile) -> Material.Model -> Model
-initModel profs mdlModel =
-    { extraSnapStat = fakeSnapStateModel
-    , table = liveTable profs
+initModel : Material.Model -> Model
+initModel mdlModel =
+    { isAddingTask = False
     , mdl = mdlModel
     }
 
 
+--UPDATE
+type Msg = ViewAddingTask
+
+update: Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+  case msg of
+    ViewAddingTask -> ({model | isAddingTask = True}, Cmd.none)
 
 --VIEW
 
 
-viewLiveMonitor : Model -> Html msg
-viewLiveMonitor model =
+viewLiveMonitor : Model -> Maybe (List Profile) -> Html Msg
+viewLiveMonitor model extraProfiles =
     div [style [("margin", "8px 4px 8px 4px")]]
-        [ viewExtrasSnapStats model.extraSnapStat
-        , viewLiveTable model.table model.mdl
+        [ viewExtrasSnapStats fakeSnapStateModel
+        , viewLiveTable (liveTable extraProfiles) model.mdl model.isAddingTask
+
         ]
 
 
-viewLiveTable : LiveExtraTable -> Material.Model -> Html msg
-viewLiveTable table mdlModel =
+viewLiveTable : LiveExtraTable -> Material.Model -> Bool -> Html Msg
+viewLiveTable table mdlModel isAddingTask =
     let
         panelHeader =
             Just { title = "Extras", rightItem = Nothing }
@@ -92,6 +105,7 @@ viewLiveTable table mdlModel =
         panelBody =
             div [style [("margin", "8px")]]
                 [ viewSearchTaskBar mdlModel
+                , if isAddingTask then viewTaskPanel else div [] []
                 , (viewLiveTableItems table)
                 ]
 
@@ -101,7 +115,19 @@ viewLiveTable table mdlModel =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewSearchTaskBar: Material.Model -> Html msg
+viewTaskPanel: Html Msg
+viewTaskPanel =
+  div [ style [
+        ( "display", "flex" )
+        , ("align-items", "center")
+        , ( "justify-content", "space-between" )
+        , ( "padding", "8px 4px 8px 4px" )
+        , ("height", "74px")
+        , ("background", "yellow")
+      ]]
+      [text "Task!"]
+
+viewSearchTaskBar: Material.Model -> Html Msg
 viewSearchTaskBar mdlModel =
   div [style
     [
@@ -115,21 +141,23 @@ viewSearchTaskBar mdlModel =
     ]]
     [
         viewSearch mdlModel
-      , div [style [
-          ("display", "flex")
-          ,("justify-content", "center")
-          ,("align-items", "center")
-          ,("background", "#FFFFFF")
-          ,("box-shadow", "0 2px 4px 0 rgba(155,158,167,0.50)")
-          ,("border-radius", "2px")
-          ,("font-family", "Roboto-Regular")
-          ,("font-size", "12px")
-          ,("color", "#0000FF")
-          ,("width", "72px")
-          ,("height", "32px")
-          ,("margin", "8px")
-          ,("letter-spacing" , "0")]]
-      [text "Tasks"]
+      , div [onClick ViewAddingTask,
+          style [
+            ("display", "flex")
+            ,("justify-content", "center")
+            ,("align-items", "center")
+            ,("background", "#FFFFFF")
+            ,("box-shadow", "0 2px 4px 0 rgba(155,158,167,0.50)")
+            ,("border-radius", "2px")
+            ,("font-family", "Roboto-Regular")
+            ,("font-size", "12px")
+            ,("color", "#0000FF")
+            ,("width", "72px")
+            ,("height", "32px")
+            ,("margin", "8px")
+            ,("letter-spacing" , "0")
+        ]]
+        [text "Schedule"]
     ]
 
 

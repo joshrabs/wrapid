@@ -1,6 +1,7 @@
 module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
+import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 
 import Date exposing (Date)
 import Material
@@ -16,6 +17,7 @@ type alias Model =
   , currentView: ViewState
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
+  , liveModel : LiveMonitor.Model
   , mdl : Material.Model
   }
 
@@ -35,6 +37,7 @@ type Msg
     | Profiles (List Profile)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
+    | LiveMsg LiveMonitor.Msg
 
 type alias Profile =
     { id : String

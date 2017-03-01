@@ -6,7 +6,7 @@ import Html.Events exposing (..)
 
 import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
-import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
+import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor, initModel)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
@@ -25,7 +25,7 @@ viewPAPortal model =
                 Loading -> viewLoadingScreen
                 Success extras ->
                   div []
-                      [ viewLiveMonitor (LiveMonitor.initModel extras model.mdl)
+                      [ Html.map LiveMsg (viewLiveMonitor model.liveModel extras)
                       ]
 
             SkinManager ->
