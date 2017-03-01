@@ -96,6 +96,18 @@ const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: S
   }
 `;
 
+const addScheduleItemGQL = gql`mutation scheduleItemExtra($scheduleId:ID){
+  createExtraScheduleItems(
+    extrascheduleId:$scheduleId
+    , name:"ShootMore!"
+    , category:Scene
+    , startTm:"10:00am"
+  ){
+    id
+    name
+  }
+}`
+
 const subscribeSchedule = gql`subscription {
   ExtraScheduleItems{
     mutation
@@ -255,5 +267,11 @@ export default {
     const mutation = createSchedule;
     const variables = { date, title, startTm };
     return client.mutate({ mutation, variables });
+  },
+
+  addScheduleItem: function() {
+    const mutation = addScheduleItemGQL
+    const variables = {scheduleId: "cizbzpnmaw6m80148bpys69a6"}
+    return client.mutate({mutation, variables})
   }
 };

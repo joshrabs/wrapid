@@ -130,3 +130,14 @@ app.ports.subExtraSchedule.subscribe(function() {
       console.log(error);
     })
 })
+
+
+app.ports.addScheduleItem.subscribe(function(extraId, scheduleItem) {
+  client.addScheduleItem()
+    .then(result => {
+      console.log(result);
+    })
+    .catch(error =>{
+      console.log(error)
+    })
+})

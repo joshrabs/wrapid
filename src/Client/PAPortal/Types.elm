@@ -2,6 +2,7 @@ module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
+import Client.ExtraPortal.Types exposing (ScheduleItem)
 
 import Date exposing (Date)
 import Material

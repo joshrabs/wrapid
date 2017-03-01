@@ -70,7 +70,9 @@ update msg model =
                   LiveMonitor.update subMsg model.liveModel
           in
               ( { model | liveModel = updatedLMModel }
-              , Cmd.none
+              , case subMsg of
+                  LiveMonitor.SubmitTaskByRole item -> addScheduleItem("meow", item)
+                  _ -> Cmd.none
               )
 
 subscriptions : Model -> Sub Msg

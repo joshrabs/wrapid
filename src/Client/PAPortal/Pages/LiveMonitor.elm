@@ -10,6 +10,8 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
+import Client.ExtraPortal.Types exposing (ScheduleItem)
+
 type alias Profile =
     { id : String
     , firstName : String
@@ -76,13 +78,17 @@ initModel mdlModel =
     }
 
 
+
 --UPDATE
-type Msg = ViewAddingTask
+type Msg =
+   ViewAddingTask
+  | SubmitTaskByRole ScheduleItem
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     ViewAddingTask -> ({model | isAddingTask = True}, Cmd.none)
+    SubmitTaskByRole scheduleItem -> (model, Cmd.none)
 
 --VIEW
 
@@ -130,8 +136,16 @@ viewTaskPanel =
         [input [placeholder "Start Tm"] []
         ,input [placeholder "End Tm"] []
         ]
-      , button [] [text "Submit!"]
+      , button [onClick (SubmitTaskByRole defaultScheduleItem)] [text "Submit!"]
       ]
+
+defaultScheduleItem: ScheduleItem
+defaultScheduleItem =
+  {startTm = "5:30 PM"
+  ,category ="Shoot"
+  ,endTm = Nothing
+  ,name="Zombie shot"
+  }
 
 viewSearchTaskBar: Material.Model -> Html Msg
 viewSearchTaskBar mdlModel =
