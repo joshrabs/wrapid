@@ -1,7 +1,7 @@
 port module Ports exposing (..)
 
 import Client.PAPortal.Types exposing (Profile)
-import Client.ExtraPortal.Types exposing (ExtraInfo, Day, UserId)
+import Client.ExtraPortal.Types exposing (ExtraInfo, Day, UserId, Schedule)
 
 port getAllExtraInfo : (String) -> Cmd msg
 

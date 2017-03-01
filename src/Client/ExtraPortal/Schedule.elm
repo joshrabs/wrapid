@@ -67,7 +67,7 @@ viewSchedule schedule =
               span [style scheduleItemNameStyle] [text s.name]
               ,span [style scheduleItemTitleStyle] [text s.startTm]
             ]
-      )) schedule
+      )) schedule.items
     in
       div [] listItems
   ]

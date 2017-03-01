@@ -47,7 +47,8 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
       console.log("timecards!", timecards)
       const timecard = timecards.length > 0 ? timecards[0] : null
       console.log(timecard)
-      const schedule = extraschedule.extrascheduleitemses
+      const scheduleItems = extraschedule.extrascheduleitemses
+      const schedule = {id: extraschedule.id, items: scheduleItems}
       const profile = baseprofile
       const extraInfo = {timecard, profile, schedule}
       app.ports.receiveExtraInfo.send(extraInfo);
@@ -114,4 +115,18 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
     .catch(error => {
       console.log(error);
     });
+})
+
+
+app.ports.subExtraSchedule.subscribe(function() {
+  console.log(client.subExtraSchedule)
+  client.subExtraSchedule()
+    .then(result => {
+      console.log(result);
+      const schedule = result.User.data;
+      app.ports.subReceiveExtraSchedule.send(schedule)
+    })
+    .catch(error => {
+      console.log(error);
+    })
 })

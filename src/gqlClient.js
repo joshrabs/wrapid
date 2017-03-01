@@ -1,10 +1,24 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
+import {SubscriptionClient, addGraphQLSubscriptions} from 'subscriptions-transport-ws'
 import gql from 'graphql-tag';
 
+const wsClient = new SubscriptionClient(`wss://subscriptions.graph.cool/v1/ciykpioqm1wl00120k2e8s4la`, {
+  reconnect: true,
+  connectionParams: {
+    // Pass any arguments you want for initialization
+  }
+})
+
+const networkInterface = createNetworkInterface({ uri: 'https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la' })
+
+// Extend the network interface with the WebSocket
+const networkInterfaceWithSubscriptions = addGraphQLSubscriptions(
+  networkInterface,
+  wsClient
+)
+
 const client = new ApolloClient({
-  networkInterface: createNetworkInterface({
-    uri: 'https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la'
-  })
+  networkInterface: networkInterfaceWithSubscriptions
 });
 
 // Queries
@@ -82,6 +96,18 @@ const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: S
   }
 `;
 
+const subscribeSchedule = gql`subscription {
+  ExtraScheduleItems{
+    mutation
+    node {
+      name
+      category
+      startTm
+      endTm
+    }
+  }
+}`
+
 const clockinExtra = gql`mutation clockinExtra($id: ID!, $clockinTs: String)
   {
     updateTimecard(id: $id, clockinTs: $clockinTs)
@@ -115,7 +141,7 @@ const getExtraInfo = gql`
         lastName
       },
       extraschedule (filter: {date:$date}){
-        date
+        id
         extrascheduleitemses(orderBy:startTm_ASC){
           name
           category
@@ -157,6 +183,15 @@ const paLiveMonitorAllExtraInfo = gql`query {
 
 export default {
 
+  //subscriptions
+  subExtraSchedule: function(){
+    const query = subscribeSchedule;
+    const variables = {};
+    console.log(client)
+    console.log(query)
+    return client.query({ query, variables });
+  },
+
   // Queries
   getAllExtraInfo: function(date) {
     const query = paLiveMonitorAllExtraInfo;
@@ -181,7 +216,6 @@ export default {
 
   getExtraInfo: function(userId, date) {
     const query = getExtraInfo;
-    console.log("QUERY!", query)
     const variables = { userId, date };
     return client.query({ query, variables });
   },

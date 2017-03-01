@@ -21,7 +21,7 @@ type alias TimeCard =
 type PunchAction = PunchIn | PunchOut
 
 type alias UserID = String
-type alias Schedule = List ScheduleItem
+type alias Schedule = {id: String, items: List ScheduleItem}
 type alias ScheduleItem =
   { name: String
   , category: String

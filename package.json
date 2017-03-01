@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "apollo-client": "^0.8.5",
-    "graphql-tag": "^1.2.4"
+    "graphql-tag": "^1.2.4",
+    "subscriptions-transport-ws": "^0.5.3"
   }
 }

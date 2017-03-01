@@ -43,6 +43,7 @@ type alias Model =
     , userId : UserID
     , animStyle : Animation.State
     , mdl : Material.Model
+    , shouldShowPortalSwitcher: Bool -- NOTE DEVELOPMENT ONLY!!!!
     }
 
 
@@ -55,6 +56,7 @@ initModel userId currentDate mdlModel =
       , extraInfo = Nothing
       , animStyle = initAnimStyle
       , mdl = mdlModel
+      , shouldShowPortalSwitcher = True
       }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
     )
@@ -79,9 +81,11 @@ type Msg
     | LoadRemoteData
     | ExtraInfoRetrieved ExtraInfo
     | TimeCardUpdate TimeCard
+    | SubSchedule Schedule
     | Animate Animation.Msg
     | FadeInUpMsg
     | ClockIn Time
+    | ShowPageSwitcher Bool --NOTE THIS IS DEVELOPMENT ONLY!
 
 
 fadeInUpMsg : Cmd Msg
@@ -106,9 +110,22 @@ mapWizardCmd msg =
     SubmitProfile profile -> ChangeView (PageView FormStatus)
     _ -> NoOp
 
+updateSchedule: Schedule -> Model -> Model
+updateSchedule schedule model =
+  case model.extraInfo of
+    Just extraInfo ->
+      let
+        updInfo = {extraInfo | schedule = schedule}
+      in
+        {model | extraInfo = Just updInfo}
+    Nothing -> model
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ShowPageSwitcher should ->
+          ({model | shouldShowPortalSwitcher = should}, Cmd.none)
         ChangeView view ->
             ( { model | currentView = view }, fadeInUpMsg )
 
@@ -130,7 +147,7 @@ update msg model =
                 )
 
         LoadRemoteData ->
-            ( model, fetchReqExtraInfo (( model.userId, "2017-02-18" )) )
+            ( model, Cmd.batch[fetchReqExtraInfo (( model.userId, "2017-02-18" )), subExtraSchedule ()] )
 
         ExtraInfoRetrieved extraInfo ->
           let
@@ -139,6 +156,9 @@ update msg model =
                   then DailyMonitor else ProfileWizard
           in
             ( { model | currentView=PageView nextView, extraInfo = Just extraInfo }, fadeInUpMsg )
+
+        SubSchedule schedule ->
+          (updateSchedule schedule model, Cmd.none)
 
         Animate animMsg ->
             ( { model
@@ -212,7 +232,8 @@ viewExtraPortal model =
             Just extraInfo ->
               div []
                   [ div [ style [ ( "margin-bottom", "8px" ), ( "background-color", "orange" ), ( "display", "inline-flex" ) ] ]
-                      [ button [ onClick (ChangeView (PageView ProfileWizard)) ] [ text "Profile Wizard" ]
+                      [ button [onClick (ShowPageSwitcher False)] [text "--"]
+                      , button [ onClick (ChangeView (PageView ProfileWizard)) ] [ text "Profile Wizard" ]
                       , button [ onClick (ChangeView (PageView FormStatus)) ] [ text "Form Status" ]
                       , button [ onClick (ChangeView (PageView DailyMonitor))][ text "DailyMonitor" ]
                       ]
@@ -254,7 +275,8 @@ port createExtraSchedule : ( String, String, String ) -> Cmd msg
 
 port receiveTimecardUpdate : (TimeCard -> msg) -> Sub msg
 
-
+port subExtraSchedule: () -> Cmd msg
+port subReceiveExtraSchedule: (Schedule -> msg) -> Sub msg
 
 --SUBSCRIPTIONS
 
@@ -264,6 +286,7 @@ subscriptions model =
     Sub.batch
         [ fetchReceiveExtraInfo ExtraInfoRetrieved
         , receiveTimecardUpdate TimeCardUpdate
+        , subReceiveExtraSchedule SubSchedule
         , Animation.subscription Animate [ model.animStyle ]
         ]
 

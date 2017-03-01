@@ -20,7 +20,7 @@ type NotificationIcon = Default | LunchIcon
 
 convertSchedule: Schedule -> Notifications
 convertSchedule schedule =
-  List.map convertScheduleItem schedule
+  List.map convertScheduleItem schedule.items
 
 convertScheduleItem: ScheduleItem -> NotificationBarItem
 convertScheduleItem item =
