@@ -102,16 +102,25 @@ initModel mdlModel =
 
 --UPDATE
 type Msg =
-   ViewAddingTask
+    Mdl (Material.Msg Msg)
+  | ViewAddingTask
   | SubmitTaskByRole ScheduleItem
   | SetTableFilter Filter
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    ViewAddingTask -> ({model | isAddingTask = True}, Cmd.none)
-    SubmitTaskByRole scheduleItem -> (model, Cmd.none)
-    SetTableFilter tFilter -> ({model | tableFilter = tFilter}, Cmd.none)
+    Mdl msg_ ->
+        Material.update Mdl msg_ model
+
+    ViewAddingTask ->
+      ({model | isAddingTask = True}, Cmd.none)
+
+    SubmitTaskByRole scheduleItem ->
+      (model, Cmd.none)
+
+    SetTableFilter tFilter ->
+      ({model | tableFilter = tFilter}, Cmd.none)
 
 --VIEW
 
@@ -211,22 +220,18 @@ viewSearch mdlModel =
   [ div [style [("display", "flex"), ("align-items", "center")]]
       [
         span [style [("margin-top", "4px")]] [viewSearchIcon]
-       ,input [onInput (SetTableFilter), style
-          [("font-size", "14px")
-          ,("font-family", "Roboto-Regular")
-          ,("color", "#45494E")
-          ,("margin-left", "4px")
-          ]]
-         []
+       ,span [style [("margin-left", "4px"), ("width", "170px")]]
+        [Textfield.render Mdl
+             [ 3, 0 ]
+             mdlModel
+             [ Textfield.label "Search"
+             , Textfield.floatingLabel
+             , Options.onInput SetTableFilter
+             ]
+             []
+        ]
       ]
-      -- , Textfield.render Material.Textfi
-      --     [ 10, 0 ]
-      --     mdlModel
-      --     [ Textfield.label "Enter email"
-      --     , Textfield.floatingLabel
-      --     , Textfield.email
-      --     ]
-      --     []
+
   ]
 
 viewLiveTableItems items =
