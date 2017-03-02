@@ -231,12 +231,9 @@ viewExtraPortal model =
             Nothing -> viewLoadingScreen
             Just extraInfo ->
               div []
-                  [ div [ style [ ( "margin-bottom", "8px" ), ( "background-color", "orange" ), ( "display", "inline-flex" ) ] ]
-                      [ button [onClick (ShowPageSwitcher False)] [text "--"]
-                      , button [ onClick (ChangeView (PageView ProfileWizard)) ] [ text "Profile Wizard" ]
-                      , button [ onClick (ChangeView (PageView FormStatus)) ] [ text "Form Status" ]
-                      , button [ onClick (ChangeView (PageView DailyMonitor))][ text "DailyMonitor" ]
-                      ]
+                  [if model.shouldShowPortalSwitcher then viewPageSwitcher
+                    else
+                      div [onClick (ShowPageSwitcher True), style [ ( "position", "fixed" ), ( "top", "0px" ), ( "left", "0px" ), ("min-height", "20px"), ("width", "100%"), ("background", "transparent") ]] []
                   , let
                       avatar =
                           extraInfo.profile.avatar.url
@@ -265,6 +262,20 @@ viewExtraPortal model =
                           viewFormStatusPage (ChangeView (PageView DailyMonitor)) defaultFormStatus (Animation.render model.animStyle)
                   ]
 
+viewPageSwitcher: Html Msg
+viewPageSwitcher =
+  div [style [
+      ("position", "fixed"), ("top", "0"), ("left", "0")
+      , ( "margin-bottom", "8px" )
+      , ( "background-color", "orange" )
+      , ("display", "inline-flex")
+      ]
+    ]
+    [ button [onClick (ShowPageSwitcher False)] [text "--"]
+    , button [ onClick (ChangeView (PageView ProfileWizard)) ] [ text "Profile Wizard" ]
+    , button [ onClick (ChangeView (PageView FormStatus)) ] [ text "Form Status" ]
+    , button [ onClick (ChangeView (PageView DailyMonitor))][ text "DailyMonitor" ]
+    ]
 --PORTS
 
 port clockinExtra : ( String, String ) -> Cmd msg
