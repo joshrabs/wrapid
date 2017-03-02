@@ -4,6 +4,7 @@ import Material
 import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
+import Client.Generic.Authentication.Login.State as Login
 
 import Time exposing (Time, hour)
 import Date exposing (Date, fromTime)
@@ -96,21 +97,27 @@ update msg model =
           )
 
       LoginMsg loginMsg ->
-          ( model, Cmd.none )
+        case model.currentViewState of
+          Login loginModel ->
+            let
+              (updatedLoginModel, logMsg) = Login.update loginMsg loginModel
+            in
+              ( {model | currentViewState = Login updatedLoginModel}, Cmd.none )
+
+          _ -> (model, Cmd.none)
 
       ChildMsg subMsg->
         case subMsg of
           ExtraPortalMsg epMsg ->
             case model.currentViewState of
-              Login loginModel -> (model, Cmd.none)
               ExtraPortal curModel ->
                 let
                     ( epModel, epCmd ) = ExtraPortal.update epMsg curModel
                 in
                     ( { model | currentViewState = ExtraPortal epModel }
                       , Cmd.map (\b -> (ChildMsg (ExtraPortalMsg b))) epCmd )
-              PAPortal curModel ->
-                (model, Cmd.none)
+
+              _ -> (model, Cmd.none)
 
           PAPortalMsg paMsg ->
               case model.currentViewState of
@@ -120,9 +127,8 @@ update msg model =
                   in
                       ( { model | currentViewState = PAPortal paPortalModel }
                         , Cmd.map (\b -> (ChildMsg (PAPortalMsg b))) paCmd )
-                ExtraPortal curModel ->
-                  (model, Cmd.none)
-                Login loginModel -> (model, Cmd.none)
+
+                _ -> (model, Cmd.none)
 
 
       ToggleNotifications ->

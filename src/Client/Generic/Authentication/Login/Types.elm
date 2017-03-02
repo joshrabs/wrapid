@@ -15,7 +15,3 @@ type Msg
     | Password String
     | SubmitLogin
     | Mdl (Material.Msg Msg)
-
-
-type alias Mdl =
-    Material.Model

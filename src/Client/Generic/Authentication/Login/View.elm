@@ -1,11 +1,12 @@
 module Client.Generic.Authentication.Login.View exposing (loginView)
 
-import Client.Generic.Authentication.Login.Types exposing (Model, Msg, Mdl)
+import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
 import Client.Generic.Dashboard.Dashboard as Dashboard
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Material
 import Material.Textfield as Textfield
+import Material.Options as Options
 import Material.Scheme
 
 
@@ -60,14 +61,16 @@ viewLoginPanel model =
                     [ Textfield.label "Enter email"
                     , Textfield.floatingLabel
                     , Textfield.email
+                    , Options.onInput Email
                     ]
                     []
                 , Textfield.render Mdl
                     [ 10, 1 ]
                     model.mdl
-                    [ Textfield.label "Enter password"
+                    [ Textfield.label "Password"
                     , Textfield.floatingLabel
                     , Textfield.password
+                    , Options.onInput Password
                     ]
                     []
                 ]

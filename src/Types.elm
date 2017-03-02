@@ -38,7 +38,9 @@ type Msg
     | Mdl (Material.Msg Msg)
     | ShowPortalSwitcher Bool
 
-type ChildPortalMsg = ExtraPortalMsg ExtraPortal.Msg | PAPortalMsg PAPortal.Msg
+type ChildPortalMsg 
+    = ExtraPortalMsg ExtraPortal.Msg
+    | PAPortalMsg PAPortal.Msg
 
 
 
