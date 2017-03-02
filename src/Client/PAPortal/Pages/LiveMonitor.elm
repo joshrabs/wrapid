@@ -2,7 +2,10 @@ module Client.PAPortal.Pages.LiveMonitor exposing (..)
 
 import Html exposing (Html, div, text, input, button, img, span)
 import Html.Attributes exposing (style, src, placeholder)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
+
+import Regex exposing (contains)
+
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (makePanel)
 import Assets.Icons.SearchIcon exposing (viewSearchIcon)
 import Material
@@ -23,6 +26,7 @@ type alias Profile =
 type alias Model =
     { isAddingTask: Bool
     , mdl : Material.Model
+    , tableFilter: Filter
     }
 
 
@@ -59,22 +63,39 @@ fakeImg =
     "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 
-
-liveTable: Maybe (List Profile) -> LiveExtraTable
-liveTable profs =
+type alias Filter = String
+liveTable: Maybe (List Profile) -> Filter -> LiveExtraTable
+liveTable profs tableFilter =
   case profs of
     Just extras ->
-      (List.map (\prof ->
-        {firstName=prof.firstName, lastName=prof.lastName, imgSrc=prof.avatarSrc, isClockedIn=True}
-      )
-      extras)
+      extras
+        |> tableFilterMatch tableFilter
+        |> (List.map (\prof ->
+              {firstName=prof.firstName, lastName=prof.lastName, imgSrc=prof.avatarSrc, isClockedIn=True}
+            ))
     Nothing -> []
 
+
+tableFilterMatch: Filter -> List Profile -> List Profile
+tableFilterMatch tFilter profs =
+  let
+      sanProfs prof =
+        let
+            log2 = Debug.log "Prof!" ((prof.firstName ++ prof.lastName) |> String.toLower |> String.trim)
+            log = Debug.log "FILTER!" (tFilter |> String.toLower |> String.trim )
+        in
+            (prof.firstName ++ prof.lastName) |> String.toLower |> String.trim
+
+      sanFilter =
+        tFilter |> String.toLower |> String.split " " |> String.concat
+  in
+      List.filter (\prof -> Regex.contains (Regex.regex sanFilter) (sanProfs prof)) profs
 
 initModel : Material.Model -> Model
 initModel mdlModel =
     { isAddingTask = False
     , mdl = mdlModel
+    , tableFilter = ".*"
     }
 
 
@@ -83,12 +104,14 @@ initModel mdlModel =
 type Msg =
    ViewAddingTask
   | SubmitTaskByRole ScheduleItem
+  | SetTableFilter Filter
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     ViewAddingTask -> ({model | isAddingTask = True}, Cmd.none)
     SubmitTaskByRole scheduleItem -> (model, Cmd.none)
+    SetTableFilter tFilter -> ({model | tableFilter = tFilter}, Cmd.none)
 
 --VIEW
 
@@ -97,7 +120,7 @@ viewLiveMonitor : Model -> Maybe (List Profile) -> Html Msg
 viewLiveMonitor model extraProfiles =
     div [style [("margin", "8px 4px 8px 4px")]]
         [ viewExtrasSnapStats fakeSnapStateModel
-        , viewLiveTable (liveTable extraProfiles) model.mdl model.isAddingTask
+        , viewLiveTable (liveTable extraProfiles model.tableFilter) model.mdl model.isAddingTask
 
         ]
 
@@ -182,19 +205,19 @@ viewSearchTaskBar mdlModel =
 
 
 
-viewSearch : Material.Model -> Html msg
+viewSearch : Material.Model -> Html Msg
 viewSearch mdlModel =
   div [style [("margin-left", "16px")]]
   [ div [style [("display", "flex"), ("align-items", "center")]]
       [
         span [style [("margin-top", "4px")]] [viewSearchIcon]
-       ,span [style
+       ,input [onInput (SetTableFilter), style
           [("font-size", "14px")
           ,("font-family", "Roboto-Regular")
           ,("color", "#45494E")
           ,("margin-left", "4px")
           ]]
-         [text "Search"]
+         []
       ]
       -- , Textfield.render Material.Textfi
       --     [ 10, 0 ]
