@@ -235,7 +235,7 @@ viewSearch mdlModel =
   ]
 
 viewLiveTableItems items =
-    div [style [("max-height", "280px"), ("overflow-y", "scroll")]]
+    div [style [("max-height", "580px"), ("overflow-y", "scroll")]]
     (List.map (\item -> viewLiveTableItem item) items)
 
 getImgSrc: Maybe String -> String

@@ -491,6 +491,7 @@ viewCheckbox { id, selected } =
         [ input
             [ type_ "checkbox"
             , checked selected
+            , style cellStyle
             ]
             []
         ]
@@ -509,7 +510,7 @@ viewRoleColumn : String -> ( String, String ) -> (Role -> String) -> (String -> 
 viewRoleColumn name ( fid, fname ) toStr updateField role =
     if fid == role.id && fname == name then
         Table.HtmlDetails
-            []
+            [style [("border", "1px solid black")]]
             [ input
                 [ onInput
                     (UpdateField updateField role.id)
@@ -525,9 +526,19 @@ viewRoleColumn name ( fid, fname ) toStr updateField role =
             , onSingleTouch TouchStart Touch.preventAndStop <|
                 (\x -> ChangeEditableField ( role.id, name ))
             ]
-            [ p [] [ text (toStr role) ] ]
+            [ p [style cellStyle] [ text (toStr role) ] ]
 
 
+cellStyle: List (String, String)
+cellStyle =
+  [("border", "1px solid rgba(0,0,0,.12)")
+  ,("display", "flex")
+  ,("justify-content", "center")
+  ,("align-items", "center")
+  ,("padding", "4px")
+  ,("height", "60px")
+  ,("margin", "0px")
+  ]
 
 -- Update Fields
 
