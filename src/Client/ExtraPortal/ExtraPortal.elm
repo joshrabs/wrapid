@@ -147,7 +147,12 @@ update msg model =
                 )
 
         LoadRemoteData ->
-            ( model, Cmd.batch[fetchReqExtraInfo (( model.userId, "2017-02-18" )), subExtraSchedule ()] )
+            ( model,
+              Cmd.batch
+                [fetchReqExtraInfo (( model.userId, "2017-02-18" ))
+                --, subExtraSchedule ()
+                ]
+            )
 
         ExtraInfoRetrieved extraInfo ->
           let

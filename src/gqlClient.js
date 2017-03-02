@@ -201,7 +201,7 @@ export default {
     const variables = {};
     console.log(client)
     console.log(query)
-    return client.query({ query, variables });
+    return client.subscribe({ query, variables });
   },
 
   // Queries

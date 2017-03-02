@@ -119,8 +119,9 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
 
 
 app.ports.subExtraSchedule.subscribe(function() {
-  console.log(client.subExtraSchedule)
+  console.log(client.subExtraSchedule())
   client.subExtraSchedule()
+    .latest()
     .then(result => {
       console.log(result);
       const schedule = result.User.data;

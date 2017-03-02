@@ -80,10 +80,6 @@ tableFilterMatch: Filter -> List Profile -> List Profile
 tableFilterMatch tFilter profs =
   let
       sanProfs prof =
-        let
-            log2 = Debug.log "Prof!" ((prof.firstName ++ prof.lastName) |> String.toLower |> String.trim)
-            log = Debug.log "FILTER!" (tFilter |> String.toLower |> String.trim )
-        in
             (prof.firstName ++ prof.lastName) |> String.toLower |> String.trim
 
       sanFilter =
