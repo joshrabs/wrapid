@@ -107,7 +107,11 @@ requestNextView view =
 mapWizardCmd: Wizard.Msg -> Msg
 mapWizardCmd msg =
   case msg of
-    SubmitProfile profile -> ChangeView (PageView FormStatus)
+    SubmitProfile profile ->
+      let
+         _ = Debug.log "Profile: " profile
+      in
+          ChangeView (PageView FormStatus)
     _ -> NoOp
 
 updateSchedule: Schedule -> Model -> Model

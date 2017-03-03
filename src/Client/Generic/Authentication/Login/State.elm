@@ -1,6 +1,6 @@
 module Client.Generic.Authentication.Login.State exposing (..)
 
-import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
+import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..), ViewState(..))
 import Material
 
 initModel : String -> String -> Material.Model -> Model
@@ -8,6 +8,7 @@ initModel email password mdlModel =
     { email = email
     , password = password
     , mdl = mdlModel
+    , viewState = InUse
     }
 
 update : Msg -> Model -> ( Model, Cmd Msg )

@@ -43,5 +43,5 @@ loginBody username password =
 loginUser: Username -> Password ->  Cmd (RemoteData.WebData String)
 loginUser username password =
     Http.post
-      "http://35.157.165.22//user_token" (loginBody username password) Decode.string
+      "https://35.157.165.22//user_token" (loginBody username password) Decode.string
         |> RemoteData.sendRequest

@@ -1,6 +1,6 @@
 module Client.Generic.Authentication.Login.View exposing (loginView)
 
-import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
+import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..), ViewState(..))
 import Client.Generic.Dashboard.Dashboard as Dashboard
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -81,7 +81,12 @@ viewLoginPanel model =
             Just (div [style [("display", "flex"), ("flex-direction", "row-reverse")]]
             [
               div [style loginButtonStyle]
-              [span [onClick SubmitLogin, style loginButtonTextStyle] [text "Sign In"]]
+              [case model.viewState of
+                Submitting ->
+                  div [] [text "Logging you in..."]
+                InUse ->
+                  span [onClick SubmitLogin, style loginButtonTextStyle] [text "Sign In"]
+              ]
             ])
     in
         div [style [("margin", "8px"), ("width", "360px")]] [Dashboard.makePanel panelHeader panelBody footer]

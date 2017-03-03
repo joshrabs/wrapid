@@ -2,14 +2,15 @@ module Client.Generic.WebForm.Types exposing (..)
 
 import Dict exposing (Dict)
 
--- type alias Field =
---   {id: FieldId
---   ,label: FieldLabel
---   ,input: FieldInput
---   ,category: FieldCategory
---   }
 
+type alias Field =
+  {id: FieldId
+  ,label: FieldLabel
+  ,value: FieldInput
+  ,category: FieldCategory
+  }
 
+type alias Profile = Dict String Field
 type FieldCategory = Name | Address | Doctor | Unknown
 type FieldInputType = TextInput | DropDown (List DropDownOption)
 

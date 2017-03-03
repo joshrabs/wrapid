@@ -7,8 +7,11 @@ type alias Model =
     { email : String
     , password : String
     , mdl : Material.Model
+    , viewState : ViewState
     }
 
+
+type ViewState = Submitting | InUse
 
 type Msg
     = Email String
