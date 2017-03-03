@@ -7,6 +7,8 @@ import Client.PAPortal.Types as PAPortal
 import Client.Generic.Authentication.Login.Types as Login
 import Time exposing (Time)
 import Date exposing (Date, fromTime)
+import RemoteData exposing (WebData)
+import Http exposing (..)
 
 
 type alias Model =
@@ -37,8 +39,10 @@ type Msg
     | SelectNotification String
     | Mdl (Material.Msg Msg)
     | ShowPortalSwitcher Bool
+    --| ReceiveAuthentication (Result Http.Error String)
+    | ReceiveAuthentication (RemoteData.WebData String)
 
-type ChildPortalMsg 
+type ChildPortalMsg
     = ExtraPortalMsg ExtraPortal.Msg
     | PAPortalMsg PAPortal.Msg
 

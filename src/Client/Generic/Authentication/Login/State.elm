@@ -3,7 +3,7 @@ module Client.Generic.Authentication.Login.State exposing (..)
 import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
 import Material
 
-initModel : Maybe String -> Maybe String -> Material.Model -> Model
+initModel : String -> String -> Material.Model -> Model
 initModel email password mdlModel =
     { email = email
     , password = password
@@ -14,10 +14,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Email email ->
-            ( { model | email = Just email }, Cmd.none )
+            ( { model | email = email }, Cmd.none )
 
         Password password ->
-            ( { model | password = Just password }, Cmd.none )
+            ( { model | password = password }, Cmd.none )
 
         SubmitLogin ->
             ( model, Cmd.none )

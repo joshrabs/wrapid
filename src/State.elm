@@ -5,6 +5,8 @@ import Navigation as Nav
 import Types exposing (..)
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.Generic.Authentication.Login.State as Login
+import Client.Generic.Authentication.Login.Types as LoginTypes
+import Server.API.Queries.Authentication as Server exposing (loginUser)
 
 import Time exposing (Time, hour)
 import Date exposing (Date, fromTime)
@@ -29,7 +31,7 @@ init location =
     ( { history = [ location ]
       , currentImg = Nothing
       , currentDate = Nothing
-      , currentViewState = Login (LoginState.initModel Nothing Nothing mdlModel)
+      , currentViewState = Login (LoginState.initModel "" "" mdlModel)
       , title = "Yo"
       , mdl = mdlModel
       , shouldShowPortalSwitcher = True
@@ -41,6 +43,8 @@ now : Cmd Msg
 now =
   Task.perform SetDate Date.now
 
+changeView: ViewMsg -> Cmd Msg
+changeView viewState = Task.perform (always ChangeView viewState) (Task.succeed viewState)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -66,7 +70,7 @@ update msg model =
               LoginView ->
                   let
                       loginModel =
-                          LoginState.initModel Nothing Nothing model.mdl
+                          LoginState.initModel "" "" model.mdl
                   in
                       ( { model | currentViewState = Login loginModel}
                         , Cmd.none
@@ -96,13 +100,26 @@ update msg model =
           , Cmd.none
           )
 
+      ReceiveAuthentication resp ->
+        case resp of
+          --Succeed a -> (model, Cmd.)
+        --  Error ->
+          _ -> (model, changeView ExtraPortalView)
+
       LoginMsg loginMsg ->
         case model.currentViewState of
           Login loginModel ->
             let
               (updatedLoginModel, logMsg) = Login.update loginMsg loginModel
             in
-              ( {model | currentViewState = Login updatedLoginModel}, Cmd.none )
+              ( {model | currentViewState = Login updatedLoginModel}
+              , case loginMsg of
+                  LoginTypes.SubmitLogin ->
+                    (Server.loginUser loginModel.email loginModel.password)
+                      |> Cmd.map ReceiveAuthentication
+                    --Server.loginUser ReceiveAuthentication loginModel.email loginModel.password
+                  _ -> Cmd.none
+              )
 
           _ -> (model, Cmd.none)
 

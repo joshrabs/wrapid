@@ -4,8 +4,8 @@ import Material
 
 
 type alias Model =
-    { email : Maybe String
-    , password : Maybe String
+    { email : String
+    , password : String
     , mdl : Material.Model
     }
 

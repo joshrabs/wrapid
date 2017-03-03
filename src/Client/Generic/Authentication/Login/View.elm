@@ -4,6 +4,7 @@ import Client.Generic.Authentication.Login.Types exposing (Model, Msg(..))
 import Client.Generic.Dashboard.Dashboard as Dashboard
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Material
 import Material.Textfield as Textfield
 import Material.Options as Options
@@ -80,7 +81,7 @@ viewLoginPanel model =
             Just (div [style [("display", "flex"), ("flex-direction", "row-reverse")]]
             [
               div [style loginButtonStyle]
-              [span [style loginButtonTextStyle] [text "Sign In"]]
+              [span [onClick SubmitLogin, style loginButtonTextStyle] [text "Sign In"]]
             ])
     in
         div [style [("margin", "8px"), ("width", "360px")]] [Dashboard.makePanel panelHeader panelBody footer]
