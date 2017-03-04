@@ -76,6 +76,7 @@ viewLoginPanel model =
                     , Options.onInput Password
                     ]
                     []
+                , (viewError model.error)
                 ]
                 |> Material.Scheme.top
 
@@ -94,6 +95,17 @@ viewLoginPanel model =
                 )
     in
         div [ style [ ( "margin", "8px" ), ( "width", "360px" ) ] ] [ Dashboard.makePanel panelHeader panelBody footer ]
+
+
+viewError : Maybe String -> Html Msg
+viewError error =
+    case error of
+        Nothing ->
+            div [] []
+
+        Just e ->
+            p [ style [ ( "color", "red" ) ] ]
+                [ text e ]
 
 
 loginButtonStyle : List ( String, String )

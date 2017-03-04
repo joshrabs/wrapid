@@ -11,6 +11,7 @@ import Time exposing (Time, hour)
 import Date exposing (Date, fromTime)
 import Date.Extra.Compare as CompareDate exposing (Compare2(..))
 import Task exposing (perform)
+import RemoteData exposing (RemoteData(..))
 
 
 -- import Client.PAPortal.Types as PATypes
@@ -35,7 +36,7 @@ init location =
       , currentDate =
             Nothing
             -- TODO: Don't forget to remove hardcode state
-      , currentViewState = Login (LoginState.initModel "test@email.com" "password" mdlModel)
+      , currentViewState = Login (LoginState.initModel "" "" Nothing mdlModel)
       , title = "Yo"
       , jwt = Nothing
       , mdl = mdlModel
@@ -84,7 +85,7 @@ update msg model =
                 LoginView ->
                     let
                         loginModel =
-                            LoginState.initModel "" "" model.mdl
+                            LoginState.initModel "" "" Nothing model.mdl
                     in
                         ( { model | currentViewState = Login loginModel }
                         , Cmd.none
@@ -114,12 +115,36 @@ update msg model =
             )
 
         ReceiveAuthentication resp ->
-            case Debug.log "resp:" resp of
-                --Succeed a -> (model, Cmd.)
-                --  Error ->
-                _ ->
-                    ( model, changeView ExtraPortalView )
+            case resp of
+                NotAsked ->
+                    ( model, Cmd.none )
 
+                Loading ->
+                    ( model, Cmd.none )
+
+                Failure e ->
+                    let
+                        updateLoginView =
+                            Login
+                                (LoginState.initModel ""
+                                    ""
+                                    (Just "Login or Password is incorrect")
+                                    mdlModel
+                                )
+                    in
+                        ( { model | currentViewState = updateLoginView }
+                        , Cmd.none
+                        )
+
+                Success a ->
+                    ( { model | jwt = (Just a) }
+                    , changeView ExtraPortalView
+                    )
+
+        --Succeed a -> (model, Cmd.)
+        --  Error ->
+        -- _ ->
+        --     ( model, changeView ExtraPortalView )
         LoginMsg loginMsg ->
             case model.currentViewState of
                 Login loginModel ->
