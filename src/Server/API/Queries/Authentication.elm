@@ -57,5 +57,5 @@ loginUser username password =
     Http.post
         "http://35.157.165.22/user_token"
         (loginBody username password)
-        Decode.string
+        (Decode.field "jwt" Decode.string)
         |> RemoteData.sendRequest

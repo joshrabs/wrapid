@@ -32,9 +32,12 @@ init : Nav.Location -> ( Model, Cmd Msg )
 init location =
     ( { history = [ location ]
       , currentImg = Nothing
-      , currentDate = Nothing
-      , currentViewState = Login (LoginState.initModel "" "" mdlModel)
+      , currentDate =
+            Nothing
+            -- TODO: Don't forget to remove hardcode state
+      , currentViewState = Login (LoginState.initModel "test@email.com" "password" mdlModel)
       , title = "Yo"
+      , jwt = Nothing
       , mdl = mdlModel
       , shouldShowPortalSwitcher = True
       }
@@ -111,7 +114,7 @@ update msg model =
             )
 
         ReceiveAuthentication resp ->
-            case resp of
+            case Debug.log "resp:" resp of
                 --Succeed a -> (model, Cmd.)
                 --  Error ->
                 _ ->

@@ -17,6 +17,7 @@ type alias Model =
     , currentImg : Maybe String
     , currentViewState : ViewModelState
     , title : String
+    , jwt : Maybe String
     , mdl : Material.Model
     , shouldShowPortalSwitcher :
         Bool
