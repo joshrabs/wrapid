@@ -5,7 +5,7 @@ import Client.ExtraPortal.Types exposing (ExtraInfo, Day, UserId, Schedule, Sche
 
 port getAllExtraInfo : (String) -> Cmd msg
 
-port receiveAllExtraInfo : (List Profile -> msg) -> Sub msg
+port receiveAllExtraInfo : (List ExtraInfo -> msg) -> Sub msg
 
 port addScheduleItem : (UserId, ScheduleItem) -> Cmd msg
 

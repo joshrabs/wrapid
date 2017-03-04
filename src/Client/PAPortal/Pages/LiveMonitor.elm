@@ -13,7 +13,7 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
-import Client.ExtraPortal.Types exposing (ScheduleItem)
+import Client.ExtraPortal.Types exposing (ScheduleItem, ExtraInfo)
 
 type alias Profile =
     { id : String
@@ -64,20 +64,21 @@ fakeImg =
 
 
 type alias Filter = String
-liveTable: Maybe (List Profile) -> Filter -> LiveExtraTable
-liveTable profs tableFilter =
-  case profs of
-    Just extras ->
-      extras
-        |> tableFilterMatch tableFilter
-        |> (List.map (\prof ->
-              {firstName=prof.firstName, lastName=prof.lastName, imgSrc=prof.avatarSrc, isClockedIn=True}
-            ))
-    Nothing -> []
+liveTable: List ExtraInfo -> Filter -> LiveExtraTable
+liveTable extras tableFilter =
+    extras
+      |> tableFilterMatch tableFilter
+      |> (List.map (\extra ->
+            {firstName=extra.profile.firstName
+            , lastName=extra.profile.lastName
+            , imgSrc=extra.profile.avatar.url
+            , isClockedIn=True
+            }
+          ))
 
 
-tableFilterMatch: Filter -> List Profile -> List Profile
-tableFilterMatch tFilter profs =
+tableFilterMatch: Filter -> List ExtraInfo -> List ExtraInfo
+tableFilterMatch tFilter extras =
   let
       sanProfs prof =
             (prof.firstName ++ prof.lastName) |> String.toLower |> String.trim
@@ -85,7 +86,8 @@ tableFilterMatch tFilter profs =
       sanFilter =
         tFilter |> String.toLower |> String.split " " |> String.concat
   in
-      List.filter (\prof -> Regex.contains (Regex.regex sanFilter) (sanProfs prof)) profs
+      extras
+        |> List.filter (\extra -> Regex.contains (Regex.regex sanFilter) (sanProfs extra.profile))
 
 initModel : Material.Model -> Model
 initModel mdlModel =
@@ -121,7 +123,7 @@ update msg model =
 --VIEW
 
 
-viewLiveMonitor : Model -> Maybe (List Profile) -> Html Msg
+viewLiveMonitor : Model -> List ExtraInfo -> Html Msg
 viewLiveMonitor model extraProfiles =
     div [style [("margin", "8px 4px 8px 4px")]]
         [ viewExtrasSnapStats fakeSnapStateModel

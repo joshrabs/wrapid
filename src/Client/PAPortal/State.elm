@@ -43,11 +43,11 @@ update msg model =
         ChangeView view ->
             ( { model | currentView = view }, Cmd.none )
         LoadRemoteData ->
-          (model, getAllExtraInfo("2014"))
+          (model, getAllExtraInfo("2017-03-03"))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
-        Profiles profs ->
-          ({model | extras = Success (Just profs)}, Cmd.none)
+        AllExtraInfo extraInfo ->
+          ({model | extras = Success extraInfo}, Cmd.none)
         SkinMsg subMsg ->
             let
                 ( updatedSkinModel, skinCmd ) =
@@ -77,4 +77,4 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    receiveAllExtraInfo Profiles
+    receiveAllExtraInfo AllExtraInfo

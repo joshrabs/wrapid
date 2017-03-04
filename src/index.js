@@ -99,14 +99,41 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
   console.log(d);
   client.getAllExtraInfo(d)
     .then(result => {
-      const allUsers = result.data.allUsers
+      let allUsers = result.data.allUsers
       console.log(result.data.allUsers)
-      const mapInfo = function(extra) {
+      let mapInfo = function(extra) {
         console.log(extra)
-        const {id, baseprofile} = extra;
-        const {firstName, lastName, avatar} = baseprofile
-        const avatarSrc = avatar ? avatar.url : null
-        return {id, firstName, lastName, avatarSrc}
+        let {id, baseprofile, extraschedule, timecards} = extra;
+        let {firstName, lastName, avatar} = baseprofile
+        let avatarSrc = avatar ? avatar.url : null
+        let profile = {firstName, lastName, avatar};
+        let schedule;
+        if(extraschedule){
+          let eItems = extraschedule.extrascheduleitemses.map(function(it){
+            console.log(it)
+            const {id, startTm, endTm, category, name} = it
+            return it
+          })
+          schedule = {id: extraschedule.id, items: eItems}
+        }else{
+          schedule = {id: "meow", items: [{startTm: "08:00", endTm: "10:00pm", category: "Other", name: "Call Start"}]}
+        }
+
+        console.log(timecards)
+
+        let dtc = timecards.map(function(t){
+          const {clockinTs, clockoutTs, effectiveDt, id} = t
+          return {clockinTs, clockoutTs, effectiveDt, id}
+        })
+
+        const defTimecard = dtc[0] || {clockinTs: "08:00am", clockoutTs: null, effectiveDt: "2017-03-03", id: "meow"}
+
+        console.log(schedule)
+
+
+        let frmt = {profile, schedule, timecard: defTimecard}
+        console.log(frmt)
+        return frmt
       }
       const extraInfo = allUsers.map(mapInfo)
       console.log(extraInfo)

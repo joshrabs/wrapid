@@ -2,7 +2,7 @@ module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
-import Client.ExtraPortal.Types exposing (ScheduleItem)
+import Client.ExtraPortal.Types exposing (ScheduleItem, ExtraInfo)
 
 import Date exposing (Date)
 import Material
@@ -14,7 +14,7 @@ type alias Model =
     currentDate: Maybe Date
   , selectedDate: SelectedDate
   , user: Profile
-  , extras: RemoteData ExtraInfo
+  , extras: RemoteData (List ExtraInfo)
   , currentView: ViewState
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
@@ -22,7 +22,7 @@ type alias Model =
   , mdl : Material.Model
   }
 
-type alias ExtraInfo = Maybe (List Profile)
+
 type alias SelectedDate = Maybe Date
 
 type ViewState
@@ -35,7 +35,7 @@ type Msg
     = ChangeView ViewState
     | LoadRemoteData
     | SetSelectedDate Date
-    | Profiles (List Profile)
+    | AllExtraInfo (List ExtraInfo)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitor.Msg
