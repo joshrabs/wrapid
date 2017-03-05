@@ -6,12 +6,16 @@ import Material
 type alias Model =
     { email : String
     , password : String
+    , error : Maybe String
     , mdl : Material.Model
     , viewState : ViewState
     }
 
 
-type ViewState = Submitting | InUse
+type ViewState
+    = Submitting
+    | InUse
+
 
 type Msg
     = Email String
