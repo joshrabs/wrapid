@@ -111,7 +111,7 @@ defaultItemScheduler =
 --UPDATE
 type Msg =
     Mdl (Material.Msg Msg)
-  | ViewAddingTask
+  | ToggleAddingTask
   | SubmitTaskByRole ScheduleItem
   | SetTableFilter Filter
   | SetSchedulerRole String
@@ -168,8 +168,8 @@ update msg model =
     Mdl msg_ ->
         Material.update Mdl msg_ model
 
-    ViewAddingTask ->
-      ({model | isAddingTask = True}, Cmd.none)
+    ToggleAddingTask ->
+      ({model | isAddingTask = not model.isAddingTask}, Cmd.none)
 
     SetSchedulerRole role ->
       (setSchedulerRole model role, Cmd.none)
@@ -264,7 +264,7 @@ viewSearchTaskBar mdlModel =
     ]]
     [
         viewSearch mdlModel
-      , div [onClick ViewAddingTask,
+      , div [onClick ToggleAddingTask,
           style [
             ("display", "flex")
             ,("justify-content", "center")
