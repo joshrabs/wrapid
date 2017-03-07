@@ -68,10 +68,12 @@ update msg model =
           let
               (updatedLMModel, lmCmd) =
                   LiveMonitor.update subMsg model.liveModel
+
+              log3 = Debug.log "Schedule Item" model.liveModel.roleScheduler.scheduleItem 
           in
               ( { model | liveModel = updatedLMModel }
               , case subMsg of
-                  LiveMonitor.SubmitTaskByRole item -> addScheduleItem("meow", item)
+                  LiveMonitor.SubmitTaskByRole item -> addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
 

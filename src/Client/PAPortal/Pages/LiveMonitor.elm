@@ -27,8 +27,14 @@ type alias Model =
     { isAddingTask: Bool
     , mdl : Material.Model
     , tableFilter: Filter
+    , roleScheduler: RoleScheduler
     }
 
+
+type alias RoleScheduler =
+  {role: String
+  ,scheduleItem: ScheduleItem
+  }
 
 type alias LiveExtraTable =
     List ExtraInfoItem
@@ -48,7 +54,6 @@ type alias ExtrasSnapStatModel =
     , holdClothes : Int
     , missingForms : Int
     }
-
 
 fakeSnapStateModel : ExtrasSnapStatModel
 fakeSnapStateModel =
@@ -94,9 +99,14 @@ initModel mdlModel =
     { isAddingTask = False
     , mdl = mdlModel
     , tableFilter = ".*"
+    , roleScheduler = defaultItemScheduler
     }
 
-
+defaultItemScheduler: RoleScheduler
+defaultItemScheduler =
+  {role = ""
+  ,scheduleItem = {startTm = "", endTm = Nothing, category="", name=""}
+  }
 
 --UPDATE
 type Msg =
@@ -104,6 +114,53 @@ type Msg =
   | ViewAddingTask
   | SubmitTaskByRole ScheduleItem
   | SetTableFilter Filter
+  | SetSchedulerRole String
+  | SetSchedulerTime ScheduleTimeParam String
+  | SetSchedulerCategory String
+  | SetSchedulerName String
+
+setSchedulerRole: Model -> String -> Model
+setSchedulerRole model role =
+  let
+    oldScheduler = model.roleScheduler
+    newScheduler = {oldScheduler | role = role}
+  in
+    ({model | roleScheduler = newScheduler})
+
+type ScheduleTimeParam = StartTm | EndTm
+
+setSchedulerTime: Model -> ScheduleTimeParam -> String -> Model
+setSchedulerTime model param time =
+  let
+    oldScheduler = model.roleScheduler
+    oldItem = oldScheduler.scheduleItem
+    newItem =
+      case param of
+        StartTm -> {oldItem | startTm = time}
+        EndTm -> {oldItem | endTm = Just time}
+    newSchedulerItem = {oldScheduler | scheduleItem = newItem}
+  in
+    ({model | roleScheduler = newSchedulerItem})
+
+setSchedulerCategory: Model -> String -> Model
+setSchedulerCategory model category =
+  let
+    oldScheduler = model.roleScheduler
+    oldItem = oldScheduler.scheduleItem
+    newItem = {oldItem | category = category}
+    newSchedulerItem = {oldScheduler | scheduleItem = newItem}
+  in
+    ({model | roleScheduler = newSchedulerItem})
+
+setSchedulerName: Model -> String -> Model
+setSchedulerName model name =
+  let
+    oldScheduler = model.roleScheduler
+    oldItem = oldScheduler.scheduleItem
+    newItem = {oldItem | name = name}
+    newRoleScheduler = {oldScheduler | scheduleItem = newItem}
+  in
+    ({model | roleScheduler = newRoleScheduler})
 
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -113,6 +170,18 @@ update msg model =
 
     ViewAddingTask ->
       ({model | isAddingTask = True}, Cmd.none)
+
+    SetSchedulerRole role ->
+      (setSchedulerRole model role, Cmd.none)
+
+    SetSchedulerTime timeType time ->
+      (setSchedulerTime model timeType time, Cmd.none)
+
+    SetSchedulerCategory category ->
+      (setSchedulerCategory model category, Cmd.none)
+
+    SetSchedulerName name ->
+      (setSchedulerName model name, Cmd.none)
 
     SubmitTaskByRole scheduleItem ->
       (model, Cmd.none)
@@ -161,10 +230,14 @@ viewTaskPanel =
         , ("height", "74px")
         , ("background", "yellow")
       ]]
-      [div [] [input [placeholder "Role"] []]
+      [div []
+        [ input [onInput SetSchedulerRole, placeholder "Role"] []
+        , input [onInput SetSchedulerCategory, placeholder "Category"] []
+        , input [onInput SetSchedulerName, placeholder "Name"] []
+        ]
       ,div []
-        [input [placeholder "Start Tm"] []
-        ,input [placeholder "End Tm"] []
+        [input [onInput (SetSchedulerTime StartTm), placeholder "Start Tm"] []
+        ,input [onInput (SetSchedulerTime EndTm), placeholder "End Tm"] []
         ]
       , button [onClick (SubmitTaskByRole defaultScheduleItem)] [text "Submit!"]
       ]

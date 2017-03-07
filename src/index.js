@@ -160,8 +160,9 @@ app.ports.subExtraSchedule.subscribe(function() {
 })
 
 
-app.ports.addScheduleItem.subscribe(function(extraId, scheduleItem) {
-  client.addScheduleItem()
+app.ports.addScheduleItem.subscribe(function(params) {
+  const scheduleItem = params[1]
+  client.addScheduleItem(scheduleItem)
     .then(result => {
       console.log(result);
     })
