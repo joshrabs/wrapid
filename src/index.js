@@ -157,7 +157,11 @@ app.ports.fetchDailySkin.subscribe(function(date) {
         console.log(item)
         const {user, role, pay} = item
         const {firstName, lastName, avatar} = user.baseprofile
-        return {userId: user.id, firstName, lastName, part: role, pay, avatar}
+        let sAvatar = avatar;
+        if(!avatar){
+          sAvatar = {url: null}
+        }
+        return {userId: user.id, firstName, lastName, part: role, pay, avatar: sAvatar}
       })
       console.log(frmtSkinItems)
       const skin = {effectiveDt: date, skinItems: frmtSkinItems}
