@@ -3,7 +3,7 @@ module Types exposing (..)
 import Material
 import Navigation as Nav
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
-import Client.PAPortal.Types as PAPortal
+import Client.PAPortal.State as PAPortal
 import Client.Generic.Authentication.Login.Types as Login
 import Time exposing (Time)
 import Date exposing (Date, fromTime)

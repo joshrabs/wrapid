@@ -1,5 +1,4 @@
 module Client.PAPortal.Types exposing (..)
-import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.ExtraPortal.Types exposing (ScheduleItem, TimeCard, Profile, Schedule)
 
@@ -8,19 +7,6 @@ import Material
 
 type RemoteData a = Loading | Success a
 
-type alias Model =
-  {
-    currentDate: Maybe Date
-  , selectedDate: SelectedDate
-  , user: PAProfile
-  , extraActivity: RemoteData (List ExtraActivity)
-  , currentView: ViewState
-  , currentSkin: Maybe Skin
-  , skinModel : Skin.Model
-  , wrapModel : Wrap.Model
-  , liveModel : LiveMonitorState
-  , mdl : Material.Model
-  }
 
 type alias ExtraActivity =
   { extraId: String
@@ -35,17 +21,6 @@ type ViewState
     = LiveMonitor
     | SkinManager
     | Wrap
-
-
-type Msg
-    = ChangeView ViewState
-    | LoadRemoteData
-    | SetSelectedDate Date
-    | ReceiveExtraActivity (List ExtraActivity)
-    | ReceiveDailySkin Skin
-    | SkinMsg Skin.Msg
-    | WrapMsg Wrap.Msg
-    | LiveMsg LiveMonitorMsg
 
 type alias PAProfile =
     { id : String

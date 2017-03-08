@@ -2,6 +2,7 @@ module Client.PAPortal.Pages.SkinManager exposing (..)
 
 import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
+import Client.PAPortal.Types exposing (Skin, SkinItem)
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
 import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
 import Html.Events exposing (onClick, onInput, onCheck, onDoubleClick, onBlur)
@@ -33,6 +34,33 @@ type alias Model =
     , editableField : ( String, String )
     }
 
+setModelSkin: Skin -> Model -> Model
+setModelSkin skin model =
+  let
+      roles =
+        skin.skinItems
+          |> List.indexedMap skinItemToRole
+  in
+      ({model | roles = roles})
+
+
+skinItemToRole: Int -> SkinItem -> Role
+skinItemToRole id skinItem =
+      { id = toString id
+      , role = skinItem.part
+      , first = skinItem.firstName
+      , last = skinItem.lastName
+      , callStart = ""
+      , pay = skinItem.pay
+      , lunchStart = ""
+      , lunchLength = ""
+      , clockIn = ""
+      , clockOut = ""
+      , callEnd = ""
+      , email = ""
+      , sum  = ""
+      , selected = False
+      }
 
 initModel : Model
 initModel =

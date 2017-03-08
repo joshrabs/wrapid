@@ -5,6 +5,7 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (..)
 
 import Client.PAPortal.Types exposing (..)
+import Client.PAPortal.State exposing (Msg(..), Model)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin

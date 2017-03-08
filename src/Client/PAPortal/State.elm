@@ -10,6 +10,32 @@ import Date exposing (Date)
 import Task exposing (perform, succeed)
 import Material
 
+type alias Model =
+  {
+    currentDate: Maybe Date
+  , selectedDate: SelectedDate
+  , user: PAProfile
+  , extraActivity: RemoteData (List ExtraActivity)
+  , currentView: ViewState
+  , currentSkin: Maybe Skin
+  , skinModel : Skin.Model
+  , wrapModel : Wrap.Model
+  , liveModel : LiveMonitorState
+  , mdl : Material.Model
+  }
+
+
+type Msg
+    = ChangeView ViewState
+    | LoadRemoteData
+    | SetSelectedDate Date
+    | ReceiveExtraActivity (List ExtraActivity)
+    | ReceiveDailySkin Skin
+    | SkinMsg Skin.Msg
+    | WrapMsg Wrap.Msg
+    | LiveMsg LiveMonitorMsg
+
+    
 initModel: String -> Maybe Date -> Maybe SelectedDate -> Material.Model -> (Model, Cmd Msg)
 initModel userId currentDate selectedDate materialModel =
   let
