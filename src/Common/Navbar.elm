@@ -69,7 +69,7 @@ hamburgerBarItem =
     span
         [ style
             [ ( "border-radius", "1px" )
-            , ( "background-color", "black" )
+            , ( "background-color", "white" )
             , ( "width", "18px" )
             , ( "height", "3px" )
             , ( "margin", "1px 0px 2px 0px" )
