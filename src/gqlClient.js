@@ -219,6 +219,22 @@ const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo {
   }
 }`
 
+const fetchDailySkinGQL = gql`query getDailySkin($date:String){
+  allSkins(filter: {effectiveDt:$date}){
+    skinItems{
+      user{
+        id
+        baseprofile{
+          firstName
+          lastName
+        }
+      }
+      role
+      pay
+    }
+  }
+}`
+
 export default {
 
   //subscriptions
@@ -250,6 +266,12 @@ export default {
     const mutation = clockinExtra;
     const variables = { id, clockinTs};
     return client.mutate({ mutation, variables });
+  },
+
+  fetchDailySkin: function(date) {
+    const query = fetchDailySkinGQL;
+    const variables = { date };
+    return client.query({ query, variables });
   },
 
   getExtraInfo: function(userId, date) {

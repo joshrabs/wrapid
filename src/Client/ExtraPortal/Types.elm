@@ -5,7 +5,8 @@ import Dict exposing (Dict)
 import Client.Generic.WebForm.Types exposing (FieldInput)
 
 type alias ExtraInfo =
-  { timecard: TimeCard
+  { extraId: String
+  , timecard: TimeCard
   , profile: Profile
   , schedule: Schedule
   }

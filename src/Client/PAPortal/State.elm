@@ -22,16 +22,17 @@ initModel userId currentDate selectedDate materialModel =
   in
     (
     { user = user
-    , extras = Loading
+    , extraActivity = Loading
     , currentDate = currentDate
     , selectedDate =
         case selectedDate of
           Just date -> date
           Nothing -> currentDate
     , currentView = LiveMonitor
+    , currentSkin = Nothing
     , skinModel = Skin.initModel
     , wrapModel = Wrap.initModel
-    , liveModel = LiveMonitor.initModel materialModel
+    , liveModel = LiveMonitor.initState materialModel
     , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
@@ -43,11 +44,15 @@ update msg model =
         ChangeView view ->
             ( { model | currentView = view }, Cmd.none )
         LoadRemoteData ->
-          (model, getAllExtraInfo("2017-03-03"))
+          (model, fetchDailySkin("2017-03-07"))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
-        AllExtraInfo extraInfo ->
-          ({model | extras = Success extraInfo}, Cmd.none)
+        ReceiveExtraActivity extraActivity ->
+          ({model | extraActivity = Success extraActivity}, Cmd.none)
+
+        ReceiveDailySkin skin ->
+          ({model | currentSkin = Just skin}, getAllExtraInfo("2017-03-03"))
+
         SkinMsg subMsg ->
             let
                 ( updatedSkinModel, skinCmd ) =
@@ -69,14 +74,17 @@ update msg model =
               (updatedLMModel, lmCmd) =
                   LiveMonitor.update subMsg model.liveModel
 
-              log3 = Debug.log "Schedule Item" model.liveModel.roleScheduler.scheduleItem 
+              log3 = Debug.log "Schedule Item" model.liveModel.roleScheduler.scheduleItem
           in
               ( { model | liveModel = updatedLMModel }
               , case subMsg of
-                  LiveMonitor.SubmitTaskByRole item -> addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
+                  SubmitTaskByRole item -> addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    receiveAllExtraInfo AllExtraInfo
+  Sub.batch
+  [receiveAllExtraInfo ReceiveExtraActivity
+  ,receiveDailySkin ReceiveDailySkin
+  ]

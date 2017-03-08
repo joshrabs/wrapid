@@ -13,47 +13,9 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
-import Client.ExtraPortal.Types exposing (ScheduleItem, ExtraInfo)
+import Client.ExtraPortal.Types exposing (ScheduleItem)
+import Client.PAPortal.Types exposing (..)
 
-type alias Profile =
-    { id : String
-    , firstName : String
-    , lastName: String
-    , avatarSrc : Maybe String
-    }
-
-
-type alias Model =
-    { isAddingTask: Bool
-    , mdl : Material.Model
-    , tableFilter: Filter
-    , roleScheduler: RoleScheduler
-    }
-
-
-type alias RoleScheduler =
-  {role: String
-  ,scheduleItem: ScheduleItem
-  }
-
-type alias LiveExtraTable =
-    List ExtraInfoItem
-
-
-type alias ExtraInfoItem =
-    { firstName : String
-    , lastName: String
-    , imgSrc : Maybe String
-    , isClockedIn : Bool
-    }
-
-
-type alias ExtrasSnapStatModel =
-    { totalExtras : Int
-    , clockedIn : Int
-    , holdClothes : Int
-    , missingForms : Int
-    }
 
 fakeSnapStateModel : ExtrasSnapStatModel
 fakeSnapStateModel =
@@ -68,21 +30,20 @@ fakeImg =
     "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 
-type alias Filter = String
-liveTable: List ExtraInfo -> Filter -> LiveExtraTable
-liveTable extras tableFilter =
-    extras
+liveTable: AllLiveExtraInfo -> LiveTableFilter -> LiveExtraTable
+liveTable extraInfo tableFilter =
+    extraInfo
       |> tableFilterMatch tableFilter
       |> (List.map (\extra ->
-            {firstName=extra.profile.firstName
-            , lastName=extra.profile.lastName
-            , imgSrc=extra.profile.avatar.url
+            {firstName=extra.info.firstName
+            , lastName=extra.info.lastName
+            , part = extra.info.role
+            , imgSrc=extra.info.avatar.url
             , isClockedIn=True
             }
           ))
 
-
-tableFilterMatch: Filter -> List ExtraInfo -> List ExtraInfo
+tableFilterMatch: LiveTableFilter -> AllLiveExtraInfo -> AllLiveExtraInfo
 tableFilterMatch tFilter extras =
   let
       sanProfs prof =
@@ -92,15 +53,43 @@ tableFilterMatch tFilter extras =
         tFilter |> String.toLower |> String.split " " |> String.concat
   in
       extras
-        |> List.filter (\extra -> Regex.contains (Regex.regex sanFilter) (sanProfs extra.profile))
+        |> List.filter (\extra -> Regex.contains (Regex.regex sanFilter) (sanProfs extra.info))
 
-initModel : Material.Model -> Model
-initModel mdlModel =
+initState : Material.Model -> LiveMonitorState
+initState mdlModel =
     { isAddingTask = False
     , mdl = mdlModel
     , tableFilter = ".*"
     , roleScheduler = defaultItemScheduler
     }
+
+type alias AllLiveExtraInfo = List LiveExtraInfo
+type alias LiveExtraInfo =
+  {extraId: String
+  ,activity: Maybe ExtraActivity
+  ,info: ExtraInfo
+  }
+
+getLiveExtraInfo: List ExtraActivity -> List ExtraInfo -> AllLiveExtraInfo
+getLiveExtraInfo activity info =
+  info
+    |> List.map (mergeActivityItem activity)
+
+
+mergeActivityItem: List ExtraActivity -> ExtraInfo -> LiveExtraInfo
+mergeActivityItem activity info =
+  let
+      matchingRecord =
+        activity
+          |> List.filter (\ai -> ai.extraId == info.extraId)
+          |> List.head
+  in
+      case matchingRecord of
+        Just r ->
+          {extraId = info.extraId, info=info, activity = Just r}
+        Nothing ->
+          {extraId = info.extraId, info=info, activity = Nothing}
+
 
 defaultItemScheduler: RoleScheduler
 defaultItemScheduler =
@@ -109,17 +98,9 @@ defaultItemScheduler =
   }
 
 --UPDATE
-type Msg =
-    Mdl (Material.Msg Msg)
-  | ToggleAddingTask
-  | SubmitTaskByRole ScheduleItem
-  | SetTableFilter Filter
-  | SetSchedulerRole String
-  | SetSchedulerTime ScheduleTimeParam String
-  | SetSchedulerCategory String
-  | SetSchedulerName String
 
-setSchedulerRole: Model -> String -> Model
+
+setSchedulerRole: LiveMonitorState -> String -> LiveMonitorState
 setSchedulerRole model role =
   let
     oldScheduler = model.roleScheduler
@@ -127,9 +108,7 @@ setSchedulerRole model role =
   in
     ({model | roleScheduler = newScheduler})
 
-type ScheduleTimeParam = StartTm | EndTm
-
-setSchedulerTime: Model -> ScheduleTimeParam -> String -> Model
+setSchedulerTime: LiveMonitorState -> ScheduleTimeParam -> String -> LiveMonitorState
 setSchedulerTime model param time =
   let
     oldScheduler = model.roleScheduler
@@ -142,7 +121,7 @@ setSchedulerTime model param time =
   in
     ({model | roleScheduler = newSchedulerItem})
 
-setSchedulerCategory: Model -> String -> Model
+setSchedulerCategory: LiveMonitorState -> String -> LiveMonitorState
 setSchedulerCategory model category =
   let
     oldScheduler = model.roleScheduler
@@ -152,7 +131,7 @@ setSchedulerCategory model category =
   in
     ({model | roleScheduler = newSchedulerItem})
 
-setSchedulerName: Model -> String -> Model
+setSchedulerName: LiveMonitorState -> String -> LiveMonitorState
 setSchedulerName model name =
   let
     oldScheduler = model.roleScheduler
@@ -162,7 +141,7 @@ setSchedulerName model name =
   in
     ({model | roleScheduler = newRoleScheduler})
 
-update: Msg -> Model -> (Model, Cmd Msg)
+update: LiveMonitorMsg -> LiveMonitorState -> (LiveMonitorState, Cmd LiveMonitorMsg)
 update msg model =
   case msg of
     Mdl msg_ ->
@@ -192,16 +171,16 @@ update msg model =
 --VIEW
 
 
-viewLiveMonitor : Model -> List ExtraInfo -> Html Msg
-viewLiveMonitor model extraProfiles =
+viewLiveMonitor : LiveMonitorState -> List ExtraActivity -> List ExtraInfo -> Html LiveMonitorMsg
+viewLiveMonitor model extraActivity extraInfo =
     div [style [("margin", "8px 4px 8px 4px")]]
         [ viewExtrasSnapStats fakeSnapStateModel
-        , viewLiveTable (liveTable extraProfiles model.tableFilter) model.mdl model.isAddingTask
+        , viewLiveTable (liveTable (getLiveExtraInfo extraActivity extraInfo) model.tableFilter) model.mdl model.isAddingTask
 
         ]
 
 
-viewLiveTable : LiveExtraTable -> Material.Model -> Bool -> Html Msg
+viewLiveTable : LiveExtraTable -> Material.Model -> Bool -> Html LiveMonitorMsg
 viewLiveTable table mdlModel isAddingTask =
     let
         panelHeader =
@@ -220,7 +199,7 @@ viewLiveTable table mdlModel isAddingTask =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewTaskPanel: Html Msg
+viewTaskPanel: Html LiveMonitorMsg
 viewTaskPanel =
   div [ style [
         ( "display", "flex" )
@@ -250,7 +229,7 @@ defaultScheduleItem =
   ,name="Zombie shot"
   }
 
-viewSearchTaskBar: Material.Model -> Html Msg
+viewSearchTaskBar: Material.Model -> Html LiveMonitorMsg
 viewSearchTaskBar mdlModel =
   div [style
     [
@@ -285,7 +264,7 @@ viewSearchTaskBar mdlModel =
 
 
 
-viewSearch : Material.Model -> Html Msg
+viewSearch : Material.Model -> Html LiveMonitorMsg
 viewSearch mdlModel =
   div [style [("margin-left", "16px")]]
   [ div [style [("display", "flex"), ("align-items", "center")]]
@@ -356,7 +335,7 @@ viewLiveTableItem item =
                     ,("color", "#9B9EA7")
                     ,("margin", "2px 0px 2px 0px")
                   ]]
-                  [text "Extra"]
+                  [text item.part]
               ]
             ]
           ,div [style [

@@ -6,7 +6,7 @@ import Html.Events exposing (..)
 
 import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
-import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor, initModel)
+import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
@@ -21,12 +21,15 @@ viewPAPortal model =
         , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
           [case model.currentView of
             LiveMonitor ->
-              case model.extras of
-                Loading -> viewLoadingScreen
-                Success extras ->
-                  div []
-                      [ Html.map LiveMsg (viewLiveMonitor model.liveModel extras)
-                      ]
+              case model.currentSkin of
+                Nothing -> viewLoadingScreen
+                Just skin ->
+                  case model.extraActivity of
+                    Loading -> viewLoadingScreen
+                    Success extraActivity ->
+                      div []
+                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraActivity (skinToExtraInfo skin))
+                          ]
 
             SkinManager ->
                 div []
@@ -37,6 +40,17 @@ viewPAPortal model =
           ]
         ]
 
+skinToExtraInfo : Skin -> List ExtraInfo
+skinToExtraInfo skin =
+ List.map (\si ->
+   {extraId=si.userId
+   , firstName = si.firstName
+   , lastName=si.lastName
+   , role=si.part
+   , pay=si.pay
+   , avatar={url = Nothing}}
+  )
+  skin.skinItems
 
 viewHeader : ViewState -> Html Msg
 viewHeader currentView =
@@ -122,9 +136,3 @@ viewHeaderInfo =
           ]
           [ text "RUNABETTERSET Productions" ]
       ]
-
-
-viewExtras : Profile -> Html Msg
-viewExtras profile =
-    li []
-        [ text profile.firstName ]

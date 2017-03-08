@@ -50,7 +50,7 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
       const scheduleItems = extraschedule.extrascheduleitemses
       const schedule = {id: extraschedule.id, items: scheduleItems}
       const profile = baseprofile
-      const extraInfo = {timecard, profile, schedule}
+      const extraInfo = {extraId: userId, timecard, profile, schedule}
       app.ports.receiveExtraInfo.send(extraInfo);
     })
     .catch(error => {
@@ -131,7 +131,7 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
         console.log(schedule)
 
 
-        let frmt = {profile, schedule, timecard: defTimecard}
+        let frmt = {extraId: id, profile, schedule, timecard: defTimecard}
         console.log(frmt)
         return frmt
       }
@@ -144,6 +144,29 @@ app.ports.getAllExtraInfo.subscribe(function(params) {
     });
 })
 
+
+app.ports.fetchDailySkin.subscribe(function(date) {
+  console.log(date)
+  client.fetchDailySkin(date)
+    .then(result => {
+      console.log(result.data)
+      const {data} = result
+      const skinResult = data.allSkins.length > 0 ? data.allSkins[0] : null
+      const {skinItems} = skinResult;
+      const frmtSkinItems = skinItems.map(function(item) {
+        console.log(item)
+        const {user, role, pay} = item
+        const {firstName, lastName} = user.baseprofile
+        return {userId: user.id, firstName, lastName, part: role, pay}
+      })
+      console.log(frmtSkinItems)
+      const skin = {effectiveDt: date, skinItems: frmtSkinItems}
+      app.ports.receiveDailySkin.send(skin)
+    })
+    .catch(error => {
+      console.error(error)
+    })
+})
 
 app.ports.subExtraSchedule.subscribe(function() {
   console.log(client.subExtraSchedule())

@@ -1,8 +1,7 @@
 module Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
-import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
-import Client.ExtraPortal.Types exposing (ScheduleItem, ExtraInfo)
+import Client.ExtraPortal.Types exposing (ScheduleItem, TimeCard, Profile, Schedule)
 
 import Date exposing (Date)
 import Material
@@ -13,13 +12,20 @@ type alias Model =
   {
     currentDate: Maybe Date
   , selectedDate: SelectedDate
-  , user: Profile
-  , extras: RemoteData (List ExtraInfo)
+  , user: PAProfile
+  , extraActivity: RemoteData (List ExtraActivity)
   , currentView: ViewState
+  , currentSkin: Maybe Skin
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
-  , liveModel : LiveMonitor.Model
+  , liveModel : LiveMonitorState
   , mdl : Material.Model
+  }
+
+type alias ExtraActivity =
+  { extraId: String
+  , timecard: TimeCard
+  , schedule: Schedule
   }
 
 
@@ -35,14 +41,91 @@ type Msg
     = ChangeView ViewState
     | LoadRemoteData
     | SetSelectedDate Date
-    | AllExtraInfo (List ExtraInfo)
+    | ReceiveExtraActivity (List ExtraActivity)
+    | ReceiveDailySkin Skin
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
-    | LiveMsg LiveMonitor.Msg
+    | LiveMsg LiveMonitorMsg
 
-type alias Profile =
+type alias PAProfile =
     { id : String
     , firstName : String
     , lastName: String
     , avatarSrc : Maybe String
     }
+
+type alias ExtraProfile =
+  {extraId: String
+  ,firstName: String
+  ,lastName: String
+  }
+
+type alias Skin =
+  {effectiveDt: String
+  ,skinItems: List SkinItem
+  }
+
+type alias SkinItem =
+  {userId: String
+  ,firstName: String
+  ,lastName: String
+  ,part: String
+  ,pay: String
+  }
+
+
+--Live Monitor
+type alias LiveMonitorState =
+    { isAddingTask: Bool
+    , mdl : Material.Model
+    , tableFilter: LiveTableFilter
+    , roleScheduler: RoleScheduler
+    }
+
+type alias LiveTableFilter = String
+
+type alias RoleScheduler =
+  {role: String
+  ,scheduleItem: ScheduleItem
+  }
+
+type alias LiveExtraTable =
+    List ExtraInfoItem
+
+
+type alias ExtraInfoItem =
+    { firstName : String
+    , lastName: String
+    , part: String
+    , imgSrc : Maybe String
+    , isClockedIn : Bool
+    }
+
+type alias ExtraInfo =
+  {extraId: String
+  --,profile: Profile
+  ,firstName: String
+  ,lastName: String
+  ,avatar: {url: Maybe String}
+  ,role: String
+  ,pay: String
+  }
+
+type alias ExtrasSnapStatModel =
+    { totalExtras : Int
+    , clockedIn : Int
+    , holdClothes : Int
+    , missingForms : Int
+    }
+
+type ScheduleTimeParam = StartTm | EndTm
+
+type LiveMonitorMsg =
+    Mdl (Material.Msg LiveMonitorMsg)
+  | ToggleAddingTask
+  | SubmitTaskByRole ScheduleItem
+  | SetTableFilter LiveTableFilter
+  | SetSchedulerRole String
+  | SetSchedulerTime ScheduleTimeParam String
+  | SetSchedulerCategory String
+  | SetSchedulerName String
