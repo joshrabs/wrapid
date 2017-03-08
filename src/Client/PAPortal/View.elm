@@ -42,15 +42,16 @@ viewPAPortal model =
 
 skinToExtraInfo : Skin -> List ExtraInfo
 skinToExtraInfo skin =
- List.map (\si ->
-   {extraId=si.userId
-   , firstName = si.firstName
-   , lastName=si.lastName
-   , role=si.part
-   , pay=si.pay
-   , avatar={url = Nothing}}
-  )
   skin.skinItems
+    |> List.map
+        (\si ->
+         {extraId=si.userId
+         , firstName = si.firstName
+         , lastName=si.lastName
+         , role=si.part
+         , pay=si.pay
+         , avatar=si.avatar
+        })
 
 viewHeader : ViewState -> Html Msg
 viewHeader currentView =

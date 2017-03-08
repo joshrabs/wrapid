@@ -71,6 +71,7 @@ type alias SkinItem =
   ,lastName: String
   ,part: String
   ,pay: String
+  ,avatar: {url: Maybe String}
   }
 
 

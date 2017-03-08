@@ -227,6 +227,7 @@ const fetchDailySkinGQL = gql`query getDailySkin($date:String){
         baseprofile{
           firstName
           lastName
+          avatar{url}
         }
       }
       role
