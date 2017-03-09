@@ -12,12 +12,10 @@ import Date exposing (Date, fromTime)
 import Date.Extra.Compare as CompareDate exposing (Compare2(..))
 import Task exposing (perform)
 import RemoteData exposing (RemoteData(..))
-
-
--- import Client.PAPortal.Types as PATypes
-
 import Client.PAPortal.State as PAState
 import Client.Generic.Authentication.Login.State as LoginState
+import Client.WardrobePortal.State as WardrobeState
+import Client.WardrobePortal.Ports as WardrobePorts
 
 
 defaultUserID : String
@@ -25,6 +23,7 @@ defaultUserID =
     "ciykqvsynnqo60127o3illsce"
 
 
+mdlModel : Material.Model
 mdlModel =
     Material.model
 
@@ -108,6 +107,11 @@ update msg model =
                         ( { model | currentViewState = PAPortal paModel }
                         , Cmd.map (\b -> ChildMsg (PAPortalMsg b)) paCmd
                         )
+
+                WardrobePortalView ->
+                    ( { model | currentViewState = WardrobePortal WardrobeState.init }
+                    , WardrobePorts.getAllWardrobeStatuses ()
+                    )
 
         UrlChange location ->
             ( { model | history = location :: model.history }
@@ -196,6 +200,20 @@ update msg model =
                         _ ->
                             ( model, Cmd.none )
 
+                WardrobePortalMsg wardrobeMsg ->
+                    case model.currentViewState of
+                        WardrobePortal curModel ->
+                            let
+                                ( wardrobeModel, wardrobeCmd ) =
+                                    WardrobeState.update wardrobeMsg curModel
+                            in
+                                ( { model | currentViewState = WardrobePortal wardrobeModel }
+                                , Cmd.map (\b -> (ChildMsg (WardrobePortalMsg b))) wardrobeCmd
+                                )
+
+                        _ ->
+                            model ! []
+
         ToggleNotifications ->
             ( model, Cmd.none )
 
@@ -219,5 +237,8 @@ subscriptions model =
 
             Login loginModel ->
                 Sub.none
+
+            WardrobePortal wardrobeModel ->
+                Sub.map (\b -> ChildMsg (WardrobePortalMsg b)) (WardrobeState.subscriptions wardrobeModel)
         , Material.subscriptions Mdl model
         ]

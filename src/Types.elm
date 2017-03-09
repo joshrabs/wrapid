@@ -4,6 +4,7 @@ import Material
 import Navigation as Nav
 import Client.ExtraPortal.ExtraPortal as ExtraPortal
 import Client.PAPortal.State as PAPortal
+import Client.WardrobePortal.Types as WardrobePortal
 import Client.Generic.Authentication.Login.Types as Login
 import Time exposing (Time)
 import Date exposing (Date, fromTime)
@@ -29,12 +30,14 @@ type ViewModelState
     = Login Login.Model
     | ExtraPortal ExtraPortal.Model
     | PAPortal PAPortal.Model
+    | WardrobePortal WardrobePortal.Model
 
 
 type ViewMsg
     = LoginView
     | PAPortalView
     | ExtraPortalView
+    | WardrobePortalView
 
 
 type Msg
@@ -55,6 +58,7 @@ type Msg
 type ChildPortalMsg
     = ExtraPortalMsg ExtraPortal.Msg
     | PAPortalMsg PAPortal.Msg
+    | WardrobePortalMsg WardrobePortal.Msg
 
 
 type alias Url =
