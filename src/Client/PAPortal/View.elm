@@ -16,9 +16,9 @@ viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
         [ viewHeader model.currentView
-        ,  case model.selectedDate of
-            Just selectedDate -> viewCalendar SetSelectedDate selectedDate
-            Nothing -> div [] []
+        -- ,  case model.selectedDate of
+        --     Just selectedDate -> viewCalendar SetSelectedDate selectedDate
+        --     Nothing -> div [] []
         , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
           [case model.currentView of
             LiveMonitor ->

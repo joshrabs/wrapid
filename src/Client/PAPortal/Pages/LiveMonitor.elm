@@ -365,9 +365,9 @@ viewExtrasSnapStats model =
             (model.missingForms |> toString) ++ " / " ++ totalExtras
 
         allIcons =
-          [{num=clockRatio, text ="Clocked In"}
-          , {num=clothingRatio, text ="Hold Clothes"}
-          , {num=formRatio, text ="Missing Forms"}
+          [{num=clockRatio, text ="Clocked In", background = "rgb(0,150,136)", icon="watch_later"}
+          , {num=clothingRatio, text ="Hold Clothes", background="#ff5252", icon="loyalty"}
+          , {num=formRatio, text ="Missing Forms", background="#ab47bc", icon="assignment"}
           ]
     in
         div [ style [ ( "display", "flex" ) ] ]
@@ -376,11 +376,17 @@ viewExtrasSnapStats model =
               div [style [
                   ("display", "flex")
                   , ("flex-direction", "column")
-                  , ("padding-right", "24px")
+                  , ("justify-content", "center")
+                  , ("flex", "1")
+                  , ("align-items", "center")
+                  , ("padding", "24px")
                   , ("border-right", "1px solid #EFF3F7")
+                  , ("background", r.background)
                 ]]
-                [ span [style snapRatioStyle] [text r.num]
+                [ span [] [Icon.view r.icon [Options.css "color" "white"]]
+                , span [style snapRatioStyle] [text r.num]
                 , span [style snapTextStyle] [text r.text]
+
                 ]
             )
             allIcons)
@@ -388,14 +394,15 @@ viewExtrasSnapStats model =
 
 snapRatioStyle: List (String, String)
 snapRatioStyle =
-  [("color", "#50E3C2")
-  ,("font-family", "Roboto-Regular")
-  ,("font-size", "20px")
+  [("color", "white")
+  ,("font-family", "Roboto-Bold")
+  ,("font-size", "28px")
+  ,("margin", "8px 0px 8px 0px")
   ]
 
 snapTextStyle: List (String, String)
 snapTextStyle =
-  [("color", "#282C35")
+  [("color", "white")
   ,("font-family", "Roboto-Regular")
   ,("font-size", "12px")
   ]

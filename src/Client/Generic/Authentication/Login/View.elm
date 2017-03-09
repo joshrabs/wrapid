@@ -35,8 +35,8 @@ loginView model =
                     ]
                 ]
                 [ text "RUNABETTERSET Productions" ]
+            , viewLoginPanel model
             ]
-        , viewLoginPanel model
         ]
 
 
@@ -57,7 +57,7 @@ viewLoginPanel model =
             Just { title = "Login", rightItem = Nothing }
 
         panelBody =
-            div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "margin", "8px" ) ] ]
+            div [ style [ ( "display", "flex" ), ( "flex-direction", "column" ), ( "margin", "8px" ), ("padding", "10px 15px 10px 15px") ] ]
                 [ Textfield.render Mdl
                     [ 10, 0 ]
                     model.mdl
