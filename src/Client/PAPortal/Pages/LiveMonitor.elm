@@ -19,8 +19,8 @@ import Client.PAPortal.Types exposing (..)
 
 fakeSnapStateModel : ExtrasSnapStatModel
 fakeSnapStateModel =
-    { totalExtras = 3
-    , clockedIn = 1
+    { totalExtras = 4
+    , clockedIn = 4
     , holdClothes = 2
     , missingForms = 2
     }
@@ -343,8 +343,9 @@ viewLiveTableItem item =
               ("margin-right", "8px")
               ,("display", "flex")
             ]]
-            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "watch_later" [Options.css "color" "rgb(255, 93, 0)"]]
-            ,span [] [Icon.i "loyalty"]
+            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "watch_later" [Options.css "color" "#00e676"]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "loyalty" [Options.css "color" "#ff3d00"]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "assignment" [Options.css "color" "#ff3d00"]]
             ]
         ]
 
@@ -380,7 +381,7 @@ viewExtrasSnapStats model =
                   , ("align-items", "center")
                   , ("flex", "1")
                   , ("align-items", "center")
-                  , ("padding", "24px")
+                  , ("padding", "16px")
                   , ("border-right", "1px solid #EFF3F7")
                   , ("background", r.background)
                 ]]
