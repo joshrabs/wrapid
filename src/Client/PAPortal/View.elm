@@ -91,8 +91,9 @@ viewHeader currentView =
 baseTabStyle : List ( String, String )
 baseTabStyle =
     [ ( "padding", "8px" )
-    , ( "font-size", "12px" )
+    , ( "font-size", "14px" )
     , ( "font-family", "Roboto-Regular" )
+    , ( "font-weight", "300" )
     , ( "color", "#6D717A" )
     , ("width", "125px")
     , ("display", "flex")
@@ -115,7 +116,7 @@ selectedTabStyle =
 viewHeaderInfo : Html msg
 viewHeaderInfo =
     div [ style
-        [ ( "margin", "16px" )
+        [ ( "margin", "8px" )
         , ( "display", "inline-flex" )
         , ( "flex-direction", "column" )
       ]]
@@ -131,7 +132,7 @@ viewHeaderInfo =
           [ style
               [ ( "font-family", "Roboto-Regular" )
               , ( "font-size", "16px" )
-              , ( "margin", "8px 0px 8px 0px" )
+              , ( "margin", "4px 0px 4px 0px" )
               , ( "color", "#282C35" )
               , ( "letter-spacing", "0" )
               ]
