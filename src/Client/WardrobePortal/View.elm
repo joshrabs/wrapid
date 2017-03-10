@@ -70,7 +70,6 @@ statusList mdl filter statusList =
 
 
 {-|
-TODO: Implement a date picker, instead of showing all dates.
 TODO: Categorize extras by role.
 -}
 statusItem : Material.Model -> Int -> WardrobeStatus -> Html Msg

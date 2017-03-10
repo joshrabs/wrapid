@@ -180,7 +180,8 @@ function uploadFile (event) {
     if (xhr.readyState === xhr.DONE) {
       const response = JSON.parse(xhr.responseText);
       client.updateWardrobeStatusFile(this.id, response.id)
-        .then(result => app.ports.receiveWardrobeStatusUpdate.send(result));
+        .then(result => app.ports.receiveWardrobeStatusUpdate.send(result))
+        .then(window.alert('OK!'));
       event.target.removeEventListener('change', uploadFile);
       event.target.value = null;
     }
