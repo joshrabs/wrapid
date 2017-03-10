@@ -71,3 +71,13 @@ navbarRight =
     , ( "align-items", "center" )
     , ( "margin", "8px" )
     ]
+
+
+loadContainer : Styles
+loadContainer =
+    [ ( "height", "200px" )
+    , ( "display", "flex" )
+    , ( "align-items", "center" )
+    , ( "flex-wrap", "wrap" )
+    , ( "justify-content", "center" )
+    ]

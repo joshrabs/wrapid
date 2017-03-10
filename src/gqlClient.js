@@ -1,5 +1,5 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client';
-import {SubscriptionClient, addGraphQLSubscriptions} from 'subscriptions-transport-ws'
+import {SubscriptionClient, addGraphQLSubscriptions} from 'subscriptions-transport-ws';
 import gql from 'graphql-tag';
 
 const wsClient = new SubscriptionClient(`wss://subscriptions.graph.cool/v1/ciykpioqm1wl00120k2e8s4la`, {
@@ -7,15 +7,15 @@ const wsClient = new SubscriptionClient(`wss://subscriptions.graph.cool/v1/ciykp
   connectionParams: {
     // Pass any arguments you want for initialization
   }
-})
+});
 
-const networkInterface = createNetworkInterface({ uri: 'https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la' })
+const networkInterface = createNetworkInterface({ uri: 'https://api.graph.cool/simple/v1/ciykpioqm1wl00120k2e8s4la' });
 
 // Extend the network interface with the WebSocket
 const networkInterfaceWithSubscriptions = addGraphQLSubscriptions(
   networkInterface,
   wsClient
-)
+);
 
 const client = new ApolloClient({
   networkInterface: networkInterfaceWithSubscriptions
@@ -99,7 +99,7 @@ const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: S
 const addScheduleItemGQL = gql`mutation
 
 addScheduleByRole(
-  	$scheduleId:ID
+    $scheduleId:ID
   , $name:String!
   , $category:EXTRA_SCHEDULE_ITEMS_CATEGORY
   , $startTm:String!
@@ -115,7 +115,7 @@ addScheduleByRole(
     id
     name
   }
-}`
+}`;
 
 const subscribeSchedule = gql`subscription {
   ExtraScheduleItems{
@@ -127,7 +127,7 @@ const subscribeSchedule = gql`subscription {
       endTm
     }
   }
-}`
+}`;
 
 const clockinExtra = gql`mutation clockinExtra($id: ID!, $clockinTs: String)
   {
@@ -178,18 +178,14 @@ const getExtraInfo = gql`
       }
     }
   }
-`
-
-
+`;
 
 const createTimecard = gql`mutation createTimecard($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
   createTimecard(userId:$userId, clockinTs:$clockinTs, clockoutTs:$clockoutTs, effectiveDt:$effectiveDt){
     id,
     effectiveDt
   }
-}`
-
-
+}`;
 
 const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo {
   allUsers(filter:{employeeType:Extra}){
@@ -217,7 +213,7 @@ const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo {
       }
     }
   }
-}`
+}`;
 
 const fetchDailySkinGQL = gql`query getDailySkin($date:String){
   allSkins(filter: {effectiveDt:$date}){
@@ -234,54 +230,166 @@ const fetchDailySkinGQL = gql`query getDailySkin($date:String){
       pay
     }
   }
-}`
+}`;
+
+const getAllWardrobeStatuses = gql`query
+{
+  allExtraWardrobeStatuses {
+    id
+    checkStatus
+    date
+    file {
+      id
+      secret
+      url
+      name
+    }
+    user {
+      id
+      baseprofile {
+        id
+        firstName
+        lastName
+        avatar {
+          id
+          secret
+          url
+          name
+        }
+      }
+    }
+  }
+}
+`;
+
+const updateWardrobeStatusFile = gql`
+mutation ($statusId: ID!, $fileId: ID!) {
+  setExtraWardrobePic(extraWardrobeStatusExtraWardrobeStatusId: $statusId, fileFileId: $fileId) {
+    extraWardrobeStatusExtraWardrobeStatus {
+      id
+      checkStatus
+      date
+      file {
+        id
+        secret
+        url
+        name
+      }
+      user {
+        id
+        baseprofile {
+          firstName
+          lastName
+          avatar {
+            id
+            secret
+            url
+            name
+          }
+        }
+      }
+    }
+  }
+}`;
+
+const checkOutWardrobe = gql`
+mutation ($statusId: ID!) {
+  updateExtraWardrobeStatus(id: $statusId, checkStatus: CHECKEDOUT) {
+    id
+    date
+    checkStatus
+    user {
+      id
+      baseprofile {
+        firstName
+        lastName
+        avatar {
+          id
+          secret
+          url
+        }
+      }
+    }
+    file {
+      id
+      secret
+      url
+    }
+  }
+}`;
+
+const checkInWardrobe = gql`
+mutation ($statusId: ID!) {
+  updateExtraWardrobeStatus(id: $statusId, checkStatus: CHECKIN) {
+    id
+    date
+    checkStatus
+    user {
+      id
+      baseprofile {
+        firstName
+        lastName
+        avatar {
+          id
+          secret
+          url
+        }
+      }
+    }
+    file {
+      id
+      secret
+      url
+    }
+  }
+}`;
 
 export default {
 
-  //subscriptions
-  subExtraSchedule: function(){
+  // subscriptions
+  subExtraSchedule: function () {
     const query = subscribeSchedule;
     const variables = {};
-    console.log(client)
-    console.log(query)
+    console.log(client);
+    console.log(query);
     return client.query({ query, variables });
   },
 
   // Queries
-  getAllExtraInfo: function(date) {
+  getAllExtraInfo: function (date) {
     const query = paLiveMonitorAllExtraInfo;
-    console.log("QUERY!", query)
+    console.log('QUERY!', query);
     const variables = {};
     return client.query({ query, variables });
   },
 
-  clockoutExtra: function(id, clockoutTs){
+  clockoutExtra: function (id, clockoutTs) {
     const query = clockinExtra;
     const variables = { id, clockoutTs };
-    console.log(query)
-    console.log(variables)
+    console.log(query);
+    console.log(variables);
     return client.mutate({ query, variables });
   },
 
-  clockinExtra: function(id, clockinTs){
+  clockinExtra: function (id, clockinTs) {
     const mutation = clockinExtra;
-    const variables = { id, clockinTs};
+    const variables = { id, clockinTs };
     return client.mutate({ mutation, variables });
   },
 
-  fetchDailySkin: function(date) {
+  fetchDailySkin: function (date) {
     const query = fetchDailySkinGQL;
     const variables = { date };
     return client.query({ query, variables });
   },
 
-  getExtraInfo: function(userId, date) {
+  getExtraInfo: function (userId, date) {
     const query = getExtraInfo;
     const variables = { userId, date };
     return client.query({ query, variables });
   },
 
-  createTimecard: function(userId, clockinTs, clockoutTs, effectiveDt) {
+  createTimecard: function (userId, clockinTs, clockoutTs, effectiveDt) {
     const query = createTimecard;
     const variables = { userId, clockinTs, clockoutTs, effectiveDt };
     return client.query({ query, variables });
@@ -304,6 +412,11 @@ export default {
     return client.query({ query, variables });
   },
 
+  getAllWardrobeStatuses: function () {
+    const query = getAllWardrobeStatuses;
+    return client.query({ query });
+  },
+
   // Mutations
 
   createUser: function (firstName) {
@@ -318,10 +431,27 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  addScheduleItem: function(scheduleItem) {
-    const mutation = addScheduleItemGQL
-    const {startTm, endTm, category, name} = scheduleItem
-    const variables = {scheduleId: "cizbzpnmaw6m80148bpys69a6", startTm, endTm, category, name}
-    return client.mutate({mutation, variables})
+  addScheduleItem: function (scheduleItem) {
+    const mutation = addScheduleItemGQL;
+    const {startTm, endTm, category, name} = scheduleItem;
+    const variables = {scheduleId: 'cizbzpnmaw6m80148bpys69a6', startTm, endTm, category, name};
+    return client.mutate({mutation, variables});
+  },
+
+  updateWardrobeStatusFile: function (statusId, fileId) {
+    const mutation = updateWardrobeStatusFile;
+    const variables = { statusId, fileId };
+    return client.mutate({mutation, variables});
+  },
+  checkOutWardrobe: function (statusId) {
+    const mutation = checkOutWardrobe;
+    const variables = { statusId };
+    return client.mutate({ mutation, variables });
+  },
+
+  checkInWardrobe: function (statusId) {
+    const mutation = checkInWardrobe;
+    const variables = { statusId };
+    return client.mutate({ mutation, variables });
   }
 };

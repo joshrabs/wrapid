@@ -6,24 +6,12 @@ import Material
 import Material.Menu as Menu
 import Common.Styles as Styles
 import Common.WrapidLogo exposing (logo)
-import Types exposing (Msg(..))
-
-type alias Config msg =
-    { toggleMenuMsg : msg
-    , selectItemMsg : String -> msg
-    }
 
 
-type alias Context =
-    { isOpen : Bool
-    }
-
-
-navbar : Material.Model -> Maybe String -> List String -> Html Msg
-navbar mdl avatarUrl notifications =
+navbar mdl msg avatarUrl notifications =
     let
         rightMenu =
-            [ notifier mdl notifications
+            [ notifier mdl msg notifications
             , avatar avatarUrl
             , hamburgerMenu
             ]
@@ -78,8 +66,11 @@ hamburgerBarItem =
         []
 
 
-notifier : Material.Model -> List String -> Html Msg
-notifier mdl notifications =
+
+-- notifier : Material.Model -> List String -> Html Msg
+
+
+notifier mdl msg notifications =
     let
         menuAppearance =
             [ Menu.bottomRight, Menu.ripple, Menu.icon "notifications" ]
@@ -88,7 +79,7 @@ notifier mdl notifications =
             Menu.Item [] [ text itm ]
 
         menu =
-            Menu.render Mdl [ 0 ] mdl menuAppearance (List.map menuItem notifications)
+            Menu.render msg [ 0 ] mdl menuAppearance (List.map menuItem notifications)
     in
         div
             []
