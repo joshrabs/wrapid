@@ -13,6 +13,10 @@ import Debug exposing (log)
 import Task exposing (succeed)
 import Dict exposing (fromList, Dict)
 import Client.Generic.WebForm.Types exposing (Profile, FieldCategory(..), Field)
+import Http exposing (..)
+import Json.Encode as Encode exposing (encode, object, string)
+import Json.Decode as Decode exposing (list, string)
+import RemoteData exposing (sendRequest, WebData)
 
 
 -- MODEL
@@ -177,11 +181,50 @@ type Msg
     | Upd ( Int, Int ) String
     | NextStep
     | SubmitProfile Profile
+    | ReceiveProfile (RemoteData.WebData String)
 
 
 submitProfile : Profile -> Cmd Msg
 submitProfile profile =
     Task.perform (always (SubmitProfile profile)) (Task.succeed ())
+
+
+profileBody : profile -> Http.Body
+profileBody profile =
+    jsonBody
+        (object
+            [ ( "profile"
+              , Encode.object
+                    [ ( "first_name", Encode.string "Bruce" )
+                    , ( "last_name", Encode.string "Williams" )
+                    , ( "street_address", Encode.string "10th avenue" )
+                    , ( "city", Encode.string "New York" )
+                    ]
+              )
+            ]
+        )
+
+
+submitProfileHttp : Profile -> Cmd (RemoteData.WebData String)
+submitProfileHttp profile =
+    Http.post
+        "http://35.157.165.22/profiles"
+        (profileBody profile)
+        (Decode.field "id" Decode.string)
+        |> RemoteData.sendRequest
+
+
+
+-- LoginTypes.SubmitLogin ->
+--     (Server.loginUser loginModel.email loginModel.password)
+--         |> Cmd.map ReceiveAuthentication
+-- loginUser : Username -> Password -> Cmd (RemoteData.WebData String)
+-- loginUser username password =
+--     Http.post
+--         "http://35.157.165.22/user_token"
+--         (loginBody username password)
+--         (Decode.field "jwt" Decode.string)
+--         |> RemoteData.sendRequest
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -206,7 +249,8 @@ update msg model =
 
                 cmd =
                     if allComplete then
-                        submitProfile (profileFromWizard model.steps)
+                        -- submitProfile (profileFromWizard model.steps)
+                        Cmd.map ReceiveProfile (submitProfileHttp (profileFromWizard model.steps))
                     else
                         Cmd.none
             in
@@ -235,6 +279,9 @@ update msg model =
                         listOfMsg
             in
                 ( finalModel, Cmd.batch listOfFx )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 updateSteps : ( Int, Int ) -> String -> List WizardStep -> List WizardStep
@@ -380,7 +427,16 @@ viewStep model ws step =
                 [ text (toString (ws.step + 1) ++ ". " ++ ws.title) ]
             , Card.text
                 [ Card.expand ]
-                (List.indexedMap (\i x -> viewWizardField model x.label step i (Upd ( step, i ))) ws.fields)
+                (List.indexedMap
+                    (\i x ->
+                        viewWizardField model
+                            x.label
+                            step
+                            i
+                            (Upd ( step, i ))
+                    )
+                    ws.fields
+                )
             , Card.actions
                 [ Options.css "text-align" "right" ]
                 [ Button.render Mdl
