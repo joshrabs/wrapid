@@ -356,7 +356,11 @@ viewExtraPortal model =
                                     [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
 
                             FormStatus ->
-                                viewFormStatusPage (ChangeView (PageView DailyMonitor)) defaultFormStatus (Animation.render model.animStyle)
+                                let
+                                    _ =
+                                        Debug.log "wizardID: " model.wizardProfileId
+                                in
+                                    viewFormStatusPage (ChangeView (PageView DailyMonitor)) (defaultFormStatus model.wizardProfileId) (Animation.render model.animStyle)
                         ]
 
 
@@ -429,9 +433,9 @@ defaultCrewInfoItems =
     ]
 
 
-defaultFormStatus : FormStatusPage.FormStatuses
-defaultFormStatus =
-    [ { formName = "Pence", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
-    , { formName = "Emergency Contact", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
-    , { formName = "EFS Voucher", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+defaultFormStatus : Maybe Int -> FormStatusPage.FormStatuses
+defaultFormStatus maybeId =
+    [ { id = maybeId, formName = "Pence", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+    , { id = maybeId, formName = "Emergency Contact", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+    , { id = maybeId, formName = "EFS Voucher", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
     ]

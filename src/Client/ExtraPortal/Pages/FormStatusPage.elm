@@ -21,7 +21,8 @@ type alias FormStatuses =
 
 
 type alias FormStatus =
-    { formName : String
+    { id : Maybe Int
+    , formName : String
     , completedDt : String
     , completedTs : String
     , imgSrc : String
