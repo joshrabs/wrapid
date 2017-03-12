@@ -9,12 +9,15 @@ import Material.Elevation as Elevation
 import Material.Textfield as Textfield
 import Material.Card as Card
 import Material.Button as Button
-
 import Debug exposing (log)
 import Task exposing (succeed)
 import Dict exposing (fromList, Dict)
-
 import Client.Generic.WebForm.Types exposing (Profile, FieldCategory(..), Field)
+import Http exposing (..)
+import Json.Encode as Encode exposing (encode, object, string)
+import Json.Decode as Decode exposing (list, string)
+import RemoteData exposing (sendRequest, WebData)
+
 
 -- MODEL
 
@@ -37,19 +40,20 @@ type alias WizardField =
     { id : Int
     , label : String
     , value : String
-    , category: FieldCategory
+    , category : FieldCategory
     }
 
 
 type Display
-    = Active | Hidden
+    = Active
+    | Hidden
+
 
 initEmpty : Model
 initEmpty =
     { mdl = Material.model
     , steps = []
     }
-
 
 
 init : Model
@@ -59,50 +63,66 @@ init =
         createStepsFromProfile defaultProfile
     }
 
-createStepsFromProfile: Profile -> List WizardStep
-createStepsFromProfile profile =
-  profile
-    |> Dict.values
-    |> List.map (\v -> (.category v |> toString, v))
-    |> (flip part) Dict.empty
-    |> Dict.toList
-    |> createSteps 0
 
-part: List (String, Field) -> Dict String (List Field)  -> Dict String (List Field)
+createStepsFromProfile : Profile -> List WizardStep
+createStepsFromProfile profile =
+    profile
+        |> Dict.values
+        |> List.map (\v -> ( .category v |> toString, v ))
+        |> (flip part) Dict.empty
+        |> Dict.toList
+        |> createSteps 0
+
+
+part : List ( String, Field ) -> Dict String (List Field) -> Dict String (List Field)
 part list d =
     case list of
-      x :: xs ->
-        addToDict d x
-          |> part xs
-      [] -> d
+        x :: xs ->
+            addToDict d x
+                |> part xs
+
+        [] ->
+            d
 
 
-addToDict: Dict String (List Field) -> (String, Field)  -> Dict String (List Field)
+addToDict : Dict String (List Field) -> ( String, Field ) -> Dict String (List Field)
 addToDict d k =
-  let
-    key = Tuple.first k
-    v = Tuple.second k
-    curVal = Dict.get key d
+    let
+        key =
+            Tuple.first k
 
-  in
-      case curVal of
-        Just val -> Dict.insert key (v :: val) d
-        Nothing -> Dict.insert key [v] d
+        v =
+            Tuple.second k
 
-categoryOrder = [Name, Address]
+        curVal =
+            Dict.get key d
+    in
+        case curVal of
+            Just val ->
+                Dict.insert key (v :: val) d
 
-defaultProfile: Profile
+            Nothing ->
+                Dict.insert key [ v ] d
+
+
+categoryOrder =
+    [ Name, Address ]
+
+
+defaultProfile : Profile
 defaultProfile =
-  Dict.fromList
-    [("firstName", {id="firstName", label= "First Name", value= "", category= Name})
-    ,("lastName", {id="firstName", label= "Last Name", value= "", category= Name})
+    Dict.fromList
+        [ ( "firstName", { id = "first_name", label = "first_name", value = "", category = Name } )
+        , ( "lastName", { id = "last_Name", label = "last_name", value = "", category = Name } )
+        , ( "Street", { id = "street", label = "street_address", value = "", category = Address } )
+        , ( "City", { id = "city", label = "city", value = "", category = Address } )
+        ]
 
-    ,("Street", {id="Street", label= "Street Address", value= "", category= Address})
-    ,("City", {id="City", label= "City", value= "", category= Address})
-    ]
+
+type alias FieldsByCategory =
+    ( String, List Field )
 
 
-type alias FieldsByCategory = ( String, List Field )
 createStepsFrom0 : List FieldsByCategory -> List WizardStep
 createStepsFrom0 list =
     createSteps 0 list
@@ -122,7 +142,7 @@ createSteps step list =
 
 
 createStep : Int -> FieldsByCategory -> WizardStep
-createStep step ( title, fs )  =
+createStep step ( title, fs ) =
     { step = step
     , title = title
     , display =
@@ -136,18 +156,24 @@ createStep step ( title, fs )  =
 
 
 -- ACTION, UPDATE
-profileFromWizard: List WizardStep -> Profile
-profileFromWizard wizardSteps =
-  wizardSteps
-  |> List.map (\ws -> wizardStepToFields ws)
-  |> List.concat
-  |> Dict.fromList
 
-wizardStepToFields: WizardStep -> List (String, Field)
+
+profileFromWizard : List WizardStep -> Profile
+profileFromWizard wizardSteps =
+    wizardSteps
+        |> List.map (\ws -> wizardStepToFields ws)
+        |> List.concat
+        |> Dict.fromList
+
+
+wizardStepToFields : WizardStep -> List ( String, Field )
 wizardStepToFields ws =
-  ws.fields
-  |> List.map (\wField ->
-    (wField.label, {label = wField.label, category = wField.category, value = wField.value, id=wField.label}))
+    ws.fields
+        |> List.map
+            (\wField ->
+                ( wField.label, { label = wField.label, category = wField.category, value = wField.value, id = wField.label } )
+            )
+
 
 type Msg
     = Mdl (Material.Msg Msg)
@@ -155,11 +181,51 @@ type Msg
     | Upd ( Int, Int ) String
     | NextStep
     | SubmitProfile Profile
+    | ReceiveProfile (RemoteData.WebData String)
 
 
-submitProfile: Profile -> Cmd Msg
+submitProfile : Profile -> Cmd Msg
 submitProfile profile =
-  Task.perform (always (SubmitProfile profile)) (Task.succeed ())
+    Task.perform (always (SubmitProfile profile)) (Task.succeed ())
+
+
+profileBody : profile -> Http.Body
+profileBody profile =
+    jsonBody
+        (object
+            [ ( "profile"
+              , Encode.object
+                    [ ( "first_name", Encode.string "Bruce" )
+                    , ( "last_name", Encode.string "Williams" )
+                    , ( "street_address", Encode.string "10th avenue" )
+                    , ( "city", Encode.string "New York" )
+                    ]
+              )
+            ]
+        )
+
+
+submitProfileHttp : Profile -> Cmd (RemoteData.WebData String)
+submitProfileHttp profile =
+    Http.post
+        "http://35.157.165.22/profiles"
+        (profileBody profile)
+        (Decode.field "id" Decode.string)
+        |> RemoteData.sendRequest
+
+
+
+-- LoginTypes.SubmitLogin ->
+--     (Server.loginUser loginModel.email loginModel.password)
+--         |> Cmd.map ReceiveAuthentication
+-- loginUser : Username -> Password -> Cmd (RemoteData.WebData String)
+-- loginUser username password =
+--     Http.post
+--         "http://35.157.165.22/user_token"
+--         (loginBody username password)
+--         (Decode.field "jwt" Decode.string)
+--         |> RemoteData.sendRequest
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -171,22 +237,32 @@ update msg model =
             ( { model | steps = updateSteps tuple str model.steps }, Cmd.none )
 
         NextStep ->
-          let
-              checkNextStep = nextStep model.steps
-              allComplete = areAllStepsComplete model.steps
-              log = Debug.log "ALL COMPLETE ??" allComplete
-              cmd =
-                if allComplete
-                  then submitProfile (profileFromWizard model.steps)
-                  else Cmd.none
-          in
-            ( { model | steps = nextStep model.steps }, cmd )
+            let
+                checkNextStep =
+                    nextStep model.steps
+
+                allComplete =
+                    areAllStepsComplete model.steps
+
+                log =
+                    Debug.log "ALL COMPLETE ??" allComplete
+
+                cmd =
+                    if allComplete then
+                        submitProfile (profileFromWizard model.steps)
+                        -- Cmd.map ReceiveProfile (submitProfileHttp (profileFromWizard model.steps))
+                    else
+                        Cmd.none
+            in
+                ( { model | steps = nextStep model.steps }, cmd )
 
         SubmitProfile profile ->
-          let
-            log2 = Debug.log "CMD!" "SUBMITTING PROFILE!!!"
-          in
-            (model, Cmd.none)
+            let
+                log2 =
+                    Debug.log "CMD!" "SUBMITTING PROFILE!!!"
+            in
+                ( model, Cmd.none )
+
         Batch listOfMsg ->
             let
                 ( finalModel, listOfFx ) =
@@ -203,6 +279,9 @@ update msg model =
                         listOfMsg
             in
                 ( finalModel, Cmd.batch listOfFx )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 updateSteps : ( Int, Int ) -> String -> List WizardStep -> List WizardStep
@@ -236,37 +315,47 @@ updateFields i str fields =
             []
 
 
-isFieldComplete: WizardField -> Bool
+isFieldComplete : WizardField -> Bool
 isFieldComplete field =
-  let
-    log = Debug.log "isFieldComplete" (field.value |> String.isEmpty |> not)
-  in
-    if
-      String.isEmpty field.value
-    then False
-    else True
+    let
+        log =
+            Debug.log "isFieldComplete" (field.value |> String.isEmpty |> not)
+    in
+        if String.isEmpty field.value then
+            False
+        else
+            True
 
-isStepComplete: WizardStep -> Bool
+
+isStepComplete : WizardStep -> Bool
 isStepComplete step =
-  let
-    firstMissing =
-      step.fields
-      |> List.filter (\field -> not (isFieldComplete field))
-      |> List.head
-  in
-      case firstMissing of
-        Nothing -> True
-        Just missing -> False
+    let
+        firstMissing =
+            step.fields
+                |> List.filter (\field -> not (isFieldComplete field))
+                |> List.head
+    in
+        case firstMissing of
+            Nothing ->
+                True
 
-areAllStepsComplete: List WizardStep -> Bool
+            Just missing ->
+                False
+
+
+areAllStepsComplete : List WizardStep -> Bool
 areAllStepsComplete steps =
-  let
-      firstMissingStep =
-        steps |> List.filter (\step -> not (isStepComplete step)) |> List.head
-  in
-      case firstMissingStep of
-        Just step -> False
-        Nothing -> True
+    let
+        firstMissingStep =
+            steps |> List.filter (\step -> not (isStepComplete step)) |> List.head
+    in
+        case firstMissingStep of
+            Just step ->
+                False
+
+            Nothing ->
+                True
+
 
 getNextStep : List WizardStep -> Int
 getNextStep wizard =
@@ -281,9 +370,11 @@ getNextStep wizard =
             Nothing ->
                 -1
 
-completedSteps: List WizardStep -> List WizardStep
+
+completedSteps : List WizardStep -> List WizardStep
 completedSteps steps =
-      List.filter (\x -> isStepComplete x) steps
+    List.filter (\x -> isStepComplete x) steps
+
 
 nextStep : List WizardStep -> List WizardStep
 nextStep wizard =
@@ -310,8 +401,8 @@ type alias Mdl =
 
 view : Model -> Html Msg
 view model =
-    Material.Scheme.top
-        <| Options.div
+    Material.Scheme.top <|
+        Options.div
             [ Options.center ]
             (List.indexedMap (\i x -> viewStep model x i) model.steps)
 
@@ -336,7 +427,16 @@ viewStep model ws step =
                 [ text (toString (ws.step + 1) ++ ". " ++ ws.title) ]
             , Card.text
                 [ Card.expand ]
-                (List.indexedMap (\i x -> viewWizardField model x.label step i (Upd ( step, i ))) ws.fields)
+                (List.indexedMap
+                    (\i x ->
+                        viewWizardField model
+                            x.label
+                            step
+                            i
+                            (Upd ( step, i ))
+                    )
+                    ws.fields
+                )
             , Card.actions
                 [ Options.css "text-align" "right" ]
                 [ Button.render Mdl
