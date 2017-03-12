@@ -1,7 +1,7 @@
 module Client.ExtraPortal.Pages.FormStatusPage exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (style, src)
+import Html.Attributes exposing (style, src, href)
 import Html.Events exposing (onClick)
 import Assets.Icons.CheckedCircleIcon exposing (viewCheckedCircle)
 import Assets.Icons.ForwardArrow exposing (viewForwardArrow)
@@ -23,6 +23,7 @@ type alias FormStatuses =
 type alias FormStatus =
     { id : Maybe Int
     , formName : String
+    , url : String
     , completedDt : String
     , completedTs : String
     , imgSrc : String
@@ -69,27 +70,46 @@ viewFormStatusPage msg statuses animStyle =
 
 viewFormStatusIcon : FormStatus -> Html msg
 viewFormStatusIcon item =
-    div
-        [ style
-            [ ( "display", "inline-flex" )
-            , ( "flex-direction", "column" )
-            , ( "background", "#FFFFFF" )
-            , ( "box-shadow", "0 8px 8px 0 rgba(210,214,223,0.70)" )
-            , ( "margin", "8px 16px 8px 0px" )
-            ]
-        ]
-        [ img
-            [ src defaultImgSrc
-            , style [ ( "width", "165px" ), ( "height", "118px" ) ]
-            ]
-            []
-        , div
-            [ style
-                [ ( "display", "flex" )
-                , ( "flex-direction", "column" )
-                , ( "margin", "8px" )
+    let
+        link =
+            case item.id of
+                Just id ->
+                    [ href ("http://35.157.165.22/profiles/" ++ (toString id) ++ "/" ++ item.url) ]
+
+                _ ->
+                    []
+    in
+        a link
+            [ div
+                [ style
+                    [ ( "display", "inline-flex" )
+                    , ( "flex-direction", "column" )
+                    , ( "background", "#FFFFFF" )
+                    , ( "box-shadow", "0 8px 8px 0 rgba(210,214,223,0.70)" )
+                    , ( "margin", "8px 16px 8px 0px" )
+                    ]
+                ]
+                [ img
+                    [ src defaultImgSrc
+                    , style [ ( "width", "165px" ), ( "height", "118px" ) ]
+                    ]
+                    []
+                , div
+                    [ style
+                        [ ( "display", "flex" )
+                        , ( "flex-direction", "column" )
+                        , ( "margin", "8px" )
+                        ]
+                    ]
+                    (completedStatus item)
                 ]
             ]
+
+
+completedStatus : FormStatus -> List (Html msg)
+completedStatus item =
+    case item.id of
+        Just id ->
             [ span [ style formNameCss ] [ text item.formName ]
             , div [ style [ ( "display", "flex" ), ( "align-items", "center" ), ( "margin", "2px 0px 2px 0px" ) ] ]
                 [ div [ style [ ( "width", "24px" ), ( "height", "24px" ) ] ] [ viewCheckedCircle "24" "24" ]
@@ -97,7 +117,13 @@ viewFormStatusIcon item =
                 ]
             , span [ style completedDtCss ] [ text item.completedTs ]
             ]
-        ]
+
+        Nothing ->
+            [ span [ style formNameCss ] [ text item.formName ]
+            , div [ style [ ( "display", "flex" ), ( "align-items", "center" ), ( "margin", "2px 0px 2px 0px" ) ] ]
+                [ span [ style completedDtCss ] [ text ("Incompleted.") ]
+                ]
+            ]
 
 
 formNameCss =

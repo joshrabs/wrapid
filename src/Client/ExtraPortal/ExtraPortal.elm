@@ -435,7 +435,7 @@ defaultCrewInfoItems =
 
 defaultFormStatus : Maybe Int -> FormStatusPage.FormStatuses
 defaultFormStatus maybeId =
-    [ { id = maybeId, formName = "Pence", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
-    , { id = maybeId, formName = "Emergency Contact", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
-    , { id = maybeId, formName = "EFS Voucher", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+    [ { id = maybeId, url = "pence_form.pdf", formName = "Pence", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+    , { id = maybeId, url = "emergency_form.pdf", formName = "Emergency Contact", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
+    , { id = maybeId, url = "efs_form.pdf", formName = "EFS Voucher", completedDt = "11/12/2017", completedTs = "8:00 AM", imgSrc = "meow" }
     ]
