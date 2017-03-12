@@ -3,6 +3,7 @@ port module Client.ExtraPortal.ExtraPortal exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Dict
 import Material
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (..)
 import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewFormStatusPage)
@@ -19,6 +20,7 @@ import Http exposing (..)
 import Json.Encode as Encode exposing (encode, object, string)
 import Json.Decode as Decode exposing (list, string)
 import RemoteData exposing (sendRequest, WebData)
+import Client.Generic.WebForm.Types as WebFormTypes
 
 
 -- MODEL
@@ -85,9 +87,9 @@ initAnimStyle =
 type Msg
     = NoOp
     | ChangeView ViewState
-    | SubmitWizardProfile
+    | SubmitWizardProfile WebFormTypes.Profile
     | WizardMsg Wizard.Msg
-    | ReceiveWizardProfile (RemoteData.WebData String)
+    | ReceiveWizardProfile (RemoteData.WebData Int)
     | DailyMonitorMsg DailyMonitor.Msg
     | LoadRemoteData
     | ExtraInfoRetrieved ExtraInfo
@@ -132,34 +134,36 @@ mapWizardCmd msg =
                 _ =
                     Debug.log "Profile: " profile
             in
-                SubmitWizardProfile
+                SubmitWizardProfile profile
 
         _ ->
             NoOp
 
 
-profileBody : Wizard.Model -> Http.Body
+profileBody : WebFormTypes.Profile -> Http.Body
 profileBody profile =
-    jsonBody
-        (Encode.object
-            [ ( "profile"
-              , Encode.object
-                    [ ( "first_name", Encode.string "Bruce" )
-                    , ( "last_name", Encode.string "Williams" )
-                    , ( "street_address", Encode.string "10th avenue" )
-                    , ( "city", Encode.string "New York" )
-                    ]
-              )
-            ]
-        )
+    let
+        labelValues : List ( String, Encode.Value )
+        labelValues =
+            List.map
+                (\x -> ( x.id, Encode.string x.value ))
+                (Dict.values profile)
+    in
+        jsonBody
+            (Encode.object
+                [ ( "profile"
+                  , Encode.object labelValues
+                  )
+                ]
+            )
 
 
-submitProfileHttp : Wizard.Model -> Cmd (RemoteData.WebData String)
+submitProfileHttp : WebFormTypes.Profile -> Cmd (RemoteData.WebData Int)
 submitProfileHttp profile =
     Http.post
         "http://35.157.165.22/profiles"
         (profileBody profile)
-        (Decode.field "first_name" Decode.string)
+        (Decode.field "id" Decode.int)
         |> RemoteData.sendRequest
 
 
@@ -280,9 +284,9 @@ update msg model =
                             , clockinExtra ( "cizbke6ld32du0152funy1fe3", "10:00am" )
                             )
 
-        SubmitWizardProfile ->
+        SubmitWizardProfile profile ->
             ( model
-            , (submitProfileHttp model.wizardModel)
+            , (submitProfileHttp profile)
                 |> Cmd.map ReceiveWizardProfile
             )
 
@@ -298,7 +302,7 @@ update msg model =
                     ( model, Cmd.none )
 
                 RemoteData.Success a ->
-                    ( model
+                    ( { model | wizardProfileId = Just a }
                     , requestNextView (PageView FormStatus)
                     )
 

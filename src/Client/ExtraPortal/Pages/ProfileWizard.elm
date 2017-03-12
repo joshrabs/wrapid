@@ -112,10 +112,10 @@ categoryOrder =
 defaultProfile : Profile
 defaultProfile =
     Dict.fromList
-        [ ( "firstName", { id = "firstName", label = "First Name", value = "", category = Name } )
-        , ( "lastName", { id = "firstName", label = "Last Name", value = "", category = Name } )
-        , ( "Street", { id = "Street", label = "Street Address", value = "", category = Address } )
-        , ( "City", { id = "City", label = "City", value = "", category = Address } )
+        [ ( "firstName", { id = "first_name", label = "first_name", value = "", category = Name } )
+        , ( "lastName", { id = "last_Name", label = "last_name", value = "", category = Name } )
+        , ( "Street", { id = "street", label = "street_address", value = "", category = Address } )
+        , ( "City", { id = "city", label = "city", value = "", category = Address } )
         ]
 
 
