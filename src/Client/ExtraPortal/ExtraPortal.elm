@@ -15,6 +15,10 @@ import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Animation exposing (px)
 import Time exposing (Time)
 import Server.API.Queries.ExtraPortalQueries exposing (fetchReqExtraInfo, fetchReceiveExtraInfo)
+import Http exposing (..)
+import Json.Encode as Encode exposing (encode, object, string)
+import Json.Decode as Decode exposing (list, string)
+import RemoteData exposing (sendRequest, WebData)
 
 
 -- MODEL
@@ -42,6 +46,7 @@ type alias Model =
     , extraInfo : Maybe ExtraInfo
     , wizardModel : Wizard.Model
     , userId : UserID
+    , wizardProfileId : Maybe Int
     , animStyle : Animation.State
     , mdl : Material.Model
     , shouldShowPortalSwitcher :
@@ -56,6 +61,7 @@ initModel userId currentDate mdlModel =
       , currentView = Initializing
       , wizardModel = Wizard.init
       , userId = userId
+      , wizardProfileId = Nothing
       , extraInfo = Nothing
       , animStyle = initAnimStyle
       , mdl = mdlModel
@@ -79,7 +85,9 @@ initAnimStyle =
 type Msg
     = NoOp
     | ChangeView ViewState
+    | SubmitWizardProfile
     | WizardMsg Wizard.Msg
+    | ReceiveWizardProfile (RemoteData.WebData String)
     | DailyMonitorMsg DailyMonitor.Msg
     | LoadRemoteData
     | ExtraInfoRetrieved ExtraInfo
@@ -92,6 +100,7 @@ type Msg
 
 
 
+-- | ReceiveProfile (RemoteData.WebData String)
 --NOTE THIS IS DEVELOPMENT ONLY!
 
 
@@ -123,10 +132,35 @@ mapWizardCmd msg =
                 _ =
                     Debug.log "Profile: " profile
             in
-                ChangeView (PageView FormStatus)
+                SubmitWizardProfile
 
         _ ->
             NoOp
+
+
+profileBody : Wizard.Model -> Http.Body
+profileBody profile =
+    jsonBody
+        (Encode.object
+            [ ( "profile"
+              , Encode.object
+                    [ ( "first_name", Encode.string "Bruce" )
+                    , ( "last_name", Encode.string "Williams" )
+                    , ( "street_address", Encode.string "10th avenue" )
+                    , ( "city", Encode.string "New York" )
+                    ]
+              )
+            ]
+        )
+
+
+submitProfileHttp : Wizard.Model -> Cmd (RemoteData.WebData String)
+submitProfileHttp profile =
+    Http.post
+        "http://35.157.165.22/profiles"
+        (profileBody profile)
+        (Decode.field "first_name" Decode.string)
+        |> RemoteData.sendRequest
 
 
 updateSchedule : Schedule -> Model -> Model
@@ -245,6 +279,28 @@ update msg model =
                             ( model
                             , clockinExtra ( "cizbke6ld32du0152funy1fe3", "10:00am" )
                             )
+
+        SubmitWizardProfile ->
+            ( model
+            , (submitProfileHttp model.wizardModel)
+                |> Cmd.map ReceiveWizardProfile
+            )
+
+        ReceiveWizardProfile resp ->
+            case Debug.log "resp: " resp of
+                RemoteData.NotAsked ->
+                    ( model, Cmd.none )
+
+                RemoteData.Loading ->
+                    ( model, Cmd.none )
+
+                RemoteData.Failure e ->
+                    ( model, Cmd.none )
+
+                RemoteData.Success a ->
+                    ( model
+                    , requestNextView (PageView FormStatus)
+                    )
 
         NoOp ->
             ( model, Cmd.none )

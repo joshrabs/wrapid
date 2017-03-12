@@ -249,8 +249,8 @@ update msg model =
 
                 cmd =
                     if allComplete then
-                        -- submitProfile (profileFromWizard model.steps)
-                        Cmd.map ReceiveProfile (submitProfileHttp (profileFromWizard model.steps))
+                        submitProfile (profileFromWizard model.steps)
+                        -- Cmd.map ReceiveProfile (submitProfileHttp (profileFromWizard model.steps))
                     else
                         Cmd.none
             in
