@@ -5,6 +5,7 @@ import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Ports exposing (..)
+import Server.API.Mutations.SkinMutations exposing (uploadSkin, receiveUploadedSkin)
 
 import Date exposing (Date)
 import Date.Extra.Format exposing (format)
@@ -94,7 +95,9 @@ update msg model =
                     Skin.update subMsg model.skinModel
             in
                 ( { model | skinModel = updatedSkinModel }
-                , Cmd.none
+                , case subMsg of
+                    Skin.UploadSkin -> Cmd.none
+                    _ -> Cmd.none
                 )
         WrapMsg subMsg ->
           let

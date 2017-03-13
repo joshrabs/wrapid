@@ -35,8 +35,8 @@ type alias Model =
     , editableField : ( String, String )
     }
 
-setModelSkin: Skin -> Model -> Model
-setModelSkin skin model =
+setModelRole: Skin -> Model -> Model
+setModelRole skin model =
   let
       roles =
         skin.skinItems
@@ -101,6 +101,7 @@ type Msg
     | UpdateField (String -> Role -> Role) String String
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
+    | UploadSkin
     | Breakdown
 
 
@@ -169,6 +170,8 @@ update msg model =
             let
                 ( updatedAddRolesModel, addRolesCmd ) =
                     AddRoles.update subMsg model.addRoles
+
+                l = Debug.log "Role model!!! " updatedAddRolesModel
             in
                 ( { model | addRoles = updatedAddRolesModel }
                 , Cmd.map AddRolesMsg addRolesCmd
@@ -178,11 +181,26 @@ update msg model =
             let
                 rs =
                     addIdToRoles (model.roles ++ AddRoles.toRoles (model.addRoles))
+
+                skinItems =
+                    rs
+                      |> List.map (\r ->
+                        {part=r.role
+                        , pay=r.pay
+                        , callStart=r.callStart
+                        , firstName=""
+                        , lastName=""
+                        , avatar={url=Nothing}
+                        , userId=""})
+
+                newSkin = {effectiveDt="2017-03-17", skinItems=skinItems }
             in
-                ( { model | roles = rs }
+                ( { model | roles = rs, skin = Just newSkin }
                 , Cmd.none
                 )
 
+        UploadSkin ->
+          (model, Cmd.none )
         EditRoles string ->
             ( { model | editRole = string }
             , Cmd.none
@@ -288,8 +306,9 @@ panelFooter mdl =
             mdl
             [ Button.ripple
             , Button.accent
+            , Options.onClick UploadSkin
             ]
-            [ text "Wrap Skin" ]
+            [ text "Save Skin" ]
         ]
 
 
