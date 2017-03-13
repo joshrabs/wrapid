@@ -7,6 +7,8 @@ import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Ports exposing (..)
 
 import Date exposing (Date)
+import Date.Extra.Format exposing (format)
+import Date.Extra.Config.Config_en_us exposing (config)
 import Task exposing (perform, succeed)
 import Material
 
@@ -30,12 +32,12 @@ type Msg
     | LoadRemoteData
     | SetSelectedDate Date
     | ReceiveExtraActivity (List ExtraActivity)
-    | ReceiveDailySkin Skin
+    | ReceiveDailySkin (Maybe Skin)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
 
-    
+
 initModel: String -> Maybe Date -> Maybe SelectedDate -> Material.Model -> (Model, Cmd Msg)
 initModel userId currentDate selectedDate materialModel =
   let
@@ -54,9 +56,9 @@ initModel userId currentDate selectedDate materialModel =
         case selectedDate of
           Just date -> date
           Nothing -> currentDate
-    , currentView = LiveMonitor
+    , currentView = Initializing
     , currentSkin = Nothing
-    , skinModel = Skin.initModel
+    , skinModel = Skin.initModel Nothing
     , wrapModel = Wrap.initModel
     , liveModel = LiveMonitor.initState materialModel
     , mdl = materialModel
@@ -70,14 +72,21 @@ update msg model =
         ChangeView view ->
             ( { model | currentView = view }, Cmd.none )
         LoadRemoteData ->
-          (model, fetchDailySkin("2017-03-07"))
+            let
+              date =
+                model.currentDate
+                  |> Maybe.map (Date.Extra.Format.format Date.Extra.Config.Config_en_us.config "%d-%m-%Y!!!")
+                  |> Maybe.withDefault ""
+              l = Debug.log "DATE!!!!!!: " date
+            in
+              (model, fetchDailySkin(date))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         ReceiveExtraActivity extraActivity ->
           ({model | extraActivity = Success extraActivity}, Cmd.none)
 
         ReceiveDailySkin skin ->
-          ({model | currentSkin = Just skin}, getAllExtraInfo("2017-03-03"))
+          ({model | currentSkin = skin, currentView = SkinManager}, getAllExtraInfo("2017-03-03"))
 
         SkinMsg subMsg ->
             let

@@ -26,6 +26,7 @@ type alias Model =
     { mdl : Material.Model
     , addRoles : AddRoles.Model
     , editRole : String
+    , skin : Maybe Skin
     , roles : List Role
     , tableState : Table.State
     , query : String
@@ -62,11 +63,12 @@ skinItemToRole id skinItem =
       , selected = False
       }
 
-initModel : Model
-initModel =
+initModel : Maybe Skin -> Model
+initModel skin =
     { mdl = Material.model
     , addRoles = AddRoles.init
     , editRole = ""
+    , skin = skin
     , roles = initRoles
     , tableState = (Table.initialSort "Role")
     , query = ""
@@ -76,9 +78,9 @@ initModel =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initModel, Cmd.none )
+init : Maybe Skin -> ( Model, Cmd Msg )
+init skin =
+    ( initModel skin, Cmd.none )
 
 
 
@@ -293,10 +295,17 @@ panelFooter mdl =
 
 panelBody : Model -> Html Msg
 panelBody model =
-    div []
-        [ viewAddRoles model.mdl model.dialogOpened model.addRoles
-        , viewTableWithSearch model
-        ]
+  case model.skin of
+    Just skin ->
+      div []
+          [ viewAddRoles model.mdl model.dialogOpened model.addRoles
+          , viewTableWithSearch model
+          ]
+    Nothing ->
+      div []
+      [div [] [text "Currently no skin for the day"]
+      ,viewAddRoles model.mdl AddDialog model.addRoles
+      ]
 
 
 viewAddRoles : Material.Model -> Dialog -> AddRoles.Model -> Html Msg
@@ -305,7 +314,7 @@ viewAddRoles mdl dialog addRolessModel =
         AddDialog ->
             div []
                 [ Html.map AddRolesMsg (AddRoles.view addRolessModel)
-                , button [ onClick AddRoles ] [ text "ADD ROLES" ]
+                , button [ onClick AddRoles ] [ text "ADD Extras" ]
                 ]
 
         EditDialog ->

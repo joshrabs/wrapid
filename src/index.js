@@ -124,6 +124,10 @@ app.ports.fetchDailySkin.subscribe(function (date) {
       console.log(result.data);
       const {data} = result;
       const skinResult = data.allSkins.length > 0 ? data.allSkins[0] : null;
+      if(!skinResult){
+        app.ports.receiveDailySkin.send(null);
+        return;
+      }
       const {skinItems} = skinResult;
       const frmtSkinItems = skinItems.map(function (item) {
         console.log(item);

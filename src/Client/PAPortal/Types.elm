@@ -18,7 +18,8 @@ type alias ExtraActivity =
 type alias SelectedDate = Maybe Date
 
 type ViewState
-    = LiveMonitor
+    = Initializing
+    | LiveMonitor
     | SkinManager
     | Wrap
 

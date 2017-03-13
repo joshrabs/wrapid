@@ -21,6 +21,8 @@ viewPAPortal model =
         --     Nothing -> div [] []
         , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
           [case model.currentView of
+            Initializing ->
+              viewLoadingScreen
             LiveMonitor ->
               case model.currentSkin of
                 Nothing -> viewLoadingScreen
