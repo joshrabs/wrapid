@@ -131,13 +131,13 @@ app.ports.fetchDailySkin.subscribe(function (date) {
       const {skinItems} = skinResult;
       const frmtSkinItems = skinItems.map(function (item) {
         console.log(item);
-        const {user, role, pay, callStartTs} = item;
+        const {user, part, pay, callStartTs} = item;
         const {firstName, lastName, avatar} = user.baseprofile;
         let sAvatar = avatar;
         if (!avatar) {
           sAvatar = {url: null};
         }
-        return {userId: user.id, firstName, lastName, part: role, pay, avatar: sAvatar, callStart: callStartTs};
+        return {userId: user.id, firstName, lastName, part, pay, avatar: sAvatar, callStart: callStartTs};
       });
       console.log(frmtSkinItems);
       const skin = {effectiveDt: date, skinItems: frmtSkinItems};
@@ -173,6 +173,26 @@ app.ports.addScheduleItem.subscribe(function (params) {
       console.log(error);
     });
 });
+
+app.ports.uploadSkin.subscribe(function(params){
+  console.log(params)
+  let {effectiveDt, skinItems} = params
+  console.log(effectiveDt)
+  console.log(skinItems)
+  skinItems = skinItems.map(function(si) {
+    return {"callStartTs": si.callStart, "callEndTs": "", pay: si.pay, part: si.part}
+  })
+  console.log(skinItems)
+  client.uploadSkin(effectiveDt, skinItems)
+    .then(result => {
+      console.log(result);
+      const skin = result.Data;
+      app.ports.receiveDailySkin.send(skin);
+    })
+    .catch(error => {
+      console.error(error);
+    })
+})
 
 function uploadFile (event) {
   const file = event.target.files[0];

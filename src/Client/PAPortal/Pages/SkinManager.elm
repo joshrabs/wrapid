@@ -55,7 +55,6 @@ rolesToSkin roles =
               ,callStart = r.callStart
               ,firstName=r.first
               ,lastName = r.last
-              ,avatar = {url = Nothing}
               ,userId=r.email
               }
             )
@@ -208,7 +207,6 @@ update msg model =
                         , callStart=r.callStart
                         , firstName=""
                         , lastName=""
-                        , avatar={url=Nothing}
                         , userId=""})
 
                 newSkin = {effectiveDt="2017-03-17", skinItems=skinItems }

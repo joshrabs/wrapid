@@ -226,7 +226,7 @@ const fetchDailySkinGQL = gql`query getDailySkin($date:String){
           avatar{url}
         }
       }
-      role
+      part
       pay
       callStartTs
     }
@@ -345,6 +345,27 @@ mutation ($statusId: ID!) {
   }
 }`;
 
+
+const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinItemsSkinItem!]){
+  createSkin(effectiveDt:$effectiveDt, skinItems:$skinItems){
+    effectiveDt
+    skinItems{
+      id
+      user {
+        baseprofile{
+          id
+          firstName
+          lastName
+        }
+      }
+      callStartTs
+      callEndTs
+      pay
+      part
+    }
+  }
+}`
+
 export default {
 
   // subscriptions
@@ -436,6 +457,14 @@ export default {
     const mutation = addScheduleItemGQL;
     const {startTm, endTm, category, name} = scheduleItem;
     const variables = {scheduleId: 'cizbzpnmaw6m80148bpys69a6', startTm, endTm, category, name};
+    return client.mutate({mutation, variables});
+  },
+
+  uploadSkin: function(effectiveDt, skinItems){
+    const mutation = uploadSkinGQL;
+    console.log(mutation)
+    const variables = {effectiveDt, skinItems};
+    console.log(variables);
     return client.mutate({mutation, variables});
   },
 

@@ -6,7 +6,7 @@ import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
 import Ports exposing (..)
-import Server.API.Mutations.SkinMutations exposing (uploadSkin, receiveUploadedSkin)
+import Server.API.Mutations.SkinMutations as Server exposing (uploadSkin, receiveUploadedSkin)
 
 import Date exposing (Date)
 import Date.Extra.Format exposing (format)
@@ -109,7 +109,7 @@ update msg model =
                       let
                           roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles)
                       in
-                          Cmd.none
+                          Server.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles)
                     _ -> Cmd.none
                 )
         WrapMsg subMsg ->
@@ -129,7 +129,8 @@ update msg model =
           in
               ( { model | liveModel = updatedLMModel }
               , case subMsg of
-                  SubmitTaskByRole item -> addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
+                  SubmitTaskByRole item ->
+                    addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
         SkinUploadPageMsg subMsg ->

@@ -57,7 +57,7 @@ skinToExtraInfo skin =
          , lastName=si.lastName
          , role=si.part
          , pay=si.pay
-         , avatar=si.avatar
+         , avatar={url=Nothing}
         })
 
 viewHeader : ViewState -> Html Msg
