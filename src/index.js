@@ -131,16 +131,17 @@ app.ports.fetchDailySkin.subscribe(function (date) {
       const {skinItems} = skinResult;
       const frmtSkinItems = skinItems.map(function (item) {
         console.log(item);
-        const {user, role, pay} = item;
+        const {user, role, pay, callStartTs} = item;
         const {firstName, lastName, avatar} = user.baseprofile;
         let sAvatar = avatar;
         if (!avatar) {
           sAvatar = {url: null};
         }
-        return {userId: user.id, firstName, lastName, part: role, pay, avatar: sAvatar};
+        return {userId: user.id, firstName, lastName, part: role, pay, avatar: sAvatar, callStart: callStartTs};
       });
       console.log(frmtSkinItems);
       const skin = {effectiveDt: date, skinItems: frmtSkinItems};
+      console.log(skin)
       app.ports.receiveDailySkin.send(skin);
     })
     .catch(error => {

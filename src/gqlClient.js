@@ -228,6 +228,7 @@ const fetchDailySkinGQL = gql`query getDailySkin($date:String){
       }
       role
       pay
+      callStartTs
     }
   }
 }`;

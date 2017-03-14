@@ -21,6 +21,7 @@ type ViewState
     = Initializing
     | LiveMonitor
     | SkinManager
+    | SkinUploadPage
     | Wrap
 
 type alias PAProfile =

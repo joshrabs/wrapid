@@ -4,6 +4,7 @@ import Client.PAPortal.Types exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
+import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
 import Ports exposing (..)
 import Server.API.Mutations.SkinMutations exposing (uploadSkin, receiveUploadedSkin)
 
@@ -37,6 +38,7 @@ type Msg
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
+    | SkinUploadPageMsg SkinUploadPage.Msg
 
 
 initModel: String -> Maybe Date -> Maybe SelectedDate -> Material.Model -> (Model, Cmd Msg)
@@ -87,7 +89,14 @@ update msg model =
           ({model | extraActivity = Success extraActivity}, Cmd.none)
 
         ReceiveDailySkin skin ->
-          ({model | currentSkin = skin, currentView = SkinManager}, getAllExtraInfo("2017-03-03"))
+          let
+              newView =
+                case skin of
+                  Just skin -> SkinManager
+                  Nothing -> SkinUploadPage
+          in
+
+          ({model | currentSkin = skin, currentView = newView, skinModel=Skin.initModel skin}, getAllExtraInfo("2017-03-03"))
 
         SkinMsg subMsg ->
             let
@@ -119,6 +128,8 @@ update msg model =
                   SubmitTaskByRole item -> addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
+        SkinUploadPageMsg subMsg ->
+          (model, fetchDailySkin("2017-03-07"))
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
