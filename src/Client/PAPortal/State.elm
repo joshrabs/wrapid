@@ -105,7 +105,11 @@ update msg model =
             in
                 ( { model | skinModel = updatedSkinModel }
                 , case subMsg of
-                    Skin.UploadSkin -> Cmd.none
+                    Skin.UploadSkin ->
+                      let
+                          roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles)
+                      in
+                          Cmd.none
                     _ -> Cmd.none
                 )
         WrapMsg subMsg ->

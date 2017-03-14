@@ -44,6 +44,24 @@ setModelRole skin model =
   in
       ({model | roles = roles})
 
+rolesToSkin: List Role -> Skin
+rolesToSkin roles =
+  let
+      skinItems =
+        roles
+          |> List.map (\r ->
+              {part = r.role
+              ,pay = r.pay
+              ,callStart = r.callStart
+              ,firstName=r.first
+              ,lastName = r.last
+              ,avatar = {url = Nothing}
+              ,userId=r.email
+              }
+            )
+  in
+      {effectiveDt="2017-03-08", skinItems=skinItems}
+
 
 skinItemToRole: Int -> SkinItem -> Role
 skinItemToRole id skinItem =
@@ -419,7 +437,7 @@ topButtons mdl checkedAll =
         , Textfield.render Mdl
             [ 0 ]
             mdl
-            [ Textfield.label "Search by Role"
+            [ Textfield.label "Search"
             , Textfield.floatingLabel
             , Options.dispatch Batch
             , Options.onInput SetQuery
