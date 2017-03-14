@@ -134,7 +134,8 @@ update msg model =
                   _ -> Cmd.none
               )
         SkinUploadPageMsg subMsg ->
-          (model, fetchDailySkin("2017-03-07"))
+              ({model | currentView=SkinManager}, Cmd.none)
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

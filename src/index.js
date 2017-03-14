@@ -180,14 +180,33 @@ app.ports.uploadSkin.subscribe(function(params){
   console.log(effectiveDt)
   console.log(skinItems)
   skinItems = skinItems.map(function(si) {
-    return {"callStartTs": si.callStart, "callEndTs": "", pay: si.pay, part: si.part}
+    return {
+      "callStartTs": si.callStart
+      , "callEndTs": ""
+      , pay: si.pay
+      , part: si.part
+      , email: si.userId
+    }
   })
   console.log(skinItems)
   client.uploadSkin(effectiveDt, skinItems)
     .then(result => {
       console.log(result);
-      const skin = result.Data;
-      app.ports.receiveDailySkin.send(skin);
+      const skin = result.data.createSkin;
+
+      const {skinItems} = skin;
+      skinItems.map(function(si) {
+        console.log(si)
+        const skinItemId = si.id
+        client.createExtra(si.email, "Bob", skinItemId)
+          .then(result => {
+            console.log(result);
+          })
+          .catch(error => {
+            console.error(error);
+          })
+      })
+      //app.ports.receiveDailySkin.send(skin);
     })
     .catch(error => {
       console.error(error);
