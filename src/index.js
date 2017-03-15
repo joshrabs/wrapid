@@ -186,19 +186,36 @@ app.ports.uploadSkin.subscribe(function(params){
       , pay: si.pay
       , part: si.part
       , email: si.userId
+      , firstName: si.firstName
+      , lastName: si.lastName
     }
   })
   console.log(skinItems)
   client.uploadSkin(effectiveDt, skinItems)
     .then(result => {
       console.log(result);
-      const skin = result.data.createSkin;
+      const skinCreate = result.data.createSkin;
 
-      const {skinItems} = skin;
-      skinItems.map(function(si) {
+      const {skinItems} = skinCreate;
+      const skinItemsFrmt = skinItems.map(function(si) {
         console.log(si)
-        const skinItemId = si.id
-        client.createExtra(si.email, "Bob", skinItemId)
+        const userId = si.id
+        return {
+            part: si.part
+          , pay: si.pay
+          , email: si.email
+          , callStart: si.callStartTs
+          , callEnd: si.callEndTs
+          , userId
+          , firstName: si.firstName
+          , lastName: si.lastName
+        }
+      })
+
+      console.log(skinItemsFrmt)
+
+      skinItemsFrmt.forEach(function(si) {
+        client.createExtra(si.email, si.firstName, si.userId)
           .then(result => {
             console.log(result);
           })
@@ -206,7 +223,9 @@ app.ports.uploadSkin.subscribe(function(params){
             console.error(error);
           })
       })
-      //app.ports.receiveDailySkin.send(skin);
+
+      const skin = {effectiveDt: skinCreate.effectiveDt, skinItems: skinItemsFrmt}
+      app.ports.receiveDailySkin.send(skin);
     })
     .catch(error => {
       console.error(error);

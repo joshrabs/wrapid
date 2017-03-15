@@ -61,13 +61,19 @@ initModel userId currentDate selectedDate materialModel =
           Nothing -> currentDate
     , currentView = Initializing
     , currentSkin = Nothing
-    , skinModel = Skin.initModel Nothing
+    , skinModel = Skin.initModel Nothing (getDateStr currentDate)
     , wrapModel = Wrap.initModel
     , liveModel = LiveMonitor.initState materialModel
     , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
     )
+
+getDateStr: Maybe Date -> String
+getDateStr date =
+    date
+      |> Maybe.map (Date.Extra.Format.format Date.Extra.Config.Config_en_us.config "%Y-%m-%d")
+      |> Maybe.withDefault ""
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -76,10 +82,7 @@ update msg model =
             ( { model | currentView = view }, Cmd.none )
         LoadRemoteData ->
             let
-              date =
-                model.currentDate
-                  |> Maybe.map (Date.Extra.Format.format Date.Extra.Config.Config_en_us.config "%d-%m-%Y!!!")
-                  |> Maybe.withDefault ""
+              date = getDateStr model.currentDate
               l = Debug.log "DATE!!!!!!: " date
             in
               (model, fetchDailySkin(date))
@@ -94,22 +97,28 @@ update msg model =
                 case skin of
                   Just skin -> SkinManager
                   Nothing -> SkinUploadPage
+
+              date = getDateStr model.currentDate
+              dLog = Debug.log "d: " date
           in
 
-          ({model | currentSkin = skin, currentView = newView, skinModel=Skin.initModel skin}, getAllExtraInfo("2017-03-03"))
+          ({model | currentSkin = skin, currentView = newView, skinModel=Skin.initModel skin date}, getAllExtraInfo(date))
 
         SkinMsg subMsg ->
             let
                 ( updatedSkinModel, skinCmd ) =
                     Skin.update subMsg model.skinModel
+
+                dateStr = getDateStr model.currentDate
             in
                 ( { model | skinModel = updatedSkinModel }
                 , case subMsg of
                     Skin.UploadSkin ->
                       let
-                          roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles)
+                          roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles dateStr)
+                          d = Debug.log "datestr!!: " dateStr
                       in
-                          Server.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles)
+                          Server.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles dateStr)
                     _ -> Cmd.none
                 )
         WrapMsg subMsg ->

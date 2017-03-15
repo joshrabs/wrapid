@@ -18,6 +18,7 @@ import Material.Button as Button
 import Touch exposing (TouchEvent(..), Touch)
 import SingleTouch exposing (SingleTouch, onSingleTouch)
 
+import Date exposing (Date)
 
 -- MODEL
 
@@ -26,6 +27,7 @@ type alias Model =
     { mdl : Material.Model
     , addRoles : AddRoles.Model
     , editRole : String
+    , selectedDate : String
     , skin : Maybe Skin
     , roles : List Role
     , tableState : Table.State
@@ -44,8 +46,8 @@ setModelRole skin model =
   in
       ({model | roles = roles})
 
-rolesToSkin: List Role -> Skin
-rolesToSkin roles =
+rolesToSkin: List Role -> String -> Skin
+rolesToSkin roles date =
   let
       skinItems =
         roles
@@ -59,7 +61,7 @@ rolesToSkin roles =
               }
             )
   in
-      {effectiveDt="2017-03-08", skinItems=skinItems}
+      {effectiveDt=date, skinItems=skinItems}
 
 
 skinItemToRole: Int -> SkinItem -> Role
@@ -80,11 +82,12 @@ skinItemToRole id skinItem =
       , selected = False
       }
 
-initModel : Maybe Skin -> Model
-initModel skin =
+initModel : Maybe Skin -> String -> Model
+initModel skin date =
     { mdl = Material.model
     , addRoles = AddRoles.init
     , editRole = ""
+    , selectedDate = date
     , skin = skin
     , roles = initRoles
     , tableState = (Table.initialSort "Role")
@@ -95,9 +98,11 @@ initModel skin =
     }
 
 
-init : Maybe Skin -> ( Model, Cmd Msg )
-init skin =
-    ( initModel skin, Cmd.none )
+
+
+init : Maybe Skin -> String -> ( Model, Cmd Msg )
+init skin date =
+    ( initModel skin date, Cmd.none )
 
 
 

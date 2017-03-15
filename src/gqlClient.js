@@ -364,6 +364,8 @@ const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinIte
       pay
       part
       email
+      firstName
+      lastName
     }
   }
 }`
