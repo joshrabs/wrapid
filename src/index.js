@@ -185,7 +185,7 @@ app.ports.uploadSkin.subscribe(function(params){
       , "callEndTs": ""
       , pay: si.pay
       , part: si.part
-      , email: si.userId
+      , email: si.email
       , firstName: si.firstName
       , lastName: si.lastName
     }
@@ -215,7 +215,7 @@ app.ports.uploadSkin.subscribe(function(params){
       console.log(skinItemsFrmt)
 
       skinItemsFrmt.forEach(function(si) {
-        client.createExtra(si.email, si.firstName, si.userId)
+        client.createExtra(si.email, si.firstName, si.lastName, si.userId)
           .then(result => {
             console.log(result);
           })

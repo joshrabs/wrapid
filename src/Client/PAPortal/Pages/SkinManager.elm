@@ -37,14 +37,10 @@ type alias Model =
     , editableField : ( String, String )
     }
 
-setModelRole: Skin -> Model -> Model
-setModelRole skin model =
-  let
-      roles =
-        skin.skinItems
-          |> List.indexedMap skinItemToRole
-  in
-      ({model | roles = roles})
+setRoles: Skin -> List Role
+setRoles skin =
+    skin.skinItems
+      |> List.indexedMap skinItemToRole
 
 rolesToSkin: List Role -> String -> Skin
 rolesToSkin roles date =
@@ -57,7 +53,7 @@ rolesToSkin roles date =
               ,callStart = r.callStart
               ,firstName=r.first
               ,lastName = r.last
-              ,userId=r.email
+              ,email=r.email
               }
             )
   in
@@ -70,14 +66,14 @@ skinItemToRole id skinItem =
       , role = skinItem.part
       , first = skinItem.firstName
       , last = skinItem.lastName
-      , callStart = ""
+      , callStart = skinItem.callStart
       , pay = skinItem.pay
       , lunchStart = ""
       , lunchLength = ""
       , clockIn = ""
       , clockOut = ""
       , callEnd = ""
-      , email = ""
+      , email = skinItem.email
       , sum  = ""
       , selected = False
       }
@@ -89,7 +85,10 @@ initModel skin date =
     , editRole = ""
     , selectedDate = date
     , skin = skin
-    , roles = initRoles
+    , roles =
+        case skin of
+          Just skin -> setRoles skin
+          Nothing -> initRoles
     , tableState = (Table.initialSort "Role")
     , query = ""
     , dialogOpened = NoDialog
@@ -212,7 +211,7 @@ update msg model =
                         , callStart=r.callStart
                         , firstName=""
                         , lastName=""
-                        , userId=""})
+                        , email=""})
 
                 newSkin = {effectiveDt="2017-03-17", skinItems=skinItems }
             in

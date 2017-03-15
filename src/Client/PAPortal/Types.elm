@@ -43,7 +43,7 @@ type alias Skin =
   }
 
 type alias SkinItem =
-  {userId: String
+  {email: String
   ,firstName: String
   ,lastName: String
   ,part: String

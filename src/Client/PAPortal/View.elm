@@ -52,7 +52,7 @@ skinToExtraInfo skin =
   skin.skinItems
     |> List.map
         (\si ->
-         {extraId=si.userId
+         {extraId=si.email
          , firstName = si.firstName
          , lastName=si.lastName
          , role=si.part

@@ -370,12 +370,12 @@ const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinIte
   }
 }`
 
-const createExtraGQL = gql`mutation createExtra($email:String!, $firstName:String!, $skinItemId:ID!){
+const createExtraGQL = gql`mutation createExtra($email:String!, $firstName:String!, $lastName:String!, $skinItemId:ID!){
   createUser(
       employeeType:Extra
     , baseprofile:{
       	firstName:$firstName
-      , lastName:"guy"
+      , lastName:$lastName
       , email:$email
     }
   	, skinItemId:$skinItemId
@@ -460,9 +460,9 @@ export default {
 
   // Mutations
 
-  createExtra: function(email, firstName, skinItemId) {
+  createExtra: function(email, firstName, lastName, skinItemId) {
     const mutation = createExtraGQL;
-    const variables = { email, firstName, skinItemId };
+    const variables = { email, firstName, lastName, skinItemId };
     return client.mutate({ mutation, variables });
   },
 
