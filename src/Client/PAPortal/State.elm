@@ -5,12 +5,11 @@ import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
+import Client.Utilities.DateTime exposing (frmtDate)
 import Ports exposing (..)
 import Server.API.Mutations.SkinMutations as Server exposing (uploadSkin, receiveUploadedSkin)
 
 import Date exposing (Date)
-import Date.Extra.Format exposing (format)
-import Date.Extra.Config.Config_en_us exposing (config)
 import Task exposing (perform, succeed)
 import Material
 
@@ -61,19 +60,13 @@ initModel userId currentDate selectedDate materialModel =
           Nothing -> currentDate
     , currentView = Initializing
     , currentSkin = Nothing
-    , skinModel = Skin.initModel Nothing (getDateStr currentDate)
+    , skinModel = Skin.initModel Nothing (frmtDate currentDate)
     , wrapModel = Wrap.initModel
     , liveModel = LiveMonitor.initState materialModel
     , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
     )
-
-getDateStr: Maybe Date -> String
-getDateStr date =
-    date
-      |> Maybe.map (Date.Extra.Format.format Date.Extra.Config.Config_en_us.config "%Y-%m-%d")
-      |> Maybe.withDefault ""
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -82,7 +75,7 @@ update msg model =
             ( { model | currentView = view }, Cmd.none )
         LoadRemoteData ->
             let
-              date = getDateStr model.currentDate
+              date = frmtDate model.currentDate
               l = Debug.log "DATE!!!!!!: " date
             in
               (model, fetchDailySkin(date))
@@ -98,7 +91,7 @@ update msg model =
                   Just skin -> SkinManager
                   Nothing -> SkinUploadPage
 
-              date = getDateStr model.currentDate
+              date = frmtDate model.currentDate
               dLog = Debug.log "d: " date
           in
 
@@ -109,7 +102,7 @@ update msg model =
                 ( updatedSkinModel, skinCmd ) =
                     Skin.update subMsg model.skinModel
 
-                dateStr = getDateStr model.currentDate
+                dateStr = frmtDate model.currentDate
             in
                 ( { model | skinModel = updatedSkinModel }
                 , case subMsg of

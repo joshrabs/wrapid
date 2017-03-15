@@ -17,7 +17,14 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
   client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
-      const {baseprofile, timecards, extraschedule} = result.data.User;
+      const skin = result.data.allSkins[0];
+      if(skin.length != 1){
+        //error!
+      }
+      console.log(skin)
+      const skinItem = skin.skinItems[0]
+      console.log(skinItem)
+      const {baseprofile, timecards, extraschedule} = skin.skinItems[0].user;
       console.log(baseprofile);
       console.log('timecards!', timecards);
       const timecard = timecards.length > 0 ? timecards[0] : null;
@@ -131,13 +138,13 @@ app.ports.fetchDailySkin.subscribe(function (date) {
       const {skinItems} = skinResult;
       const frmtSkinItems = skinItems.map(function (item) {
         console.log(item);
-        const {user, part, pay, callStartTs} = item;
+        const {user, part, pay, callStartTs, email} = item;
         const {firstName, lastName, avatar} = user.baseprofile;
         let sAvatar = avatar;
         if (!avatar) {
           sAvatar = {url: null};
         }
-        return {userId: user.id, firstName, lastName, part, pay, avatar: sAvatar, callStart: callStartTs};
+        return {email, firstName, lastName, part, pay, avatar: sAvatar, callStart: callStartTs};
       });
       console.log(frmtSkinItems);
       const skin = {effectiveDt: date, skinItems: frmtSkinItems};

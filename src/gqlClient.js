@@ -153,28 +153,36 @@ const clockoutExtra = gql`mutation clockoutExtra($id: ID!, $clockoutTs: String)
   }
 `;
 
-const getExtraInfo = gql`
-  query getDaysExtraInfo($userId:ID, $date:String){
-    User(id:$userId){
-      baseprofile {
-        avatar { url }
-        firstName
-        lastName
-      },
-      extraschedule (filter: {date:$date}){
-        id
-        extrascheduleitemses(orderBy:startTm_ASC){
-          name
-          category
-          startTm
-          endTm
+const getExtraInfoGQL = gql`
+  query getExtraDayInfo($email:String, $date:String){
+    allSkins(filter: {effectiveDt:$date}){
+      effectiveDt
+      skinItems(filter: {email:$email}){
+        user{
+          id
+          baseprofile{
+            firstName
+            lastName
+            avatar{url}
+          }
+          extraschedule (filter: {date:$date}){
+            id
+            extrascheduleitemses(orderBy:startTm_ASC){
+              name
+              category
+              startTm
+              endTm
+            }
+          },
+          timecards(filter: {effectiveDt: $date}) {
+            id,
+            effectiveDt,
+            clockinTs,
+            clockoutTs
+          }
         }
-      },
-      timecards(filter: {effectiveDt: $date}) {
-        id,
-        effectiveDt,
-        clockinTs,
-        clockoutTs
+        part
+        pay
       }
     }
   }
@@ -229,6 +237,7 @@ const fetchDailySkinGQL = gql`query getDailySkin($date:String){
       part
       pay
       callStartTs
+      email
     }
   }
 }`;
@@ -424,9 +433,9 @@ export default {
     return client.query({ query, variables });
   },
 
-  getExtraInfo: function (userId, date) {
-    const query = getExtraInfo;
-    const variables = { userId, date };
+  getExtraInfo: function (email, date) {
+    const query = getExtraInfoGQL;
+    const variables = { email, date };
     return client.query({ query, variables });
   },
 

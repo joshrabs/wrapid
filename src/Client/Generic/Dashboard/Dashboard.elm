@@ -173,7 +173,7 @@ viewAvatar url =
             text "Error Loading Avatar"
 
         Just loc ->
-            img [ style [ ( "width", "40px" ), ( "border-radius", "50%" ) ], src loc ] []
+            img [ style [ ( "width", "40px" ), ("height", "40px"), ( "border-radius", "50%" ) ], src loc ] []
 
 
 viewHamburgerMenu : Html msg
