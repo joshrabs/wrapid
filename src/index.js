@@ -242,7 +242,7 @@ app.ports.uploadSkin.subscribe(function(params){
                 console.log(error);
               });
 
-            client.createTimecard(userId, "", "", effectiveDt)
+            client.createTimecard(userId, null, null, effectiveDt)
               .then(result => {
                 console.log('timecard created!', result)
               })
