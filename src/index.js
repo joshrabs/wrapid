@@ -269,7 +269,9 @@ app.ports.uploadSkin.subscribe(function(params){
     })
 })
 
-function uploadFile (event) {
+function uploadFile (event, id, onUploadFuncName) {
+  console.log(event)
+  console.log(onUploadFuncName)
   const file = event.target.files[0];
   const data = new window.FormData();
   data.append('data', file);
@@ -279,22 +281,39 @@ function uploadFile (event) {
   xhr.onreadystatechange = () => {
     if (xhr.readyState === xhr.DONE) {
       const response = JSON.parse(xhr.responseText);
-      client.updateWardrobeStatusFile(this.id, response.id)
-        .then(result => app.ports.receiveWardrobeStatusUpdate.send(result))
-        .then(window.alert('OK!'));
-      event.target.removeEventListener('change', uploadFile);
-      event.target.value = null;
+      uploadPortMap[onUploadFuncName](id, response)
     }
   };
 
   xhr.send(data);
 }
 
-app.ports.selectWardrobePhoto.subscribe((id) => {
+const updateWardrobeStatusFile = (id, response) => {
+  client.updateWardrobeStatusFile(id, id)
+    .then(result => app.ports.receiveWardrobeStatusUpdate.send(result))
+  event.target.removeEventListener('change', uploadFile);
+  event.target.value = null;
+}
+
+const uploadProfilePhoto = (id, response) => {
+
+}
+
+const uploadPortMap =
+  {updateWardrobeStatusFile: (id, response) => updateWardrobeStatusFile(id, response)
+  ,uploadProfilePhoto
+  }
+
+app.ports.selectWardrobePhoto.subscribe((params) => {
+
+  const id = params[0]
+  const onUploadFuncName = params[1]
+  console.log(id)
+  console.log(onUploadFuncName)
   const node = document.getElementById(id);
   node.click();
 
-  node.addEventListener('change', uploadFile);
+  node.addEventListener('change', (e) => uploadFile(e, id, onUploadFuncName));
 });
 
 app.ports.getAllWardrobeStatuses.subscribe(() => {
