@@ -249,6 +249,12 @@ app.ports.uploadSkin.subscribe(function(params){
               .catch(error => {
                 console.error(error);
               })
+
+            client.createExtraWardrobeCard(userId, effectiveDt)
+              .then(result => {
+                console.log('Created wardrobe card!', result);
+              })
+              .catch(error => console.error(error))
           })
           .catch(error => {
             console.error(error);

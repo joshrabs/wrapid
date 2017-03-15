@@ -395,6 +395,14 @@ const createExtraGQL = gql`mutation createExtra($email:String!, $firstName:Strin
   }
 }`
 
+const createExtraWardrobeCardGQL = gql`
+  mutation createExtraWardrobeCard($userId:ID!, $date:String!){
+   createExtraWardrobeStatus(date:$date, userId:$userId, checkStatus:NOTCHECKEDOUT){
+     id
+   }
+  }
+`
+
 export default {
 
   // subscriptions
@@ -502,6 +510,12 @@ export default {
     console.log(mutation)
     const variables = {effectiveDt, skinItems};
     console.log(variables);
+    return client.mutate({mutation, variables});
+  },
+
+  createExtraWardrobeCard: function(userId, date){
+    const mutation = createExtraWardrobeCardGQL;
+    const variables = {userId, date};
     return client.mutate({mutation, variables});
   },
 
