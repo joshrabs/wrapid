@@ -35,7 +35,8 @@ type alias NotificationBell =
 type alias Notification =
     String
 
-
+defaultAvatar =
+    "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 --UPDATE
 
@@ -152,7 +153,7 @@ viewRightItems rightItems =
                             div [] [ viewAvatar avatar ]
 
                         Nothing ->
-                            div [] [ text "not showing an avatar?!" ]
+                            div [] [ ]
 
                 Nothing ->
                     div [] []
@@ -168,12 +169,15 @@ rightItemBox htmlMsg =
 
 viewAvatar : Avatar -> Html msg
 viewAvatar url =
-    case url of
-        Nothing ->
-            text "Error Loading Avatar"
+    img [ style [ ( "width", "40px" ), ("height", "40px"), ( "border-radius", "50%" ) ]
+      , src
+          (case url of
+            Nothing -> defaultAvatar
+            Just loc -> loc
+          )
+        ]
+        []
 
-        Just loc ->
-            img [ style [ ( "width", "40px" ), ("height", "40px"), ( "border-radius", "50%" ) ], src loc ] []
 
 
 viewHamburgerMenu : Html msg

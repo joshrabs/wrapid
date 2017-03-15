@@ -82,12 +82,13 @@ const createUser = gql`mutation($firstName: String!)
   }
 `;
 
-const createSchedule = gql`mutation($date: String!, $title: String!, $startTm: String!)
+const createScheduleGQL = gql`mutation createExtraSchedule($userId:ID!, $date: String!, $name: String!, $startTm: String!)
   {
     createExtraSchedule(
+      userId:$userId
       date: $date
       extrascheduleitemses: {
-        title: $title
+        name: $name
         startTm: $startTm
       }
     ) {
@@ -188,7 +189,7 @@ const getExtraInfoGQL = gql`
   }
 `;
 
-const createTimecard = gql`mutation createTimecard($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
+const createTimecardGQL = gql`mutation createTimecard($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
   createTimecard(userId:$userId, clockinTs:$clockinTs, clockoutTs:$clockoutTs, effectiveDt:$effectiveDt){
     id,
     effectiveDt
@@ -439,11 +440,7 @@ export default {
     return client.query({ query, variables });
   },
 
-  createTimecard: function (userId, clockinTs, clockoutTs, effectiveDt) {
-    const query = createTimecard;
-    const variables = { userId, clockinTs, clockoutTs, effectiveDt };
-    return client.query({ query, variables });
-  },
+
 
   getAllProfiles: function () {
     const query = getAllProfiles;
@@ -469,6 +466,12 @@ export default {
 
   // Mutations
 
+  createTimecard: function (userId, clockinTs, clockoutTs, effectiveDt) {
+    const mutation = createTimecardGQL;
+    const variables = { userId, clockinTs, clockoutTs, effectiveDt };
+    return client.mutate({ mutation, variables });
+  },
+
   createExtra: function(email, firstName, lastName, skinItemId) {
     const mutation = createExtraGQL;
     const variables = { email, firstName, lastName, skinItemId };
@@ -481,9 +484,9 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  createSchedule: function (date, title, startTm) {
-    const mutation = createSchedule;
-    const variables = { date, title, startTm };
+  createSchedule: function (userId, date, name, startTm) {
+    const mutation = createScheduleGQL;
+    const variables = { userId, date, name, startTm };
     return client.mutate({ mutation, variables });
   },
 

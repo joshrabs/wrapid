@@ -24,14 +24,19 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
       console.log(skin)
       const skinItem = skin.skinItems[0]
       console.log(skinItem)
-      const {baseprofile, timecards, extraschedule} = skin.skinItems[0].user;
+      let {baseprofile, timecards, extraschedule} = skin.skinItems[0].user;
       console.log(baseprofile);
       console.log('timecards!', timecards);
       const timecard = timecards.length > 0 ? timecards[0] : null;
       console.log(timecard);
       const scheduleItems = extraschedule.extrascheduleitemses;
       const schedule = {id: extraschedule.id, items: scheduleItems};
-      const profile = baseprofile;
+      let {firstName, lastName, avatar} = baseprofile
+
+      if(!avatar){
+        avatar = {url:null}
+      }
+      const profile = {firstName, lastName, avatar}
       const extraInfo = {extraId: userId, timecard, profile, schedule};
       app.ports.receiveExtraInfo.send(extraInfo);
     })
@@ -62,9 +67,9 @@ app.ports.clockinExtra.subscribe(function (timecardClockin) {
 app.ports.createExtraSchedule.subscribe(function (scheduleParams) {
   console.log(`Getting extra info for`, scheduleParams);
   const date = scheduleParams[0];
-  const title = scheduleParams[1];
+  const name = scheduleParams[1];
   const startTm = scheduleParams[2];
-  client.createSchedule(date, title, startTm)
+  client.createSchedule(date, name, startTm)
     .then(result => {
       console.log('result!', result);
       const timecard = result.data;
@@ -225,6 +230,25 @@ app.ports.uploadSkin.subscribe(function(params){
         client.createExtra(si.email, si.firstName, si.lastName, si.userId)
           .then(result => {
             console.log(result);
+            const userId = result.data.createUser.id
+            console.log(si)
+            client.createSchedule(userId, effectiveDt, "Arrive on Set", si.callStart)
+              .then(result => {
+                console.log('result!', result);
+                const schedule = result.data;
+                // app.ports.receiveExtraInfo.send(timecard);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+
+            client.createTimecard(userId, "", "", effectiveDt)
+              .then(result => {
+                console.log('timecard created!', result)
+              })
+              .catch(error => {
+                console.error(error);
+              })
           })
           .catch(error => {
             console.error(error);
