@@ -5,6 +5,7 @@ import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
+import Client.PAPortal.Pages.Schedule as Schedule
 import Client.Utilities.DateTime exposing (frmtDate)
 import Ports exposing (..)
 import Server.API.Mutations.SkinMutations as Server exposing (uploadSkin, receiveUploadedSkin)
@@ -24,6 +25,7 @@ type alias Model =
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
   , liveModel : LiveMonitorState
+  , scheduleModel : Schedule.Model
   , mdl : Material.Model
   }
 
@@ -37,6 +39,7 @@ type Msg
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
+    | ScheduleMsg Schedule.Msg
     | SkinUploadPageMsg SkinUploadPage.Msg
 
 
@@ -63,6 +66,7 @@ initModel userId currentDate selectedDate materialModel =
     , skinModel = Skin.initModel Nothing (frmtDate currentDate)
     , wrapModel = Wrap.initModel
     , liveModel = LiveMonitor.initState materialModel
+    , scheduleModel = Schedule.initModel
     , mdl = materialModel
     }
     , Task.perform (always LoadRemoteData) (Task.succeed ())
@@ -138,6 +142,16 @@ update msg model =
                     addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
+              
+        ScheduleMsg subMsg ->
+          let
+              scheduleModelUpdate =
+                  Schedule.update subMsg model.scheduleModel
+          in
+              ( { model | scheduleModel = scheduleModelUpdate }
+              , Cmd.none
+              )
+              
         SkinUploadPageMsg subMsg ->
               ({model | currentView=SkinManager}, Cmd.none)
 

@@ -24,6 +24,7 @@ type ViewState
     | SkinManager
     | SkinUploadPage
     | Wrap
+    | Schedule
 
 type alias PAProfile =
     { id : String
