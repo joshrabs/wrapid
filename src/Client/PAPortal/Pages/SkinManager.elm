@@ -18,6 +18,7 @@ import Material.Button as Button
 import Touch exposing (TouchEvent(..), Touch)
 import SingleTouch exposing (SingleTouch, onSingleTouch)
 
+import Date exposing (Date)
 
 -- MODEL
 
@@ -26,6 +27,7 @@ type alias Model =
     { mdl : Material.Model
     , addRoles : AddRoles.Model
     , editRole : String
+    , selectedDate : String
     , skin : Maybe Skin
     , roles : List Role
     , tableState : Table.State
@@ -35,14 +37,27 @@ type alias Model =
     , editableField : ( String, String )
     }
 
-setModelSkin: Skin -> Model -> Model
-setModelSkin skin model =
+setRoles: Skin -> List Role
+setRoles skin =
+    skin.skinItems
+      |> List.indexedMap skinItemToRole
+
+rolesToSkin: List Role -> String -> Skin
+rolesToSkin roles date =
   let
-      roles =
-        skin.skinItems
-          |> List.indexedMap skinItemToRole
+      skinItems =
+        roles
+          |> List.map (\r ->
+              {part = r.role
+              ,pay = r.pay
+              ,callStart = r.callStart
+              ,firstName=r.first
+              ,lastName = r.last
+              ,email=r.email
+              }
+            )
   in
-      ({model | roles = roles})
+      {effectiveDt=date, skinItems=skinItems}
 
 
 skinItemToRole: Int -> SkinItem -> Role
@@ -51,25 +66,29 @@ skinItemToRole id skinItem =
       , role = skinItem.part
       , first = skinItem.firstName
       , last = skinItem.lastName
-      , callStart = ""
+      , callStart = skinItem.callStart
       , pay = skinItem.pay
       , lunchStart = ""
       , lunchLength = ""
       , clockIn = ""
       , clockOut = ""
       , callEnd = ""
-      , email = ""
+      , email = skinItem.email
       , sum  = ""
       , selected = False
       }
 
-initModel : Maybe Skin -> Model
-initModel skin =
+initModel : Maybe Skin -> String -> Model
+initModel skin date =
     { mdl = Material.model
     , addRoles = AddRoles.init
     , editRole = ""
+    , selectedDate = date
     , skin = skin
-    , roles = initRoles
+    , roles =
+        case skin of
+          Just skin -> setRoles skin
+          Nothing -> initRoles
     , tableState = (Table.initialSort "Role")
     , query = ""
     , dialogOpened = NoDialog
@@ -78,9 +97,11 @@ initModel skin =
     }
 
 
-init : Maybe Skin -> ( Model, Cmd Msg )
-init skin =
-    ( initModel skin, Cmd.none )
+
+
+init : Maybe Skin -> String -> ( Model, Cmd Msg )
+init skin date =
+    ( initModel skin date, Cmd.none )
 
 
 
@@ -101,6 +122,7 @@ type Msg
     | UpdateField (String -> Role -> Role) String String
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
+    | UploadSkin
     | Breakdown
 
 
@@ -169,6 +191,8 @@ update msg model =
             let
                 ( updatedAddRolesModel, addRolesCmd ) =
                     AddRoles.update subMsg model.addRoles
+
+                l = Debug.log "Role model!!! " updatedAddRolesModel
             in
                 ( { model | addRoles = updatedAddRolesModel }
                 , Cmd.map AddRolesMsg addRolesCmd
@@ -178,11 +202,25 @@ update msg model =
             let
                 rs =
                     addIdToRoles (model.roles ++ AddRoles.toRoles (model.addRoles))
+
+                skinItems =
+                    rs
+                      |> List.map (\r ->
+                        {part=r.role
+                        , pay=r.pay
+                        , callStart=r.callStart
+                        , firstName=""
+                        , lastName=""
+                        , email=""})
+
+                newSkin = {effectiveDt="2017-03-17", skinItems=skinItems }
             in
-                ( { model | roles = rs }
+                ( { model | roles = rs, skin = Just newSkin }
                 , Cmd.none
                 )
 
+        UploadSkin ->
+          (model, Cmd.none )
         EditRoles string ->
             ( { model | editRole = string }
             , Cmd.none
@@ -288,8 +326,9 @@ panelFooter mdl =
             mdl
             [ Button.ripple
             , Button.accent
+            , Options.onClick UploadSkin
             ]
-            [ text "Wrap Skin" ]
+            [ text "Save Skin" ]
         ]
 
 
@@ -400,7 +439,7 @@ topButtons mdl checkedAll =
         , Textfield.render Mdl
             [ 0 ]
             mdl
-            [ Textfield.label "Search by Role"
+            [ Textfield.label "Search"
             , Textfield.floatingLabel
             , Options.dispatch Batch
             , Options.onInput SetQuery

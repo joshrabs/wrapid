@@ -3,7 +3,7 @@ port module Client.WardrobePortal.Ports exposing (..)
 import Json.Encode as Json
 
 
-port selectWardrobePhoto : String -> Cmd msg
+port selectWardrobePhoto : (String, String) -> Cmd msg
 
 
 port getAllWardrobeStatuses : () -> Cmd msg

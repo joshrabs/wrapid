@@ -10,6 +10,7 @@ import Client.ExtraPortal.Pages.FormStatusPage as FormStatusPage exposing (viewF
 import Client.ExtraPortal.Pages.ProfileWizard as Wizard exposing (Msg(..))
 import Client.ExtraPortal.Pages.DailyMonitor as DailyMonitor exposing (viewDailyMonitor, Msg(..))
 import Client.ExtraPortal.Types exposing (..)
+import Client.Utilities.DateTime exposing (frmtDate)
 import Date exposing (Date)
 import Task exposing (perform, succeed)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
@@ -210,7 +211,7 @@ update msg model =
         LoadRemoteData ->
             ( model
             , Cmd.batch
-                [ fetchReqExtraInfo (( model.userId, "2017-02-18" ))
+                [ fetchReqExtraInfo (( "Bob@fakeguy.com", frmtDate model.currentDate ))
                   --, subExtraSchedule ()
                 ]
             )

@@ -10,6 +10,7 @@ import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalenda
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
+import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 
 viewPAPortal : Model -> Html Msg
@@ -23,6 +24,9 @@ viewPAPortal model =
           [case model.currentView of
             Initializing ->
               viewLoadingScreen
+            SkinUploadPage ->
+              div []
+              [Html.map SkinUploadPageMsg SkinUploadPage.view]
             LiveMonitor ->
               case model.currentSkin of
                 Nothing -> viewLoadingScreen
@@ -48,12 +52,12 @@ skinToExtraInfo skin =
   skin.skinItems
     |> List.map
         (\si ->
-         {extraId=si.userId
+         {extraId=si.email
          , firstName = si.firstName
          , lastName=si.lastName
          , role=si.part
          , pay=si.pay
-         , avatar=si.avatar
+         , avatar={url=Nothing}
         })
 
 viewHeader : ViewState -> Html Msg
@@ -65,29 +69,33 @@ viewHeader currentView =
             else
                 baseTabStyle
     in
-        div [ style [ ( "background-color", "#FFFFFF" ), ( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" ) ] ]
-            [ viewHeaderInfo
-            , div [style
-                [( "display", "flex" )
-                , ( "border-top", "1px solid #EBF0F5" )
-              ]]
-              [ div
-                  [ onClick (ChangeView LiveMonitor)
-                  , style (getTabStyle LiveMonitor)
-                  ]
-                  [ text "Live Monitor" ]
-              , div
-                  [ onClick (ChangeView SkinManager)
-                  , style (getTabStyle SkinManager)
-                  ]
-                  [ text "Skin Manager" ]
-              , div
-                  [ onClick (ChangeView Wrap)
-                  , style (getTabStyle Wrap)
-                  ]
-                  [ text "Wrap" ]
+      case currentView of
+        SkinUploadPage -> div [] []
+        Initializing -> div [] []
+        _ ->
+          div [ style [ ( "background-color", "#FFFFFF" ), ( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" ) ] ]
+              [ viewHeaderInfo
+              , div [style
+                  [( "display", "flex" )
+                  , ( "border-top", "1px solid #EBF0F5" )
+                ]]
+                [ div
+                    [ onClick (ChangeView LiveMonitor)
+                    , style (getTabStyle LiveMonitor)
+                    ]
+                    [ text "Live Monitor" ]
+                , div
+                    [ onClick (ChangeView SkinManager)
+                    , style (getTabStyle SkinManager)
+                    ]
+                    [ text "Skin Manager" ]
+                , div
+                    [ onClick (ChangeView Wrap)
+                    , style (getTabStyle Wrap)
+                    ]
+                    [ text "Wrap" ]
+                ]
               ]
-            ]
 
 
 baseTabStyle : List ( String, String )

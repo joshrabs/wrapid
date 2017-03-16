@@ -23,7 +23,7 @@ update msg model =
             { model | statuses = receiveStatuses result } ! []
 
         SelectWardrobeStatusPhoto uploadId ->
-            ( model, Ports.selectWardrobePhoto uploadId )
+            ( model, Ports.selectWardrobePhoto(uploadId, "updateWardrobeStatusFile") )
 
         SelectDate date ->
             if date == "None" then
