@@ -82,7 +82,10 @@ update msg model =
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         ReceiveExtraActivity extraActivity ->
-          ({model | extraActivity = Success extraActivity}, Cmd.none)
+          let
+              ea = Debug.log "EXTRA ACTIVITY!" extraActivity
+          in
+            ({model | extraActivity = Success extraActivity}, Cmd.none)
 
         ReceiveDailySkin skin ->
           let

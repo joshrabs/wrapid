@@ -14,6 +14,13 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
   const day = userDay[1];
   console.log(userId);
   console.log(day);
+  getAndSendExtraInfo(userId, day)
+
+});
+
+function getAndSendExtraInfo(userId, day) {
+  console.log(userId)
+  console.log(day)
   client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
@@ -43,7 +50,7 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
     .catch(error => {
       console.log(error);
     });
-});
+}
 
 app.ports.clockinExtra.subscribe(function (timecardClockin) {
   console.log(`Getting extra info for`, timecardClockin);
@@ -80,19 +87,22 @@ app.ports.createExtraSchedule.subscribe(function (scheduleParams) {
     });
 });
 
-app.ports.getAllExtraInfo.subscribe(function (params) {
-  const d = params[0];
+app.ports.getAllExtraInfo.subscribe(function (d) {
+
   console.log(d);
   client.getAllExtraInfo(d)
     .then(result => {
-      let allUsers = result.data.allUsers;
-      console.log(result.data.allUsers);
-      let mapInfo = function (extra) {
+      console.log(result)
+      let allUsers = result.data.allSkins[0].skinItems;
+      console.log(allUsers);
+      let mapInfo = function (si) {
+        const extra = si.user
         console.log(extra);
+        const {part, pay} = si
         let {id, baseprofile, extraschedule, timecards} = extra;
-        let {firstName, lastName, avatar} = baseprofile;
+        let {firstName, lastName, avatar, email} = baseprofile;
         let avatarSrc = avatar ? avatar.url : null;
-        let profile = {firstName, lastName, avatar};
+        let profile = {firstName, lastName, avatar: {url: avatarSrc}, extraId: email, role: part, pay};
         let schedule;
         if (extraschedule) {
           let eItems = extraschedule.extrascheduleitemses.map(function (it) {
@@ -116,7 +126,7 @@ app.ports.getAllExtraInfo.subscribe(function (params) {
 
         console.log(schedule);
 
-        let frmt = {extraId: id, profile, schedule, timecard: defTimecard};
+        let frmt = {extraId: id, extraInfo: profile, schedule, timecard: defTimecard};
         console.log(frmt);
         return frmt;
       };
@@ -149,6 +159,7 @@ app.ports.fetchDailySkin.subscribe(function (date) {
         if (!avatar) {
           sAvatar = {url: null};
         }
+        console.log(sAvatar)
         return {email, firstName, lastName, part, pay, avatar: sAvatar, callStart: callStartTs};
       });
       console.log(frmtSkinItems);
@@ -269,9 +280,23 @@ app.ports.uploadSkin.subscribe(function(params){
     })
 })
 
-function uploadFile (event, id, onUploadFuncName) {
+function uploadFileClick (id, onUploadFuncName) {
+  console.log(id)
+  console.log(onUploadFuncName)
+  const node = document.getElementById(id);
+  node.addEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
+  node.click();
+
+}
+
+
+function uploadFileListen (event, id, onUploadFuncName) {
   console.log(event)
   console.log(onUploadFuncName)
+
+  console.log(id)
+  console.log(onUploadFuncName)
+
   const file = event.target.files[0];
   const data = new window.FormData();
   data.append('data', file);
@@ -281,7 +306,8 @@ function uploadFile (event, id, onUploadFuncName) {
   xhr.onreadystatechange = () => {
     if (xhr.readyState === xhr.DONE) {
       const response = JSON.parse(xhr.responseText);
-      uploadPortMap[onUploadFuncName](id, response)
+      console.log(response)
+      uploadPortMap[onUploadFuncName](response.id, response)
     }
   };
 
@@ -291,29 +317,36 @@ function uploadFile (event, id, onUploadFuncName) {
 const updateWardrobeStatusFile = (id, response) => {
   client.updateWardrobeStatusFile(id, id)
     .then(result => app.ports.receiveWardrobeStatusUpdate.send(result))
-  event.target.removeEventListener('change', uploadFile);
+  event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
   event.target.value = null;
 }
 
-const uploadProfilePhoto = (id, response) => {
+const onAvatarUpload = (id, response) => {
+  client.updateUserAvatar("cj0bdii6lzzjc0112yc07ez5h", id)
+    .then(result => {
+      console.log(result)
+      // getAndSendExtraInfo('Bob@fakeguy.com', '2017-03-15')
+    })
 
+  event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
+  event.target.value = null;
 }
 
 const uploadPortMap =
   {updateWardrobeStatusFile: (id, response) => updateWardrobeStatusFile(id, response)
-  ,uploadProfilePhoto
+  ,onAvatarUpload: (id, response) => onAvatarUpload(id, response)
   }
 
-app.ports.selectWardrobePhoto.subscribe((params) => {
 
-  const id = params[0]
-  const onUploadFuncName = params[1]
+app.ports.uploadAvatar.subscribe((id) => {
   console.log(id)
-  console.log(onUploadFuncName)
-  const node = document.getElementById(id);
-  node.click();
+  uploadFileClick(id, 'onAvatarUpload')
+});
 
-  node.addEventListener('change', (e) => uploadFile(e, id, onUploadFuncName));
+app.ports.selectWardrobePhoto.subscribe(id => {
+
+  uploadFileClick(id, 'updateWardrobeStatusFile')
+
 });
 
 app.ports.getAllWardrobeStatuses.subscribe(() => {

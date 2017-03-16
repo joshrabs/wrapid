@@ -196,30 +196,46 @@ const createTimecardGQL = gql`mutation createTimecard($userId:ID!, $clockinTs:St
   }
 }`;
 
-const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo {
-  allUsers(filter:{employeeType:Extra}){
-    id
-    baseprofile{
-      firstName
-      lastName
-      avatar {
-        url
+const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo($date:String){
+  allSkins(filter: {effectiveDt:$date}){
+    effectiveDt
+    skinItems{
+      part
+      pay
+
+      user{
+        id
+
+        baseprofile{
+          firstName
+          lastName
+          email
+          avatar{url}
+        }
+        extraWardrobeStatuses{
+          checkStatus
+          files{
+            url
+          }
+        }
+        timecards(filter:{effectiveDt:$date}){
+          id
+          effectiveDt
+          clockinTs
+          clockoutTs
+        }
+        extraschedule(filter:{date:$date}){
+          id
+          extrascheduleitemses{
+            name
+            category
+            startTm
+            endTm
+          }
+        }
       }
-    }
-    timecards(filter:{effectiveDt:"2014-07-18"}){
-      id
-      effectiveDt
-      clockinTs
-      clockoutTs
-    }
-    extraschedule{
-      id
-      extrascheduleitemses{
-        name
-        category
-        startTm
-        endTm
-      }
+
+
     }
   }
 }`;
@@ -302,6 +318,14 @@ mutation ($statusId: ID!, $fileId: ID!) {
     }
   }
 }`;
+
+const updateUserAvatar = gql `
+  mutation updateUserAvatar($profileId:ID!, $fileId:ID!){
+   setProfileAvatar(avatarFileId:$fileId, baseProfileBaseProfileId:$profileId){
+     avatarFile{url}
+   }
+  }
+`;
 
 const checkOutWardrobe = gql`
 mutation ($statusId: ID!) {
@@ -417,7 +441,8 @@ export default {
   getAllExtraInfo: function (date) {
     const query = paLiveMonitorAllExtraInfo;
     console.log('QUERY!', query);
-    const variables = {};
+    const variables = {date};
+    console.log(variables)
     return client.query({ query, variables });
   },
 
@@ -486,6 +511,12 @@ export default {
   createUser: function (firstName) {
     const mutation = createUser;
     const variables = { firstName };
+    return client.mutate({ mutation, variables });
+  },
+
+  updateUserAvatar: function(profileId, fileId){
+    const mutation = updateUserAvatar;
+    const variables = { profileId, fileId };
     return client.mutate({ mutation, variables });
   },
 
