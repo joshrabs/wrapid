@@ -249,7 +249,7 @@ const getAllWardrobeStatuses = gql`query
     id
     checkStatus
     date
-    file {
+    files {
       id
       secret
       url
@@ -275,12 +275,12 @@ const getAllWardrobeStatuses = gql`query
 
 const updateWardrobeStatusFile = gql`
 mutation ($statusId: ID!, $fileId: ID!) {
-  setExtraWardrobePic(extraWardrobeStatusExtraWardrobeStatusId: $statusId, fileFileId: $fileId) {
+  addToExtraWardrobePic(extraWardrobeStatusExtraWardrobeStatusId: $statusId, filesFileId: $fileId) {
     extraWardrobeStatusExtraWardrobeStatus {
       id
       checkStatus
       date
-      file {
+      files {
         id
         secret
         url
@@ -321,7 +321,7 @@ mutation ($statusId: ID!) {
         }
       }
     }
-    file {
+    files {
       id
       secret
       url
@@ -347,14 +347,13 @@ mutation ($statusId: ID!) {
         }
       }
     }
-    file {
+    files {
       id
       secret
       url
     }
   }
 }`;
-
 
 const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinItemsSkinItem!]){
   createSkin(effectiveDt:$effectiveDt, skinItems:$skinItems){
@@ -378,22 +377,22 @@ const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinIte
       lastName
     }
   }
-}`
+}`;
 
 const createExtraGQL = gql`mutation createExtra($email:String!, $firstName:String!, $lastName:String!, $skinItemId:ID!){
   createUser(
       employeeType:Extra
     , baseprofile:{
-      	firstName:$firstName
+      firstName:$firstName
       , lastName:$lastName
       , email:$email
     }
-  	, skinItemId:$skinItemId
+    , skinItemId:$skinItemId
   )
   {
     id
   }
-}`
+}`;
 
 const createExtraWardrobeCardGQL = gql`
   mutation createExtraWardrobeCard($userId:ID!, $date:String!){
@@ -401,7 +400,7 @@ const createExtraWardrobeCardGQL = gql`
      id
    }
   }
-`
+`;
 
 export default {
 
@@ -448,8 +447,6 @@ export default {
     return client.query({ query, variables });
   },
 
-
-
   getAllProfiles: function () {
     const query = getAllProfiles;
     return client.query({ query });
@@ -480,7 +477,7 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  createExtra: function(email, firstName, lastName, skinItemId) {
+  createExtra: function (email, firstName, lastName, skinItemId) {
     const mutation = createExtraGQL;
     const variables = { email, firstName, lastName, skinItemId };
     return client.mutate({ mutation, variables });
@@ -505,15 +502,15 @@ export default {
     return client.mutate({mutation, variables});
   },
 
-  uploadSkin: function(effectiveDt, skinItems){
+  uploadSkin: function (effectiveDt, skinItems) {
     const mutation = uploadSkinGQL;
-    console.log(mutation)
+    console.log(mutation);
     const variables = {effectiveDt, skinItems};
     console.log(variables);
     return client.mutate({mutation, variables});
   },
 
-  createExtraWardrobeCard: function(userId, date){
+  createExtraWardrobeCard: function (userId, date) {
     const mutation = createExtraWardrobeCardGQL;
     const variables = {userId, date};
     return client.mutate({mutation, variables});
