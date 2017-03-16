@@ -35,9 +35,6 @@ liveTable extraInfo tableFilter =
     extraInfo
       |> tableFilterMatch tableFilter
       |> (List.map (\extra ->
-          let
-              l = Debug.log "AVATAR!" extra
-          in
             {firstName=extra.firstName
             , lastName=extra.lastName
             , part = extra.role
