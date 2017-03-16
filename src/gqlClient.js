@@ -514,7 +514,7 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  updateUserAvatar: function(profileId, fileId){
+  updateUserAvatar: function (profileId, fileId){
     const mutation = updateUserAvatar;
     const variables = { profileId, fileId };
     return client.mutate({ mutation, variables });

@@ -14,23 +14,22 @@ app.ports.getExtraInfo.subscribe(function (userDay) {
   const day = userDay[1];
   console.log(userId);
   console.log(day);
-  getAndSendExtraInfo(userId, day)
-
+  getAndSendExtraInfo(userId, day);
 });
 
-function getAndSendExtraInfo(userId, day) {
-  console.log(userId)
-  console.log(day)
+function getAndSendExtraInfo (userId, day) {
+  console.log(userId);
+  console.log(day);
   client.getExtraInfo(userId, day)
     .then(result => {
       console.log(result);
       const skin = result.data.allSkins[0];
-      if(skin.length != 1){
-        //error!
+      if (skin.length != 1) {
+        // error!
       }
-      console.log(skin)
-      const skinItem = skin.skinItems[0]
-      console.log(skinItem)
+      console.log(skin);
+      const skinItem = skin.skinItems[0];
+      console.log(skinItem);
       let {baseprofile, timecards, extraschedule} = skin.skinItems[0].user;
       console.log(baseprofile);
       console.log('timecards!', timecards);
@@ -38,12 +37,12 @@ function getAndSendExtraInfo(userId, day) {
       console.log(timecard);
       const scheduleItems = extraschedule.extrascheduleitemses;
       const schedule = {id: extraschedule.id, items: scheduleItems};
-      let {firstName, lastName, avatar} = baseprofile
+      let {firstName, lastName, avatar} = baseprofile;
 
-      if(!avatar){
-        avatar = {url:null}
+      if (!avatar) {
+        avatar = {url: null};
       }
-      const profile = {firstName, lastName, avatar}
+      const profile = {firstName, lastName, avatar};
       const extraInfo = {extraId: userId, timecard, profile, schedule};
       app.ports.receiveExtraInfo.send(extraInfo);
     })
@@ -88,17 +87,16 @@ app.ports.createExtraSchedule.subscribe(function (scheduleParams) {
 });
 
 app.ports.getAllExtraInfo.subscribe(function (d) {
-
   console.log(d);
   client.getAllExtraInfo(d)
     .then(result => {
-      console.log(result)
+      console.log(result);
       let allUsers = result.data.allSkins[0].skinItems;
       console.log(allUsers);
       let mapInfo = function (si) {
-        const extra = si.user
+        const extra = si.user;
         console.log(extra);
-        const {part, pay} = si
+        const {part, pay} = si;
         let {id, baseprofile, extraschedule, timecards} = extra;
         let {firstName, lastName, avatar, email} = baseprofile;
         let avatarSrc = avatar ? avatar.url : null;
@@ -146,7 +144,7 @@ app.ports.fetchDailySkin.subscribe(function (date) {
       console.log(result.data);
       const {data} = result;
       const skinResult = data.allSkins.length > 0 ? data.allSkins[0] : null;
-      if(!skinResult){
+      if (!skinResult) {
         app.ports.receiveDailySkin.send(null);
         return;
       }
@@ -159,12 +157,12 @@ app.ports.fetchDailySkin.subscribe(function (date) {
         if (!avatar) {
           sAvatar = {url: null};
         }
-        console.log(sAvatar)
+        console.log(sAvatar);
         return {email, firstName, lastName, part, pay, avatar: sAvatar, callStart: callStartTs};
       });
       console.log(frmtSkinItems);
       const skin = {effectiveDt: date, skinItems: frmtSkinItems};
-      console.log(skin)
+      console.log(skin);
       app.ports.receiveDailySkin.send(skin);
     })
     .catch(error => {
@@ -197,53 +195,53 @@ app.ports.addScheduleItem.subscribe(function (params) {
     });
 });
 
-app.ports.uploadSkin.subscribe(function(params){
-  console.log(params)
-  let {effectiveDt, skinItems} = params
-  console.log(effectiveDt)
-  console.log(skinItems)
-  skinItems = skinItems.map(function(si) {
+app.ports.uploadSkin.subscribe(function (params) {
+  console.log(params);
+  let {effectiveDt, skinItems} = params;
+  console.log(effectiveDt);
+  console.log(skinItems);
+  skinItems = skinItems.map(function (si) {
     return {
-      "callStartTs": si.callStart
-      , "callEndTs": ""
-      , pay: si.pay
-      , part: si.part
-      , email: si.email
-      , firstName: si.firstName
-      , lastName: si.lastName
-    }
-  })
-  console.log(skinItems)
+      'callStartTs': si.callStart,
+      'callEndTs': '',
+      pay: si.pay,
+      part: si.part,
+      email: si.email,
+      firstName: si.firstName,
+      lastName: si.lastName
+    };
+  });
+  console.log(skinItems);
   client.uploadSkin(effectiveDt, skinItems)
     .then(result => {
       console.log(result);
       const skinCreate = result.data.createSkin;
 
       const {skinItems} = skinCreate;
-      const skinItemsFrmt = skinItems.map(function(si) {
-        console.log(si)
-        const userId = si.id
+      const skinItemsFrmt = skinItems.map(function (si) {
+        console.log(si);
+        const userId = si.id;
         return {
-            part: si.part
-          , pay: si.pay
-          , email: si.email
-          , callStart: si.callStartTs
-          , callEnd: si.callEndTs
-          , userId
-          , firstName: si.firstName
-          , lastName: si.lastName
-        }
-      })
+          part: si.part,
+          pay: si.pay,
+          email: si.email,
+          callStart: si.callStartTs,
+          callEnd: si.callEndTs,
+          userId,
+          firstName: si.firstName,
+          lastName: si.lastName
+        };
+      });
 
-      console.log(skinItemsFrmt)
+      console.log(skinItemsFrmt);
 
-      skinItemsFrmt.forEach(function(si) {
+      skinItemsFrmt.forEach(function (si) {
         client.createExtra(si.email, si.firstName, si.lastName, si.userId)
           .then(result => {
             console.log(result);
-            const userId = result.data.createUser.id
-            console.log(si)
-            client.createSchedule(userId, effectiveDt, "Arrive on Set", si.callStart)
+            const userId = result.data.createUser.id;
+            console.log(si);
+            client.createSchedule(userId, effectiveDt, 'Arrive on Set', si.callStart)
               .then(result => {
                 console.log('result!', result);
                 const schedule = result.data;
@@ -255,47 +253,45 @@ app.ports.uploadSkin.subscribe(function(params){
 
             client.createTimecard(userId, null, null, effectiveDt)
               .then(result => {
-                console.log('timecard created!', result)
+                console.log('timecard created!', result);
               })
               .catch(error => {
                 console.error(error);
-              })
+              });
 
             client.createExtraWardrobeCard(userId, effectiveDt)
               .then(result => {
                 console.log('Created wardrobe card!', result);
               })
-              .catch(error => console.error(error))
+              .catch(error => console.error(error));
           })
           .catch(error => {
             console.error(error);
-          })
-      })
+          });
+      });
 
-      const skin = {effectiveDt: skinCreate.effectiveDt, skinItems: skinItemsFrmt}
+      const skin = {effectiveDt: skinCreate.effectiveDt, skinItems: skinItemsFrmt};
       app.ports.receiveDailySkin.send(skin);
     })
     .catch(error => {
       console.error(error);
-    })
-})
+    });
+});
 
 function uploadFileClick (id, onUploadFuncName) {
-  console.log(id)
-  console.log(onUploadFuncName)
+  console.log(id);
+  console.log(onUploadFuncName);
   const node = document.getElementById(id);
   node.addEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
   node.click();
-
 }
 
-
 function uploadFileListen (event, id, onUploadFuncName) {
-  console.log(event)
-  console.log(onUploadFuncName)
+  console.log(event);
+  console.log(onUploadFuncName);
 
-  console.log(id)
-  console.log(onUploadFuncName)
+  console.log(id);
+  console.log(onUploadFuncName);
 
   const file = event.target.files[0];
   const data = new window.FormData();
@@ -306,8 +302,8 @@ function uploadFileListen (event, id, onUploadFuncName) {
   xhr.onreadystatechange = () => {
     if (xhr.readyState === xhr.DONE) {
       const response = JSON.parse(xhr.responseText);
-      console.log(response)
-      uploadPortMap[onUploadFuncName](response.id, response)
+      console.log(response);
+      uploadPortMap[onUploadFuncName](id, response);
     }
   };
 
@@ -315,38 +311,37 @@ function uploadFileListen (event, id, onUploadFuncName) {
 }
 
 const updateWardrobeStatusFile = (id, response) => {
-  client.updateWardrobeStatusFile(id, id)
-    .then(result => app.ports.receiveWardrobeStatusUpdate.send(result))
+  console.log('Status ID: ', id);
+  console.log('Response ID: ', response.id);
+  client.updateWardrobeStatusFile(id, response.id)
+    .then(result => app.ports.receiveWardrobeStatusUpdate.send(result));
   event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
   event.target.value = null;
-}
+};
 
 const onAvatarUpload = (id, response) => {
-  client.updateUserAvatar("cj0bdii6lzzjc0112yc07ez5h", id)
+  client.updateUserAvatar('cj0bdii6lzzjc0112yc07ez5h', id)
     .then(result => {
-      console.log(result)
+      console.log(result);
       // getAndSendExtraInfo('Bob@fakeguy.com', '2017-03-15')
-    })
+    });
 
   event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
   event.target.value = null;
-}
+};
 
 const uploadPortMap =
-  {updateWardrobeStatusFile: (id, response) => updateWardrobeStatusFile(id, response)
-  ,onAvatarUpload: (id, response) => onAvatarUpload(id, response)
-  }
-
+  {updateWardrobeStatusFile: (id, response) => updateWardrobeStatusFile(id, response),
+    onAvatarUpload: (id, response) => onAvatarUpload(id, response)
+  };
 
 app.ports.uploadAvatar.subscribe((id) => {
-  console.log(id)
-  uploadFileClick(id, 'onAvatarUpload')
+  console.log(id);
+  uploadFileClick(id, 'onAvatarUpload');
 });
 
 app.ports.selectWardrobePhoto.subscribe(id => {
-
-  uploadFileClick(id, 'updateWardrobeStatusFile')
-
+  uploadFileClick(id, 'updateWardrobeStatusFile');
 });
 
 app.ports.getAllWardrobeStatuses.subscribe(() => {
