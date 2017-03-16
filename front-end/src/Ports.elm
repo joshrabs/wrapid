@@ -1,10 +1,10 @@
 port module Ports exposing (..)
 
-import Client.PAPortal.Types exposing (Skin, ExtraActivity)
-import Client.ExtraPortal.Types exposing (ExtraInfo, Day, UserId, Schedule, ScheduleItem)
+import Client.PAPortal.Types as PATypes exposing (Skin, ExtraInfo)
+import Client.ExtraPortal.Types as EPTypes exposing (ExtraInfo, Day, UserId, Schedule, ScheduleItem)
 
 port getAllExtraInfo : (String) -> Cmd msg
-port receiveAllExtraInfo : (List ExtraActivity -> msg) -> Sub msg
+port receiveAllExtraInfo : (List PATypes.ExtraInfo -> msg) -> Sub msg
 
 port fetchDailySkin : (String) -> Cmd msg
 port receiveDailySkin : (Maybe Skin -> msg) -> Sub msg
@@ -16,7 +16,7 @@ port addScheduleItem : (UserId, ScheduleItem) -> Cmd msg
 
 
 port getExtraInfo : ( UserId, Day ) -> Cmd msg
-port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
+port receiveExtraInfo : (EPTypes.ExtraInfo -> msg) -> Sub msg
 
 
 port uploadAvatar : (UserId) -> Cmd msg

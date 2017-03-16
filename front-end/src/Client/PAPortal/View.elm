@@ -31,11 +31,11 @@ viewPAPortal model =
               case model.currentSkin of
                 Nothing -> viewLoadingScreen
                 Just skin ->
-                  case model.extraActivity of
+                  case model.extraInfo of
                     Loading -> viewLoadingScreen
-                    Success extraActivity ->
+                    Success extraInfo ->
                       div []
-                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraActivity (extraActivity |> List.map (\ea -> ea.extraInfo)))
+                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
                           ]
 
             SkinManager ->
@@ -47,18 +47,18 @@ viewPAPortal model =
           ]
         ]
 
-skinToExtraInfo : Skin -> List ExtraInfo
-skinToExtraInfo skin =
-  skin.skinItems
-    |> List.map
-        (\si ->
-         {extraId=si.email
-         , firstName = si.firstName
-         , lastName=si.lastName
-         , role=si.part
-         , pay=si.pay
-         , avatar={url=Nothing}
-        })
+-- skinToExtraInfo : Skin -> List ExtraInfo
+-- skinToExtraInfo skin =
+--   skin.skinItems
+--     |> List.map
+--         (\si ->
+--          {extraId=si.email
+--          , firstName = si.firstName
+--          , lastName=si.lastName
+--          , role=si.part
+--          , pay=si.pay
+--          , avatar={url=Nothing}
+--         })
 
 viewHeader : ViewState -> Html Msg
 viewHeader currentView =
