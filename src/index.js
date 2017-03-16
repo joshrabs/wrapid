@@ -126,7 +126,16 @@ app.ports.getAllExtraInfo.subscribe(function (d) {
 
         console.log(schedule);
 
-        let frmt = {extraId: id, extraInfo: profile, schedule, timecard: defTimecard};
+        let frmt = {
+          extraId: id
+          , firstName: profile.firstName
+          , lastName: profile.lastName
+          , avatar: profile.avatar
+          , role: profile.role
+          , pay: profile.pay
+          ,  schedule
+          , timecard: defTimecard
+        };
         console.log(frmt);
         return frmt;
       };

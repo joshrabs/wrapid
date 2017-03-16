@@ -36,12 +36,12 @@ liveTable extraInfo tableFilter =
       |> tableFilterMatch tableFilter
       |> (List.map (\extra ->
           let
-              l = Debug.log "AVATAR!" extra.info
+              l = Debug.log "AVATAR!" extra
           in
-            {firstName=extra.info.firstName
-            , lastName=extra.info.lastName
-            , part = extra.info.role
-            , imgSrc=extra.info.avatar.url
+            {firstName=extra.firstName
+            , lastName=extra.lastName
+            , part = extra.role
+            , imgSrc=extra.avatar.url
             , isClockedIn=True
             }
           ))
@@ -56,7 +56,7 @@ tableFilterMatch tFilter extras =
         tFilter |> String.toLower |> String.split " " |> String.concat
   in
       extras
-        |> List.filter (\extra -> Regex.contains (Regex.regex sanFilter) (sanProfs extra.info))
+        |> List.filter (\extra -> Regex.contains (Regex.regex sanFilter) (sanProfs extra))
 
 initState : Material.Model -> LiveMonitorState
 initState mdlModel =
@@ -66,34 +66,35 @@ initState mdlModel =
     , roleScheduler = defaultItemScheduler
     }
 
-type alias AllLiveExtraInfo = List LiveExtraInfo
-type alias LiveExtraInfo =
-  {extraId: String
-  ,activity: Maybe ExtraActivity
-  ,info: ExtraInfo
-  }
+type alias AllLiveExtraInfo = List ExtraInfo
+-- type alias AllLiveExtraInfo = List LiveExtraInfo
+-- type alias LiveExtraInfo =
+--   {extraId: String
+--   -- ,activity: Maybe ExtraActivity
+--   ,info: ExtraInfo
+--   }
 
-getLiveExtraInfo: List ExtraActivity -> List ExtraInfo -> AllLiveExtraInfo
-getLiveExtraInfo activity info =
+getLiveExtraInfo: List ExtraInfo -> AllLiveExtraInfo
+getLiveExtraInfo info =
   info
-    |> List.map (mergeActivityItem activity)
+    -- |> List.map (mergeActivityItem activity)
 
 
-mergeActivityItem: List ExtraActivity -> ExtraInfo -> LiveExtraInfo
-mergeActivityItem activity info =
-  let
-      matchingRecord =
-        activity
-          |> List.filter (\ai -> ai.extraInfo.extraId == info.extraId)
-          |> List.head
-
-      z = Debug.log "MATCHING RECORD!" info
-  in
-      case matchingRecord of
-        Just r ->
-          {extraId = info.extraId, info=info, activity = Just r}
-        Nothing ->
-          {extraId = info.extraId, info=info, activity = Nothing}
+-- mergeActivityItem: List ExtraActivity -> ExtraInfo -> LiveExtraInfo
+-- mergeActivityItem activity info =
+--   let
+--       matchingRecord =
+--         activity
+--           |> List.filter (\ai -> ai.extraInfo.extraId == info.extraId)
+--           |> List.head
+--
+--       z = Debug.log "MATCHING RECORD!" info
+--   in
+--       case matchingRecord of
+--         Just r ->
+--           {extraId = info.extraId, info=info, activity = Just r}
+--         Nothing ->
+--           {extraId = info.extraId, info=info, activity = Nothing}
 
 
 defaultItemScheduler: RoleScheduler
@@ -176,11 +177,11 @@ update msg model =
 --VIEW
 
 
-viewLiveMonitor : LiveMonitorState -> List ExtraActivity -> List ExtraInfo -> Html LiveMonitorMsg
-viewLiveMonitor model extraActivity extraInfo =
+viewLiveMonitor : LiveMonitorState -> List ExtraInfo -> Html LiveMonitorMsg
+viewLiveMonitor model extraInfo =
     div [style [("margin", "8px 4px 8px 4px")]]
         [ viewExtrasSnapStats fakeSnapStateModel
-        , viewLiveTable (liveTable (getLiveExtraInfo extraActivity extraInfo) model.tableFilter) model.mdl model.isAddingTask
+        , viewLiveTable (liveTable (getLiveExtraInfo extraInfo) model.tableFilter) model.mdl model.isAddingTask
 
         ]
 
