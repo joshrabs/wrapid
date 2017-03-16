@@ -17,3 +17,6 @@ port addScheduleItem : (UserId, ScheduleItem) -> Cmd msg
 
 port getExtraInfo : ( UserId, Day ) -> Cmd msg
 port receiveExtraInfo : (ExtraInfo -> msg) -> Sub msg
+
+
+port uploadAvatar : (UserId) -> Cmd msg

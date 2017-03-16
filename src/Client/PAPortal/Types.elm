@@ -10,6 +10,7 @@ type RemoteData a = Loading | Success a
 
 type alias ExtraActivity =
   { extraId: String
+  , extraInfo: ExtraInfo
   , timecard: TimeCard
   , schedule: Schedule
   }

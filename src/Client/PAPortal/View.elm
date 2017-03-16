@@ -35,7 +35,7 @@ viewPAPortal model =
                     Loading -> viewLoadingScreen
                     Success extraActivity ->
                       div []
-                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraActivity (skinToExtraInfo skin))
+                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraActivity (extraActivity |> List.map (\ea -> ea.extraInfo)))
                           ]
 
             SkinManager ->

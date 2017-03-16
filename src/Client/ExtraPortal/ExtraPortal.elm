@@ -1,7 +1,7 @@
 port module Client.ExtraPortal.ExtraPortal exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, id, type_, accept)
 import Html.Events exposing (onClick)
 import Dict
 import Material
@@ -17,6 +17,7 @@ import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Animation exposing (px)
 import Time exposing (Time)
 import Server.API.Queries.ExtraPortalQueries exposing (fetchReqExtraInfo, fetchReceiveExtraInfo)
+import Server.API.Mutations.Avatar exposing (setUserAvatar)
 import Http exposing (..)
 import Json.Encode as Encode exposing (encode, object, string)
 import Json.Decode as Decode exposing (list, string)
@@ -100,6 +101,8 @@ type Msg
     | FadeInUpMsg
     | ClockIn Time
     | ShowPageSwitcher Bool
+    | UploadAvatar
+    -- | ReceiveUploadedAvatar String
 
 
 
@@ -307,6 +310,8 @@ update msg model =
                     , requestNextView (PageView FormStatus)
                     )
 
+        UploadAvatar ->
+          (model, setUserAvatar(model.userId))
         NoOp ->
             ( model, Cmd.none )
 
@@ -354,7 +359,12 @@ viewExtraPortal model =
 
                             ProfileWizard ->
                                 div []
-                                    [ Html.map WizardMsg (Wizard.view model.wizardModel) ]
+                                    [button [onClick UploadAvatar] [text "upload avatar"]
+                                    ,input
+                                        [ style [ ( "display", "none" ) ], id <| model.userId, type_ "file", accept "image/*" ]
+                                        []
+                                    ,Html.map WizardMsg (Wizard.view model.wizardModel)
+                                    ]
 
                             FormStatus ->
                                 let

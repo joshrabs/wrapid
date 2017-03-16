@@ -35,6 +35,9 @@ liveTable extraInfo tableFilter =
     extraInfo
       |> tableFilterMatch tableFilter
       |> (List.map (\extra ->
+          let
+              l = Debug.log "AVATAR!" extra.info
+          in
             {firstName=extra.info.firstName
             , lastName=extra.info.lastName
             , part = extra.info.role
@@ -81,8 +84,10 @@ mergeActivityItem activity info =
   let
       matchingRecord =
         activity
-          |> List.filter (\ai -> ai.extraId == info.extraId)
+          |> List.filter (\ai -> ai.extraInfo.extraId == info.extraId)
           |> List.head
+
+      z = Debug.log "MATCHING RECORD!" info
   in
       case matchingRecord of
         Just r ->
