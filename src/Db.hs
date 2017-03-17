@@ -5,7 +5,7 @@
 {-# LANGUAGE QuasiQuotes         #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Db ( 
+module Db ( ConnectConfig(..)
           ) where
 
 import           Control.Applicative
@@ -31,3 +31,21 @@ import           Safe
 
 -----------------------------------------------------------------------------
 
+data ConnectConfig = ConnectConfig
+  { host     :: String
+  , port     :: String
+  , dbs      :: String
+  , user     :: String
+  , pass     :: String
+  } deriving (Generic, Eq, Read, Show, Typeable, FromJSON, ToJSON)
+
+mkConnInfo :: ConnectConfig -- ^ Internal configuration representation
+           -> ConnectInfo   -- ^ Representation used by Postgresql.Simple
+mkConnInfo config =
+  defaultConnectInfo
+  { connectHost     = host config 
+  , connectPort     = fromInteger $ read $ port config
+  , connectDatabase = dbs  config
+  , connectUser     = user config
+  , connectPassword = pass config
+  }
