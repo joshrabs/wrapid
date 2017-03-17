@@ -23,8 +23,8 @@ executable wrapid-api-upload
                ,       aeson                  >= 0.1.11.4
                ,       servant                >= 0.6
                ,       servant-server
-               ,       servant-swagger
                ,       servant-auth
+               ,       servant-multipart      
                ,       swagger2      
                ,       postgresql-simple
                ,       wai

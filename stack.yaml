@@ -3,16 +3,26 @@ resolver: lts-8.2
 packages:
 - '.'
 - location:
+    git: https://github.com/haskell-servant/servant
+    commit: b0dbd79a068d9dec509b12c450297d88047de17c
+  subdirs:
+    - servant
+    - servant-server  
+- location:
     git: https://github.com/kelecorix/servant-auth.git
     commit: 610624a8f30a8a97568b5d00442058d89535ddde
   subdirs:
     - servant-auth
-    - servant-auth-server 
-
+    - servant-auth-server
+- location:
+    git: https://github.com/haskell-servant/servant-multipart
+    commit: 582d7ef0e2492c8f8492e2a7f25a9bf0ae2fead8
+    
 extra-deps:
    - directory-1.2.7.1
    - aws-0.16
 
+   
 # Override default flag values for local packages and extra-deps
 flags: {}
 
