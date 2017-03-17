@@ -11,8 +11,6 @@ packages:
 
 extra-deps:
    - directory-1.2.7.1
-   - servant-0.8.1
-   - http-api-data-0.2.4
    - aws-0.16
 
 # Override default flag values for local packages and extra-deps

@@ -18,12 +18,20 @@ executable wrapid-api-upload
   main-is:             Main.hs
   other-modules:       Api
                      , Db
+                     , Types.Config
   build-depends:       base                   >= 4
                ,       aeson                  >= 0.1.11.4
                ,       servant                >= 0.6
+               ,       servant-server
                ,       servant-swagger
+               ,       servant-auth
                ,       swagger2      
                ,       postgresql-simple
+               ,       wai
+               ,       wai-extra
+               ,       wai-cors       
+               ,       warp      
+               ,       optparse-applicative                      
                ,       aws      
                ,       uuid
                ,       text
@@ -31,11 +39,14 @@ executable wrapid-api-upload
                ,       bytestring
                ,       time
                ,       mtl
+               ,       safe
+               ,       yaml      
                ,       http-client
                ,       http-types
                ,       lens-aeson
                ,       directory
                ,       filepath
+               ,       servant-auth-server      
   default-extensions:  OverloadedStrings
                     ,  TemplateHaskell
   other-extensions:    ScopedTypeVariables
