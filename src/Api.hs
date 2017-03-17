@@ -30,7 +30,9 @@ import qualified Db                         as Db
 
 -----------------------------------------------------------------------------
 
-type APIv1 m =
+type APIv1 =
+  "1":>
+    (
        "upload"
     :> Capture "query" Text
     :> Post '[JSON] Text
@@ -48,10 +50,38 @@ type APIv1 m =
     :> "prop"
     :> Capture "uuid"  Text
     :> Post '[JSON] Text
+    )
 
-server :: Server APIv1
-server = simpleUpload
-    :<|> avatarUpload
-    :<|> setUpload
-    :<|> setPropUpload
+restAPIv1 :: Proxy APIv1
+restAPIv1 = Proxy    
+   
+server :: Db.ConnectConfig -> Server APIv1
+server cc = simpleUpload  cc
+       :<|> avatarUpload  cc
+       :<|> setUpload     cc
+       :<|> setPropUpload cc
+
+simpleUpload :: Db.ConnectConfig
+             -> Handler Text
+simpleUpload cc = do
+  return $ ""
+
+avatarUpload :: Db.ConnectConfig
+             -> Text
+             -> Handler Text
+avatarUpload cc uuid = do
+  return $ ""
+
+setUpload :: Db.ConnectConfig
+          -> Text
+          -> Handler Text
+setUpload cc uuid = do
+  return $ ""
+
+setPropUpload :: Db.ConnectConfig
+              -> Text
+              -> Text
+              -> Handler Text
+setPropUpload cc suuid puuid = do
+  return $ ""
 
