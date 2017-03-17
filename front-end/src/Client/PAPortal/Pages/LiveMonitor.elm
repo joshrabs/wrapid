@@ -205,7 +205,6 @@ viewLiveTable table mdlModel isAddingTask =
         panelBody =
             div [style [("margin", "8px")]]
                 [ viewSearchTaskBar mdlModel
-                , if isAddingTask then viewTaskPanel else div [] []
                 , (viewLiveTableItems table)
                 ]
 
@@ -215,35 +214,6 @@ viewLiveTable table mdlModel isAddingTask =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewTaskPanel: Html LiveMonitorMsg
-viewTaskPanel =
-  div [ style [
-        ( "display", "flex" )
-        , ("align-items", "center")
-        , ( "justify-content", "space-between" )
-        , ( "padding", "8px 4px 8px 4px" )
-        , ("height", "74px")
-        , ("background", "yellow")
-      ]]
-      [div []
-        [ input [onInput SetSchedulerRole, placeholder "Role"] []
-        , input [onInput SetSchedulerCategory, placeholder "Category"] []
-        , input [onInput SetSchedulerName, placeholder "Name"] []
-        ]
-      ,div []
-        [input [onInput (SetSchedulerTime StartTm), placeholder "Start Tm"] []
-        ,input [onInput (SetSchedulerTime EndTm), placeholder "End Tm"] []
-        ]
-      , button [onClick (SubmitTaskByRole defaultScheduleItem)] [text "Submit!"]
-      ]
-
-defaultScheduleItem: ScheduleItem
-defaultScheduleItem =
-  {startTm = "5:30 PM"
-  ,category ="Shoot"
-  ,endTm = Nothing
-  ,name="Zombie shot"
-  }
 
 viewSearchTaskBar: Material.Model -> Html LiveMonitorMsg
 viewSearchTaskBar mdlModel =
@@ -259,23 +229,6 @@ viewSearchTaskBar mdlModel =
     ]]
     [
         viewSearch mdlModel
-      , div [onClick ToggleAddingTask,
-          style [
-            ("display", "flex")
-            ,("justify-content", "center")
-            ,("align-items", "center")
-            ,("background", "#FFFFFF")
-            ,("box-shadow", "0 2px 4px 0 rgba(155,158,167,0.50)")
-            ,("border-radius", "2px")
-            ,("font-family", "Roboto-Regular")
-            ,("font-size", "12px")
-            ,("color", "#0000FF")
-            ,("width", "72px")
-            ,("height", "32px")
-            ,("margin", "8px")
-            ,("letter-spacing" , "0")
-        ]]
-        [text "Schedule"]
     ]
 
 
