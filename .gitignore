@@ -9,6 +9,8 @@ repl-temp-*
 
 # app
 dist
+
+# haskell
 cabal-dev
 *.o
 *.hi
@@ -25,9 +27,8 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
-#*
-#*#
+
+# emacs
 .#*
 *~
-log
 *.dump-hi
