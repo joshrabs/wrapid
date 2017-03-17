@@ -96,7 +96,12 @@ update msg model =
               dLog = Debug.log "d: " date
           in
 
-          ({model | currentSkin = skin, currentView = newView, skinModel=Skin.initModel skin date}, getAllExtraInfo(date))
+          ({model |
+            currentSkin = skin
+            , currentView = newView
+            , skinModel=Skin.initModel skin date}
+            , getAllExtraInfo("2017-03-16")
+          )
 
         SkinMsg subMsg ->
             let
