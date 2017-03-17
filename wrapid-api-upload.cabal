@@ -24,6 +24,7 @@ executable wrapid-api-upload
                ,       servant                >= 0.6
                ,       servant-server
                ,       servant-auth
+               ,       servant-auth-server
                ,       servant-multipart      
                ,       swagger2      
                ,       postgresql-simple
@@ -43,10 +44,12 @@ executable wrapid-api-upload
                ,       yaml      
                ,       http-client
                ,       http-types
+               ,       http-conduit      
                ,       lens-aeson
                ,       directory
                ,       filepath
-               ,       servant-auth-server      
+               ,       unix
+               ,       resourcet
   default-extensions:  OverloadedStrings
                     ,  TemplateHaskell
   other-extensions:    ScopedTypeVariables
