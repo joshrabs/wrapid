@@ -1,10 +1,14 @@
 module Client.PAPortal.Pages.Schedule.Model exposing (..)
-
-import Dict exposing (Dict)
+import Client.PAPortal.Pages.Schedule.Message exposing (..)
+import Client.PAPortal.Pages.Schedule.Task as Task
 
 --MODEL
-type alias Model =  { }
+type alias Model =  { task : Maybe Task.Task
+                    , modals : List Modal
+                    }
 
     
 initModel: Model
-initModel = {}
+initModel = { task = Nothing
+            , modals = []
+            }

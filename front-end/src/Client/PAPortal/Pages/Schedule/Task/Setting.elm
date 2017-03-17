@@ -4,21 +4,21 @@ import Html
 import Html exposing (Html)
 
 import Html.Attributes as Attr
-
+import Client.PAPortal.Pages.Schedule.Message exposing (..)
 import Common.Renderable as Renderable
 import Common.Renderable exposing (Renderable)
 
 
 type Data = Interior | Exterior
-type alias Setting msg = Renderable Data (Html msg) {}
+type alias Setting = Renderable Data (Html Message) {}
 
-create : Data -> Setting msg
+create : Data -> Setting
 create = Renderable.create render
 
-render : Data -> Html msg
+render : Data -> Html Message
 render = Html.text << toString 
 
-radio : String -> Bool -> Html msg
+radio : String -> Bool -> Html Message
 radio value selected =
     let attributes = [ Attr.type_ "radio"
                      , Attr.name "setting"
@@ -28,7 +28,7 @@ radio value selected =
         input = Html.input attributes []
     in Html.div [] [input, Html.text value]
          
-input : Data -> Html msg
+input : Data -> Html Message
 input selected =
     let attributes = []
         helper n = radio (Basics.toString n) (selected == n)

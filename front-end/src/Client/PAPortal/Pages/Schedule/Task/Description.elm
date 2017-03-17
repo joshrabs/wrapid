@@ -3,18 +3,21 @@ module Client.PAPortal.Pages.Schedule.Task.Description exposing (..)
 import Html
 import Html exposing (Html)
 
+import Client.PAPortal.Pages.Schedule.Message exposing (..)
 import Common.Renderable as Renderable
 import Common.Renderable exposing (Renderable)
 
 import Html.Attributes as Attr
 
 type alias Data = String
-type alias Description msg = Renderable Data (Html msg) {}
+type alias Description = Renderable Data (Html Message) {}
 
-create : Data -> Description msg
+    
+
+create : Data -> Description
 create = Renderable.create render
 
-render : Data -> Html msg
+render : Data -> Html Message
 render data = Html.text data
     
 
@@ -29,9 +32,14 @@ input data =
     in Html.textarea attributes [Html.text data]
 -}
 
-input : Data -> Html msg
+input : Data -> Html Message
 input data =
     let attributes = [ Attr.name "title"
                      ]
     in Html.textarea attributes [Html.text data]
         
+validate : Description -> Maybe (List String)
+validate toValidate =
+    case toValidate.data of
+        "" -> Just ["The description may not be blank"]
+        _ -> Nothing

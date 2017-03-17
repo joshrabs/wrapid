@@ -10,25 +10,26 @@ import Html exposing (Html)
 
 import Html.Attributes as Attr
 
+import Client.PAPortal.Pages.Schedule.Message exposing (..)
 import Common.Renderable as Renderable
 import Common.Renderable exposing (Renderable)
 
 type Data = Wardrobe | Props | Lunch | Shoot | Wrap    
-type alias Type msg = Renderable Data (Html msg) {}
+type alias Type = Renderable Data (Html Message) {}
     
-create : Data -> Type msg
+create : Data -> Type
 create = Renderable.create render
 
-render : Data -> Html msg
+render : Data -> Html Message
 render = Html.text << Basics.toString
 
-asOption : Bool -> Data -> Html msg
+asOption : Bool -> Data -> Html Message
 asOption selected data =
     let attributes = [Attr.selected selected]
         body = [Html.text << toString <| data]
     in Html.option attributes body
          
-input : Data -> Html msg
+input : Data -> Html Message
 input data =
     let attributes = []
         body = List.map (\d -> asOption (d == data) d) [Wardrobe, Props, Lunch, Shoot, Wrap]

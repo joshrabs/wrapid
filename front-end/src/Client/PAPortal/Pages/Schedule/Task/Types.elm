@@ -8,10 +8,10 @@ import Client.PAPortal.Pages.Schedule.Task.TimeOfDay as TimeOfDay
 import Client.PAPortal.Pages.Schedule.Task.Title as Title
 import Client.PAPortal.Pages.Schedule.Task.Type as Type
 
-type alias Description msg = Description.Description msg
-type alias Extra msg = Extra.Extra msg
-type alias Setting msg = Setting.Setting msg
-type alias Time msg = Time.Time msg
-type alias TimeOfDay msg = TimeOfDay.TimeOfDay msg
-type alias Title msg = Title.Title msg
-type alias Type msg = Type.Type msg
+type alias Description = Description.Description
+type alias Extra = Extra.Extra
+type alias Setting = Setting.Setting
+type alias Time = Time.Time
+type alias TimeOfDay = TimeOfDay.TimeOfDay
+type alias Title = Title.Title
+type alias Type = Type.Type
