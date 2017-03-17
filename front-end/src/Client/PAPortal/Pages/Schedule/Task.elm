@@ -60,8 +60,8 @@ gen n = create { type_ = Type.create Type.Wardrobe
                      
                }
 
-asInput : Data msg -> Html msg
-asInput { type_, title, desc, startTime, endTime, setting, timeOfDay, extras } =
+input : Data msg -> Html msg
+input { type_, title, desc, startTime, endTime, setting, timeOfDay, extras } =
     let attributes = []
         body = [ Type.input type_.data
                , Title.input title.data
@@ -77,4 +77,4 @@ asInput { type_, title, desc, startTime, endTime, setting, timeOfDay, extras } =
 testTask = gen "Test"
         
 main : Html msg
-main = asInput testTask.data
+main = input testTask.data
