@@ -30,7 +30,11 @@ SELECT * FROM map_extra_profile_fields('test@email.com');
 ### Mutations
 
 #### Set User Profile Photo
-set_user_profile_photo -> (p_user_id: TEXT, p_b64_image BYTEA) RETURNS BYTEA
+set_user_profile_photo -> (p_user_id: TEXT, p_b64_image BYTEA) -> VARCHAR(500)
+
+```
+SELECT * FROM set_user_profile_photo('test@fake.com', 'http://samples3url...');
+```
 
 ####  Register extra
 Adds extra as user and fills out some of profile fields (first name, last name)

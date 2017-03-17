@@ -2,6 +2,15 @@ CREATE TABLE extra
 (
     user_id TEXT PRIMARY KEY NOT NULL
 );
+CREATE TABLE extra_schedule
+(
+    effective_dt DATE NOT NULL,
+    production_shoot_lat CHAR(2) NOT NULL,
+    production_shoot_long CHAR(2) NOT NULL,
+    created_ts TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    updated_ts TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    CONSTRAINT extra_schedule_effective_dt_production_shoot_lat_production_sho PRIMARY KEY (effective_dt, production_shoot_lat, production_shoot_long)
+);
 CREATE TABLE paper_form
 (
     paper_form_id TEXT PRIMARY KEY NOT NULL,
@@ -43,6 +52,7 @@ CREATE TABLE profile_field
     profile_field_id TEXT PRIMARY KEY NOT NULL,
     label TEXT NOT NULL
 );
+
 CREATE TABLE profile_field_input
 (
     profile_field_id TEXT,
@@ -62,6 +72,7 @@ CREATE TABLE skin
     production_set_id TEXT NOT NULL,
     CONSTRAINT skin_effectivedt_production_set_id_pk PRIMARY KEY (effective_dt, production_set_id)
 );
+
 CREATE TABLE skin_item
 (
     effective_dt DATE NOT NULL,
@@ -84,7 +95,7 @@ CREATE TABLE user_profile
 (
     user_id TEXT NOT NULL,
     last_submitted_ts TIMESTAMP WITH TIME ZONE,
-    profile_photo_b64 BYTEA
+    s3_icon_avatar_url VARCHAR(500)
 );
 ALTER TABLE extra ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
 CREATE UNIQUE INDEX extra_user_id_uindex ON extra (user_id);
