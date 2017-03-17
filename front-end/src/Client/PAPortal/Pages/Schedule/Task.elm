@@ -3,26 +3,27 @@ module Client.PAPortal.Pages.Schedule.Task exposing (..)
 import Html
 import Html exposing (Html)
 
-import Client.PAPortal.Pages.Schedule.Renderable as Renderable
-import Client.PAPortal.Pages.Schedule.Renderable exposing (Renderable)
+import Common.Renderable as Renderable
+import Common.Renderable exposing (Renderable)
 
-import Client.PAPortal.Pages.Schedule.Name as Name
-import Client.PAPortal.Pages.Schedule.Name exposing (Name)
+import Client.PAPortal.Pages.Schedule.Task.Types exposing (..)
 
-import Client.PAPortal.Pages.Schedule.Prop as Prop
-import Client.PAPortal.Pages.Schedule.Prop exposing (Prop)
+import Client.PAPortal.Pages.Schedule.Task.Description as Description
+import Client.PAPortal.Pages.Schedule.Task.Extra as Extra
+import Client.PAPortal.Pages.Schedule.Task.Setting as Setting
+import Client.PAPortal.Pages.Schedule.Task.Time as Time
+import Client.PAPortal.Pages.Schedule.Task.TimeOfDay as TimeOfDay
+import Client.PAPortal.Pages.Schedule.Task.Title as Title
+import Client.PAPortal.Pages.Schedule.Task.Type as Type
 
-import Client.PAPortal.Pages.Schedule.Role as Role
-import Client.PAPortal.Pages.Schedule.Role exposing (Role)
-
-import Client.PAPortal.Pages.Schedule.Person as Person
-import Client.PAPortal.Pages.Schedule.Person exposing (Person)
-
-
-type alias Data msg = { prop : Prop msg
-                      , role : Role msg
-                      , person : Person msg
-                      , name : Name msg
+type alias Data msg = { type_ : Type msg
+                      , title : Title msg
+                      , desc : Description msg
+                      , startTime : Time msg
+                      , endTime : Time msg
+                      , setting : Setting msg
+                      , timeOfDay : TimeOfDay msg
+                      , extras : List (Extra msg)
                       }
 
 type alias Task msg = Renderable (Data msg) (Html msg) {}
@@ -31,25 +32,33 @@ create : Data msg -> Task msg
 create = Renderable.create render
 
 render : Data msg -> Html msg
-render { prop, role, person, name } =
+render { title, type_, desc, startTime, endTime, setting, timeOfDay, extras } =
     let attributes = []
-        td x = Html.td [] [x]
-        body  = List.map (td << Renderable.doRender)
-            [ prop, role, person, name ]
-    in Html.tr attributes body
+        body  = 
+            [ Renderable.doRender type_
+            , Renderable.doRender title
+            , Renderable.doRender desc
+            , Renderable.doRender startTime
+            , Renderable.doRender endTime
+            , Renderable.doRender setting
+            , Renderable.doRender timeOfDay
+            , List.map Renderable.doRender extras |> Html.div []
+            ]
+    in Html.div attributes body
 
 
-gen n = create { prop = Prop.create ("Prop " ++ n)
-               , role = Role.create ("Role " ++ n)
-               , person = Person.create ("Person " ++ n)
-               , name = Name.create ("Name " ++ n)
-               }
         
-testTask : Task msg
-testTask = create { prop = Prop.create "Prop"
-                  , role = Role.create "Role"
-                  , person = Person.create "Person"
-                  , name = Name.create "Name"
-                  }
+gen : String -> Task msg
+gen n = create { type_ = Type.create Type.Wardrobe
+               , title = Title.create ("Title " ++ n)
+               , desc = Description.create ("Description " ++ n)
+               , startTime = Time.create "8:00"
+               , endTime = Time.create "9:00"
+               , setting = Setting.create Setting.Interior
+               , timeOfDay = TimeOfDay.create TimeOfDay.Day
+               , extras = []
+                     
+               }
 
-main = testTask.render testTask.data
+main : Html msg
+main = Renderable.doRender (gen "Test")

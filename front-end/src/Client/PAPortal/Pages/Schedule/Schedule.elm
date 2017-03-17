@@ -3,8 +3,8 @@ module Client.PAPortal.Pages.Schedule.Schedule exposing (..)
 import Html
 import Html exposing (Html)
 
-import Client.PAPortal.Pages.Schedule.Renderable as Renderable
-import Client.PAPortal.Pages.Schedule.Renderable exposing (Renderable)
+import Common.Renderable as Renderable
+import Common.Renderable exposing (Renderable)
 
 import Client.PAPortal.Pages.Schedule.Task as Task
 import Client.PAPortal.Pages.Schedule.Task exposing (Task)

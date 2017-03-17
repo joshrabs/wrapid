@@ -1,4 +1,4 @@
-module Client.PAPortal.Pages.Schedule.Renderable exposing (..)
+module Common.Renderable exposing (..)
 
 import Html
 import Html exposing (Html)
