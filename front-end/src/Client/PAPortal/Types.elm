@@ -8,12 +8,11 @@ import Material
 type RemoteData a = Loading | Success a
 
 
-type alias ExtraActivity =
-  { extraId: String
-  , extraInfo: ExtraInfo
-  , timecard: TimeCard
-  , schedule: Schedule
-  }
+-- type alias ExtraActivity =
+--   { extraId: String
+--   , timecard: TimeCard
+--   , schedule: Schedule
+--   }
 
 
 type alias SelectedDate = Maybe Date
@@ -89,6 +88,8 @@ type alias ExtraInfo =
   ,avatar: {url: Maybe String}
   ,role: String
   ,pay: String
+  , timecard: TimeCard
+  , schedule: Schedule
   }
 
 type alias ExtrasSnapStatModel =

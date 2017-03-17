@@ -19,7 +19,8 @@ type alias Model =
     currentDate: Maybe Date
   , selectedDate: SelectedDate
   , user: PAProfile
-  , extraActivity: RemoteData (List ExtraActivity)
+  , extraInfo: RemoteData (List ExtraInfo)
+  -- , extraActivity: RemoteData (List ExtraActivity)
   , currentView: ViewState
   , currentSkin: Maybe Skin
   , skinModel : Skin.Model
@@ -34,7 +35,7 @@ type Msg
     = ChangeView ViewState
     | LoadRemoteData
     | SetSelectedDate Date
-    | ReceiveExtraActivity (List ExtraActivity)
+    | ReceiveExtraInfo (List ExtraInfo)
     | ReceiveDailySkin (Maybe Skin)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
@@ -55,7 +56,7 @@ initModel userId currentDate selectedDate materialModel =
   in
     (
     { user = user
-    , extraActivity = Loading
+    , extraInfo = Loading
     , currentDate = currentDate
     , selectedDate =
         case selectedDate of
@@ -85,11 +86,8 @@ update msg model =
               (model, fetchDailySkin(date))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
-        ReceiveExtraActivity extraActivity ->
-          let
-              ea = Debug.log "EXTRA ACTIVITY!" extraActivity
-          in
-            ({model | extraActivity = Success extraActivity}, Cmd.none)
+        ReceiveExtraInfo extraInfo ->
+            ({model | extraInfo = Success extraInfo}, Cmd.none)
 
         ReceiveDailySkin skin ->
           let
@@ -159,6 +157,6 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-  [receiveAllExtraInfo ReceiveExtraActivity
+  [receiveAllExtraInfo ReceiveExtraInfo
   ,receiveDailySkin ReceiveDailySkin
   ]
