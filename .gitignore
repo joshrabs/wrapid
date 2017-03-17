@@ -9,3 +9,25 @@ repl-temp-*
 
 # app
 dist
+cabal-dev
+*.o
+*.hi
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+.virtualenv
+.hpc
+.hsenv
+.cabal-sandbox/
+.stack-work/
+cabal.sandbox.config
+*.prof
+*.aux
+*.hp
+#*
+#*#
+.#*
+*~
+log
+*.dump-hi
