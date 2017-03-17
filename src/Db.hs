@@ -6,6 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Db ( ConnectConfig(..)
+          , mkConnInfo
           ) where
 
 import           Control.Applicative

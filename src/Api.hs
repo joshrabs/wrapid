@@ -34,7 +34,6 @@ type APIv1 =
   "1":>
     (
        "upload"
-    :> Capture "query" Text
     :> Post '[JSON] Text
 
   :<|> "upload":> "profile"
@@ -56,26 +55,28 @@ restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy    
    
 server :: Db.ConnectConfig -> Server APIv1
-server cc = simpleUpload  cc
+server cc = simpleUpload
        :<|> avatarUpload  cc
        :<|> setUpload     cc
        :<|> setPropUpload cc
 
-simpleUpload :: Db.ConnectConfig
-             -> Handler Text
-simpleUpload cc = do
-  return $ ""
+simpleUpload :: Handler Text
+simpleUpload = undefined
 
 avatarUpload :: Db.ConnectConfig
              -> Text
              -> Handler Text
 avatarUpload cc uuid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
   return $ ""
 
 setUpload :: Db.ConnectConfig
           -> Text
           -> Handler Text
 setUpload cc uuid = do
+  let connInfo = Db.mkConnInfo cc
+  conn      <- liftIO $ connect connInfo
   return $ ""
 
 setPropUpload :: Db.ConnectConfig
@@ -83,5 +84,7 @@ setPropUpload :: Db.ConnectConfig
               -> Text
               -> Handler Text
 setPropUpload cc suuid puuid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
   return $ ""
 

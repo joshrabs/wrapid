@@ -65,6 +65,24 @@ parser = info (helper <*> optionsParser) optionsDesc
 
 --------------------------------------------------------------------------------
 
+-- | This is default parameters that are in use if config wasn't supplied
+--   TODO: implement Yaml configuration reader
+defaultConnectConfigProd = ConnectConfig {
+    host     = "db"
+  , port     = "5432"
+  , dbs      = "wrapid"
+  , user     = "wrapid"
+  , pass     = "squeezit"
+ }
+
+defaultConnectConfigTest = ConnectConfig {
+    host     = "localhost"
+  , port     = "5432"
+  , dbs      = "wrapid"
+  , user     = "wrapid"
+  , pass     = "squeezit"
+ }
+
 wrapidCors :: Middleware
 wrapidCors = cors (const $ Just policy)
     where
@@ -86,13 +104,13 @@ main = do
 
   case opMode $ opts of
     False -> do
-      putStrLn $ "|INFO | lumper-api | Running production"
+      putStrLn $ "|INFO | wrapid-api | Running production"
       run port $
         logStdoutDev $
           serveWithContext restAPIv1 cfg (server defaultConnectConfigProd)
     True  -> do
-      putStrLn $ "|INFO | lumper-api | Running development"
+      putStrLn $ "|INFO | wrapid-api | Running development"
       run port $
-        lumperCors $
+        wrapidCors $
           logStdoutDev $
             serveWithContext restAPIv1 cfg (server defaultConnectConfigTest)
