@@ -13,20 +13,12 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
-import Client.ExtraPortal.Types exposing (ScheduleItem)
+import Client.ExtraPortal.Types exposing (ScheduleItem, TimeCard)
 import Client.PAPortal.Types exposing (..)
 
 
-fakeSnapStateModel : ExtrasSnapStatModel
-fakeSnapStateModel =
-    { totalExtras = 4
-    , clockedIn = 4
-    , holdClothes = 2
-    , missingForms = 2
-    }
 
-
-fakeImg =
+defaultProfile =
     "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 
@@ -39,7 +31,7 @@ liveTable extraInfo tableFilter =
             , lastName=extra.lastName
             , part = extra.role
             , imgSrc=extra.avatar.url
-            , isClockedIn=True
+            , isClockedIn=isClockedIn extra.timecard
             }
           ))
 
@@ -101,8 +93,6 @@ defaultItemScheduler =
   }
 
 --UPDATE
-
-
 setSchedulerRole: LiveMonitorState -> String -> LiveMonitorState
 setSchedulerRole model role =
   let
@@ -172,12 +162,35 @@ update msg model =
       ({model | tableFilter = tFilter}, Cmd.none)
 
 --VIEW
+getSnapStatFromInfo: List ExtraInfo -> ExtrasSnapStatModel
+getSnapStatFromInfo info =
+  let
+      totalExtras = List.length info
+      clockedInQt =
+        info
+          |> List.map (\ei -> ei.timecard)
+          |> List.filter isClockedIn
+          |> List.length
+      holdingClothes = 0
+      missingForms = 0
+  in
+        { totalExtras = totalExtras
+        , clockedIn = clockedInQt
+        , holdClothes = holdingClothes
+        , missingForms = missingForms
+        }
 
+
+isClockedIn: TimeCard -> Bool
+isClockedIn timecard =
+  case timecard.clockinTs of
+    Just clockin -> True
+    Nothing -> False
 
 viewLiveMonitor : LiveMonitorState -> List ExtraInfo -> Html LiveMonitorMsg
 viewLiveMonitor model extraInfo =
     div [style [("margin", "8px 4px 8px 4px")]]
-        [ viewExtrasSnapStats fakeSnapStateModel
+        [ viewExtrasSnapStats (getSnapStatFromInfo extraInfo)
         , viewLiveTable (liveTable (getLiveExtraInfo extraInfo) model.tableFilter) model.mdl model.isAddingTask
 
         ]
@@ -295,7 +308,7 @@ getImgSrc: Maybe String -> String
 getImgSrc imgSrc =
   case imgSrc of
     Just src -> src
-    Nothing -> fakeImg
+    Nothing -> defaultProfile
 
 viewLiveTableItem : ExtraInfoItem -> Html msg
 viewLiveTableItem item =
@@ -346,12 +359,18 @@ viewLiveTableItem item =
               ("margin-right", "8px")
               ,("display", "flex")
             ]]
-            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "watch_later" [Options.css "color" "#00e676"]]
-            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "loyalty" [Options.css "color" "#ff3d00"]]
-            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "assignment" [Options.css "color" "#ff3d00"]]
+            [span [style [("margin", "0px 8px 0px 8px")]]
+                [Icon.view "watch_later"
+                  [Options.css "color"
+                    (if item.isClockedIn then validIconColor else badIconColor)
+                ]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "loyalty" [Options.css "color" badIconColor]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "assignment" [Options.css "color" badIconColor]]
             ]
         ]
 
+validIconColor = "#00e676"
+badIconColor = "#ff3d00"
 
 viewExtrasSnapStats : ExtrasSnapStatModel -> Html msg
 viewExtrasSnapStats model =
