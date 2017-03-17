@@ -60,5 +60,21 @@ gen n = create { type_ = Type.create Type.Wardrobe
                      
                }
 
+asInput : Data msg -> Html msg
+asInput { type_, title, desc, startTime, endTime, setting, timeOfDay, extras } =
+    let attributes = []
+        body = [ Type.input type_.data
+               , Title.input title.data
+               , Description.input desc.data
+               , Time.input "Start Time" startTime.data
+               , Time.input "End Time" endTime.data
+               , Setting.input setting.data
+               , TimeOfDay.input timeOfDay.data
+               , Html.div [] (List.map (\d -> Extra.input False d.data) extras)
+               ]
+    in Html.div attributes <| List.intersperse (Html.br [] []) body
+
+testTask = gen "Test"
+        
 main : Html msg
-main = Renderable.doRender (gen "Test")
+main = asInput testTask.data

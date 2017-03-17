@@ -28,12 +28,12 @@ radio value selected =
         input = Html.input attributes []
     in Html.div [] [input, Html.text value]
          
-input : Maybe Data -> Html msg
+input : Data -> Html msg
 input selected =
     let attributes = []
-        helper n = radio (Basics.toString n) (selected == Just n)
+        helper n = radio (Basics.toString n) (selected == n)
         body = List.map helper [ Day, Night ]
     in Html.div attributes body
     
     
-main = input (Just Day)
+main = input Day

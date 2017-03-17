@@ -18,9 +18,20 @@ render : Data -> Html msg
 render data = Html.text data
     
 
+-- TODO: This code compiles but dies in the browser:
+--
+{-              
 input : Data -> Html msg
 input data =
     let attributes = [ Attr.type_ "text"
                      , Attr.name "title"
                      ]
     in Html.textarea attributes [Html.text data]
+-}
+
+input : Data -> Html msg
+input data =
+    let attributes = [ Attr.name "title"
+                     ]
+    in Html.textarea attributes [Html.text data]
+        

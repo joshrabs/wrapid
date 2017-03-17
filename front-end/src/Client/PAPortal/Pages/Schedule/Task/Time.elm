@@ -18,10 +18,11 @@ render : Data -> Html msg
 render data = Html.text data
     
 
-input : Data -> Html msg
-input data =
+input : String -> Data -> Html msg
+input label data =
     let attributes = [ Attr.type_ "text"
                      , Attr.name "title"
                      , Attr.value data
                      ]
-    in Html.input attributes []
+    in Html.div [] [ Html.label [] [Html.text label]
+                   , Html.input attributes []]
