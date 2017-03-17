@@ -7,4 +7,5 @@ This directory represents set of microservices and related libraries that perfro
 
 | Name         | Type    | Description
 |--------------|---------|--------------------------------------------------------------------------
+| api          | service | api for common methods, business logic
 | api-upload   | service | api for assets upload, image manipulation
