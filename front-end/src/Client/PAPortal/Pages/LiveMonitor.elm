@@ -13,20 +13,12 @@ import Material.Icon as Icon
 import Material.Textfield as Textfield
 import Material.Options as Options
 
-import Client.ExtraPortal.Types exposing (ScheduleItem)
+import Client.ExtraPortal.Types exposing (ScheduleItem, TimeCard)
 import Client.PAPortal.Types exposing (..)
 
 
-fakeSnapStateModel : ExtrasSnapStatModel
-fakeSnapStateModel =
-    { totalExtras = 4
-    , clockedIn = 4
-    , holdClothes = 2
-    , missingForms = 2
-    }
 
-
-fakeImg =
+defaultProfile =
     "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
 
 
@@ -39,7 +31,7 @@ liveTable extraInfo tableFilter =
             , lastName=extra.lastName
             , part = extra.role
             , imgSrc=extra.avatar.url
-            , isClockedIn=True
+            , isClockedIn=isClockedIn extra.timecard
             }
           ))
 
@@ -101,8 +93,6 @@ defaultItemScheduler =
   }
 
 --UPDATE
-
-
 setSchedulerRole: LiveMonitorState -> String -> LiveMonitorState
 setSchedulerRole model role =
   let
@@ -172,12 +162,35 @@ update msg model =
       ({model | tableFilter = tFilter}, Cmd.none)
 
 --VIEW
+getSnapStatFromInfo: List ExtraInfo -> ExtrasSnapStatModel
+getSnapStatFromInfo info =
+  let
+      totalExtras = List.length info
+      clockedInQt =
+        info
+          |> List.map (\ei -> ei.timecard)
+          |> List.filter isClockedIn
+          |> List.length
+      holdingClothes = 0
+      missingForms = 0
+  in
+        { totalExtras = totalExtras
+        , clockedIn = clockedInQt
+        , holdClothes = holdingClothes
+        , missingForms = missingForms
+        }
 
+
+isClockedIn: TimeCard -> Bool
+isClockedIn timecard =
+  case timecard.clockinTs of
+    Just clockin -> True
+    Nothing -> False
 
 viewLiveMonitor : LiveMonitorState -> List ExtraInfo -> Html LiveMonitorMsg
 viewLiveMonitor model extraInfo =
     div [style [("margin", "8px 4px 8px 4px")]]
-        [ viewExtrasSnapStats fakeSnapStateModel
+        [ viewExtrasSnapStats (getSnapStatFromInfo extraInfo)
         , viewLiveTable (liveTable (getLiveExtraInfo extraInfo) model.tableFilter) model.mdl model.isAddingTask
 
         ]
@@ -192,7 +205,6 @@ viewLiveTable table mdlModel isAddingTask =
         panelBody =
             div [style [("margin", "8px")]]
                 [ viewSearchTaskBar mdlModel
-                , if isAddingTask then viewTaskPanel else div [] []
                 , (viewLiveTableItems table)
                 ]
 
@@ -202,35 +214,6 @@ viewLiveTable table mdlModel isAddingTask =
         Dashboard.makePanel panelHeader panelBody footer
 
 
-viewTaskPanel: Html LiveMonitorMsg
-viewTaskPanel =
-  div [ style [
-        ( "display", "flex" )
-        , ("align-items", "center")
-        , ( "justify-content", "space-between" )
-        , ( "padding", "8px 4px 8px 4px" )
-        , ("height", "74px")
-        , ("background", "yellow")
-      ]]
-      [div []
-        [ input [onInput SetSchedulerRole, placeholder "Role"] []
-        , input [onInput SetSchedulerCategory, placeholder "Category"] []
-        , input [onInput SetSchedulerName, placeholder "Name"] []
-        ]
-      ,div []
-        [input [onInput (SetSchedulerTime StartTm), placeholder "Start Tm"] []
-        ,input [onInput (SetSchedulerTime EndTm), placeholder "End Tm"] []
-        ]
-      , button [onClick (SubmitTaskByRole defaultScheduleItem)] [text "Submit!"]
-      ]
-
-defaultScheduleItem: ScheduleItem
-defaultScheduleItem =
-  {startTm = "5:30 PM"
-  ,category ="Shoot"
-  ,endTm = Nothing
-  ,name="Zombie shot"
-  }
 
 viewSearchTaskBar: Material.Model -> Html LiveMonitorMsg
 viewSearchTaskBar mdlModel =
@@ -246,23 +229,6 @@ viewSearchTaskBar mdlModel =
     ]]
     [
         viewSearch mdlModel
-      , div [onClick ToggleAddingTask,
-          style [
-            ("display", "flex")
-            ,("justify-content", "center")
-            ,("align-items", "center")
-            ,("background", "#FFFFFF")
-            ,("box-shadow", "0 2px 4px 0 rgba(155,158,167,0.50)")
-            ,("border-radius", "2px")
-            ,("font-family", "Roboto-Regular")
-            ,("font-size", "12px")
-            ,("color", "#0000FF")
-            ,("width", "72px")
-            ,("height", "32px")
-            ,("margin", "8px")
-            ,("letter-spacing" , "0")
-        ]]
-        [text "Schedule"]
     ]
 
 
@@ -295,7 +261,7 @@ getImgSrc: Maybe String -> String
 getImgSrc imgSrc =
   case imgSrc of
     Just src -> src
-    Nothing -> fakeImg
+    Nothing -> defaultProfile
 
 viewLiveTableItem : ExtraInfoItem -> Html msg
 viewLiveTableItem item =
@@ -346,12 +312,18 @@ viewLiveTableItem item =
               ("margin-right", "8px")
               ,("display", "flex")
             ]]
-            [span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "watch_later" [Options.css "color" "#00e676"]]
-            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "loyalty" [Options.css "color" "#ff3d00"]]
-            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "assignment" [Options.css "color" "#ff3d00"]]
+            [span [style [("margin", "0px 8px 0px 8px")]]
+                [Icon.view "watch_later"
+                  [Options.css "color"
+                    (if item.isClockedIn then validIconColor else badIconColor)
+                ]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "loyalty" [Options.css "color" badIconColor]]
+            ,span [style [("margin", "0px 8px 0px 8px")]] [Icon.view "assignment" [Options.css "color" badIconColor]]
             ]
         ]
 
+validIconColor = "#00e676"
+badIconColor = "#ff3d00"
 
 viewExtrasSnapStats : ExtrasSnapStatModel -> Html msg
 viewExtrasSnapStats model =

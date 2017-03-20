@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>8240a901-bffe-4861-815b-ccc656676a7a</OriginalElement>
+  <nodes>
+    <node x="167.0" y="168.0">8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra_profile</node>
+    <node x="0.0" y="212.0">8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.user</node>
+    <node x="189.0" y="0.0">8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.base_profile</node>
+    <node x="122.0" y="380.0">8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra" target="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.user">
+      <point x="-36.75" y="-37.0" />
+      <point x="158.75" y="355.0" />
+      <point x="73.5" y="355.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra" target="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra_profile">
+      <point x="36.75" y="-37.0" />
+      <point x="232.25" y="355.0" />
+      <point x="317.5" y="355.0" />
+      <point x="0.0" y="81.0" />
+    </edge>
+    <edge source="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra_profile" target="8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.base_profile">
+      <point x="0.0" y="-81.0" />
+      <point x="0.0" y="59.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7848101265822784" x="234.0" y="227.0" />
+  <SelectedNodes>
+    <node>8240a901-bffe-4861-815b-ccc656676a7a.TABLE:wrapid.public.extra</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+  </Categories>
+</Diagram>
+
