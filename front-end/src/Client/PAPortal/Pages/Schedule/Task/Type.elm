@@ -11,17 +11,23 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 
 import Client.PAPortal.Pages.Schedule.Message exposing (..)
-import Common.Renderable as Renderable
-import Common.Renderable exposing (Renderable)
+import Client.PAPortal.Pages.Schedule.Widget exposing (..)
+import Client.PAPortal.Pages.Schedule.Widget as Widget
 
 type Data = Wardrobe | Props | Lunch | Shoot | Wrap    
-type alias Type = Renderable Data (Html Message) {}
+type alias Type msg = Widget Data msg
     
-create : Data -> Type
-create = Renderable.create render
+create : Data -> Type msg
+create = Widget.create functions
 
-render : Data -> Html Message
-render = Html.text << Basics.toString
+functions : Widget.Functions Data msg
+functions = { default |
+              render = render_
+            , input = input_
+            }
+         
+render_ : Data -> Html msg
+render_ = Html.text << Basics.toString
 
 asOption : Bool -> Data -> Html Message
 asOption selected data =
@@ -29,10 +35,10 @@ asOption selected data =
         body = [Html.text << toString <| data]
     in Html.option attributes body
          
-input : Data -> Html Message
-input data =
+input_ : Data -> Html Message
+input_ data =
     let attributes = []
         body = List.map (\d -> asOption (d == data) d) [Wardrobe, Props, Lunch, Shoot, Wrap]
     in Html.select attributes body
 
-main = input Lunch
+

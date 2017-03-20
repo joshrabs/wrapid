@@ -5,26 +5,29 @@ import Html exposing (Html)
 
 import Client.PAPortal.Pages.Schedule.Message exposing (..)
 
-import Common.Renderable as Renderable
-import Common.Renderable exposing (Renderable)
+import Client.PAPortal.Pages.Schedule.Widget exposing (..)
+import Client.PAPortal.Pages.Schedule.Widget as Widget
 
 import Client.PAPortal.Pages.Schedule.Task as Task
 import Client.PAPortal.Pages.Schedule.Task exposing (Task)
 
-type alias Data = List Task
+type alias Data msg = List (Task msg)
                             
-type alias Schedule = Renderable Data (Html Message) {}
+type alias Schedule msg = Widget (Data msg) msg
 
-create : Data -> Schedule
-create = Renderable.create render
+create : Data msg -> Schedule msg
+create = Widget.create functions
 
-render : Data -> Html Message
-render tasks =
+functions : Widget.Functions (Data msg) msg
+functions = { default |
+              render = render_
+            }
+
+render_ : Data msg -> Html msg
+render_ tasks =
     let attributes = []
-        body = List.map Renderable.doRender tasks
+        body = List.map render tasks
     in Html.table attributes body
 
-testSchedule : Schedule
-testSchedule = create (List.map Task.gen ["1", "2", "3", "4"])
 
-main = Renderable.doRender testSchedule
+

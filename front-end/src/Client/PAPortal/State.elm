@@ -26,7 +26,7 @@ type alias Model =
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
   , liveModel : LiveMonitorState
-  , scheduleModel : Schedule.Model
+  , scheduleModel : Schedule.Model Msg
   , mdl : Material.Model
   }
 

@@ -5,6 +5,8 @@ import Client.PAPortal.Pages.Schedule.Task exposing (Task)
 import Client.PAPortal.Pages.Schedule.Message exposing (..)
 import Client.PAPortal.Pages.Schedule.Model exposing (..)
 import Client.PAPortal.Pages.Schedule.Update exposing (..)
+import Client.PAPortal.Pages.Schedule.Widget as Widget
+
 
 import Html exposing (Html)
 import Html
@@ -14,7 +16,7 @@ import Html.Events as Events
 
 
 --VIEW
-view: Model -> Html Message
+view: Model msg -> Html Message
 view model =
     let attributes = []
         modals = List.map (getModal model) model.modals
@@ -43,14 +45,14 @@ createErrorModal errors =
                
     in Html.div [] ( body ++ [closeButton "Okay"] )        
                 
-createTaskModal : Maybe Task -> Html Message
+createTaskModal : Maybe (Task msg) -> Html Message
 createTaskModal task =
     let task_ = case task of
                     Nothing -> Task.new
                     Just task -> task
         attributes = []
         body = [ Html.h2 [] [Html.text "Add Task"]
-               , Task.input task_.data
+               , Widget.input task_
                , addTaskButton SubmitNewTask
                , closeButton "Cancel"
                ]

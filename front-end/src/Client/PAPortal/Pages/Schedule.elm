@@ -6,7 +6,7 @@ import Client.PAPortal.Pages.Schedule.View as View
 import Client.PAPortal.Pages.Schedule.Message as Message
 
 
-type alias Model = Model.Model
+type alias Model msg = Model.Model msg
 type alias Msg = Message.Message
 
 initModel = Model.initModel

@@ -4,30 +4,37 @@ import Html
 import Html exposing (Html)
 
 import Client.PAPortal.Pages.Schedule.Message exposing (..)
-import Common.Renderable as Renderable
-import Common.Renderable exposing (Renderable)
+import Client.PAPortal.Pages.Schedule.Widget exposing (..)
+import Client.PAPortal.Pages.Schedule.Widget as Widget
 
 import Html.Attributes as Attr
 
 type alias Data = String
-type alias Title = Renderable Data (Html Message) {}
+type alias Title msg = Widget Data msg
 
-create : Data -> Title
-create = Renderable.create render
+create : Data -> Title msg
+create = Widget.create functions
 
-render : Data -> Html Message
-render data = Html.text data
+functions : Widget.Functions Data msg
+functions = { default |
+              render = render_
+            , input = input_
+            , validate = validate_
+            }
+         
+render_ : Data -> Html msg
+render_ data = Html.text data
     
-input : Data -> Html Message
-input data =
+input_ : Data -> Html Message
+input_ data =
     let attributes = [ Attr.type_ "text"
                      , Attr.name "title"
                      , Attr.value data
                      ]
     in Html.input attributes []
 
-validate : Title -> Maybe (List String)
-validate toValidate =
-    case toValidate.data of
+validate_ : Data -> Maybe (List String)
+validate_ toValidate =
+    case toValidate of
         "" -> Just ["You must specify a title"]
         _ -> Nothing
