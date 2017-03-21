@@ -18,7 +18,6 @@ import           Database.PostgreSQL.Simple.Types
 import           GHC.Generics
 import           Web.HttpApiData
 
-
 -----------------------------------------------------------------------------
 
 -- | Type that describes set extra in a system
