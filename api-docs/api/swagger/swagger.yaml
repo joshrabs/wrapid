@@ -1,60 +1,293 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
-  version: "0.0.1"
-  title: Hello World App
-# during dev, should point to your local machine
-host: localhost:10010
-# basePath prefixes all resource paths 
-basePath: /
-# 
-schemes:
-  # tip: remove http to make production-grade
-  - http
-  - https
-# format of bodies a client can send (Content-Type)
-consumes:
-  - application/json
-# format of the responses to the client (Accepts)
-produces:
-  - application/json
+  version: '1.0'
+  title: Common API
+  license:
+    name: AllRightsReserved
+  description: This is a Common API service desription
+host: runabetterset.com
 paths:
-  /hello:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: hello_world
+  '/user/{email}':
     get:
-      description: Returns 'Hello' to the caller
-      # used as the method name of the controller
-      operationId: hello
+      produces:
+        - application/json;charset=utf-8
       parameters:
-        - name: name
-          in: query
-          description: The name of the person to whom to say hello
-          required: false
+        - required: true
+          in: path
+          name: email
           type: string
       responses:
-        "200":
-          description: Success
+        '200':
           schema:
-            # a pointer to a definition
-            $ref: "#/definitions/HelloWorldResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
+            $ref: '#/definitions/User'
+          description: ''
+        '404':
+          description: '`email` not found'
+  '/set/{uuid}/extra':
+    get:
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+      responses:
+        '200':
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /swagger:
-    x-swagger-pipe: swagger_raw
-# complex objects have schema definitions
+            $ref: '#/definitions/Extra'
+          description: ''
+        '404':
+          description: '`uuid` not found'
+    post:
+      consumes:
+        - application/json;charset=utf-8
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+        - required: true
+          schema:
+            $ref: '#/definitions/Extra'
+          in: body
+          name: body
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Extra'
+          description: ''
+        '400':
+          description: Invalid `body`
+        '404':
+          description: '`uuid` not found'
+  '/set/{uuid}/shedule':
+    get:
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Schedule'
+          description: ''
+        '404':
+          description: '`uuid` not found'
+    post:
+      consumes:
+        - application/json;charset=utf-8
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+        - required: true
+          schema:
+            $ref: '#/definitions/Schedule'
+          in: body
+          name: body
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Schedule'
+          description: ''
+        '400':
+          description: Invalid `body`
+        '404':
+          description: '`uuid` not found'
+  '/set/{uuid}/schedule/event':
+    post:
+      consumes:
+        - application/json;charset=utf-8
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+        - required: true
+          schema:
+            $ref: '#/definitions/Event'
+          in: body
+          name: body
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Event'
+          description: ''
+        '400':
+          description: Invalid `body`
+        '404':
+          description: '`uuid` not found'
+  '/set/{uuid}/schedule/event/{id}':
+    get:
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+        - required: true
+          in: path
+          name: id
+          type: string
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Event'
+          description: ''
+        '404':
+          description: '`uuid` or `id` not found'
+  '/set/{uuid}/schedule/event/{id}/delete':
+    get:
+      produces:
+        - application/json;charset=utf-8
+      parameters:
+        - required: true
+          in: path
+          name: uuid
+          type: string
+        - required: true
+          in: path
+          name: id
+          type: string
+      responses:
+        '200':
+          schema:
+            type: boolean
+          description: ''
+        '404':
+          description: '`uuid` or `id` not found'
 definitions:
-  HelloWorldResponse:
+  User:
     required:
-      - message
+      - id
+      - email
+      - verfied
+      - deactivated
     properties:
-      message:
+      id:
+        maximum: 9223372036854776000
+        minimum: -9223372036854776000
+        type: integer
+      email:
         type: string
-  ErrorResponse:
+      upassword:
+        type: string
+      salt:
+        type: string
+      verlink:
+        type: string
+      verfied:
+        type: boolean
+      deactivated:
+        type: boolean
+      created:
+        $ref: '#/definitions/UTCTime'
+      seen:
+        $ref: '#/definitions/UTCTime'
+      logged:
+        type: boolean
+      role:
+        maximum: 9223372036854776000
+        minimum: -9223372036854776000
+        type: integer
+    type: object
+  UTCTime:
+    example: '2016-07-22T00:00:00Z'
+    format: 'yyyy-mm-ddThh:MM:ssZ'
+    type: string
+  Extra:
     required:
-      - message
+      - id
+      - etype
+      - role
+      - call
+      - rate
+      - name
+      - contact
+      - notes
     properties:
-      message:
+      id:
+        maximum: 9223372036854776000
+        minimum: -9223372036854776000
+        type: integer
+      etype:
         type: string
+      role:
+        type: string
+      call:
+        type: string
+      rate:
+        type: string
+      name:
+        type: string
+      contact:
+        type: string
+      notes:
+        type: string
+    type: object
+  Schedule:
+    required:
+      - scUserId
+      - scSetId
+      - scEffective
+      - scCreated
+      - scUpdated
+    properties:
+      scUserId:
+        type: string
+      scSetId:
+        type: string
+      scEffective:
+        $ref: '#/definitions/UTCTime'
+      scCreated:
+        $ref: '#/definitions/UTCTime'
+      scUpdated:
+        $ref: '#/definitions/UTCTime'
+    type: object
+  Event:
+    required:
+      - evUserId
+      - evSetId
+      - evEffective
+      - evTitle
+      - evStart
+      - evFinish
+      - evCreated
+      - evUpdated
+      - evDayTime
+    properties:
+      evUserId:
+        type: string
+      evSetId:
+        type: string
+      evEffective:
+        $ref: '#/definitions/UTCTime'
+      evTitle:
+        type: string
+      evDesc:
+        type: string
+      evDescScene:
+        type: string
+      evStart:
+        $ref: '#/definitions/UTCTime'
+      evFinish:
+        $ref: '#/definitions/UTCTime'
+      evCreated:
+        $ref: '#/definitions/UTCTime'
+      evUpdated:
+        $ref: '#/definitions/UTCTime'
+      evDayTime:
+        type: string
+    type: object
