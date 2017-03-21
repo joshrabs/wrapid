@@ -21,12 +21,15 @@ executable wrapid-api
                      , Types.Config
                      , Types.User
   build-depends:       base                   >= 4
+               ,       common
                ,       aeson                  >= 0.1.11.4
                ,       servant                >= 0.6
+               --,       servant-client      
                ,       servant-server
                ,       servant-auth
                ,       servant-auth-server
-               ,       servant-multipart      
+               ,       servant-multipart
+               ,       servant-swagger       
                ,       swagger2      
                ,       postgresql-simple
                ,       wai
@@ -38,6 +41,7 @@ executable wrapid-api
                ,       uuid
                ,       text
                ,       lens
+               ,       lens-aeson     
                ,       bytestring
                ,       time
                ,       mtl
@@ -46,7 +50,6 @@ executable wrapid-api
                ,       http-client
                ,       http-types
                ,       http-conduit      
-               ,       lens-aeson
                ,       directory
                ,       filepath
                ,       unix

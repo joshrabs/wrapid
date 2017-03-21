@@ -17,6 +17,12 @@ packages:
 - location:
     git: https://github.com/haskell-servant/servant-multipart
     commit: 582d7ef0e2492c8f8492e2a7f25a9bf0ae2fead8
+# - location:
+#     git: https://sigrlami:e3fbc18969f77343c8d64130c341dc6ffaef52c0@github.com/smaccoun/wrapid.git
+#     commit: 9ad7c8fe406617855247e4c9b73a5c2117798877
+#   subdirs:
+#    - common
+- ../common/    
     
 extra-deps:
    - directory-1.2.7.1
