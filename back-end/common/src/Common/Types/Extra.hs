@@ -24,13 +24,13 @@ import           Web.HttpApiData
 --
 data Extra =
   Extra { id          :: Int           -- ^
-        , etype       :: Text          -- ^ TODO: should be extra type
-        , role        :: Text
-        , call        :: Text
-        , rate        :: Text
-        , name        :: Text
-        , contact     :: Text
-        , notes       :: Text
+        , etype       :: Text          -- ^ TODO: should be extra datatype
+        , role        :: Text          -- ^ TODO: should be role datatype
+        , call        :: Text           
+        , rate        :: Text          -- ^ rate per hour
+        , name        :: Text          -- ^ 
+        , contact     :: Text          -- ^ email, phone, etc.
+        , notes       :: Text          -- ^ additiona notes
         } deriving (Eq, Generic, Show)
 
 instance FromJSON Extra

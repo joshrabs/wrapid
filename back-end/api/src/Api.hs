@@ -56,18 +56,46 @@ type APIv1 =
       :> Get '[JSON] User
 
     :<|> "set"
-      :> Capture "uuid" Text
-      :> "wrap" :> "add"
+      :> Capture "uuid" Text  -- ^ production set id
+      :> "extra"
       :> ReqBody '[JSON] Extra
       :> Post '[JSON] Extra
+
+    :<|> "set"
+      :> Capture "uuid" Text  -- ^ production set id
+      :> "extra"
+      :> Get '[JSON] Extra
+    
+    :<|> "set" 
+     :> Capture "uuid" Text   -- ^ production set id
+     :> "shedule"
+     :> ReqBody '[JSON] Schedule
+     :> Post    '[JSON] Schedule
+
+    :<|> "set" 
+     :> Capture "uuid" Text   -- ^ production set id
+     :> "shedule"             -- ^ returns only schedule for today
+     :> Get '[JSON] Schedule
+    
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "schedule"           -- ^ adds event only for today's schedule
+      :> "event"
+      :> ReqBody '[JSON] Event
+      :> Post    '[JSON] Event
+      
     )
 
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
 server :: Db.ConnectConfig -> Server APIv1
-server cc =  getUser cc
+server cc =  getUser  cc
         :<|> addExtra cc
+        :<|> getExtra cc
+        :<|> addSchedule cc
+        :<|> getShedule cc
+        :<|> addEvent cc
 
 --------------------------------------------------------------------------------
 -- Handlers
@@ -77,3 +105,16 @@ getUser cc email = undefined
 
 addExtra :: Db.ConnectConfig -> Text -> Extra -> Handler Extra
 addExtra cc uuid extra = undefined
+
+addExtra :: Db.ConnectConfig -> Text -> Handler Extra
+addExtra cc uuid = undefined
+
+addSchedule :: Db.ConnectConfig -> Text -> Schedule -> Handler Schedule
+addSchedule cc uuid sched = undefined
+
+getSchedule :: Db.ConnectConfig -> Text -> Handler Schedule
+getSchedule cc uuid = undefined
+
+addEvent :: Db.ConnectConfig -> Text -> Event -> Handler Event
+addEvent cc uuid event = undefined
+

@@ -161,4 +161,18 @@ skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> Text              -- ^ Unique `Set` uuid
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
-skinUpload cc suuid mdata = undefined             
+skinUpload cc suuid mdata = do
+  -- 1. convert data to csv file
+  -- 2.
+  liftIO $ do
+    putStrLn "Inputs:"
+    forM_ (inputs mdata) $ \input ->
+      putStrLn $ "  " ++ show (iName input)
+              ++ " -> " ++ show (iValue input)
+
+    forM_ (files mdata) $ \file -> do
+      content <- readFile (fdFilePath file)
+        putStrLn $ "Content of " ++ show (fdFileName file)
+              ++ " at " ++ fdFilePath file
+      putStrLn content
+  return $ True

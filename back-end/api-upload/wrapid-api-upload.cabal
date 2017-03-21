@@ -51,6 +51,7 @@ executable wrapid-api-upload
                ,       filepath
                ,       unix
                ,       resourcet
+               ,       cassava      
   default-extensions:  OverloadedStrings
                     ,  TemplateHaskell
   other-extensions:    ScopedTypeVariables
