@@ -23,8 +23,9 @@ executable wrapid-api
   build-depends:       base                   >= 4
                ,       common
                ,       aeson                  >= 0.1.11.4
+               ,       aeson-pretty
+               ,       cassava
                ,       servant                >= 0.6
-               --,       servant-client      
                ,       servant-server
                ,       servant-auth
                ,       servant-auth-server
