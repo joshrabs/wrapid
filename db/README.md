@@ -52,7 +52,62 @@ SELECT * FROM map_extra_profile_fields('test@email.com');
 ```
 
 
+#### Get extra schedule
+*get_extra_schedule*
+*PARAMS:*
+p_effective_dt DATE, p_user_id VARCHAR(100)
+
+*RETURNS*
+RETURNS TABLE(
+    effective_dt DATE,
+    production_set_id VARCHAR(50),
+    user_id TEXT,
+    title VARCHAR(100),
+    description VARCHAR(100),
+    start_ts TIMESTAMP WITHOUT TIME ZONE,
+    end_ts TIMESTAMP WITHOUT TIME ZONE,
+    scene_desc extra_schedule_event_scene_desc,
+    time_of_day extra_schedule_event_time_of_day
+  )
+
+```
+SELECT * FROM get_extra_schedule('2017-03-21', 'test@fake.com');  
+
+```
+
 ### Mutations
+
+#### Add Extra Schedule Event
+*add_extra_schedule_event*
+**Notes: Will insert a new schedule for event if no schedule exists for this event**
+*PARAMETERS*
+(p_effective_dt DATE,
+    p_production_set_id VARCHAR(50),
+    p_user_id TEXT,
+    p_title VARCHAR(100),
+    p_description VARCHAR(100),
+    p_start_ts TIMESTAMP WITH TIME ZONE,
+    p_end_ts TIMESTAMP WITH TIME ZONE,
+    p_scene_desc extra_schedule_event_scene_desc,
+    p_time_of_day extra_schedule_event_time_of_day
+  )
+*RETURN*
+TEXT ('SUCCESS')
+
+```
+SELECT * FROM
+  add_extra_schedule_event
+  ('2017-03-21'
+  , 'RunaBetterSet'
+  , 'test@fake.com'
+  , 'Scene 1'
+  , 'Act nicely'
+  , to_timestamp('10:00', 'HH24:MI')
+  , to_timestamp('13:00', 'HH24:MI')
+  , 'INTERIOR'
+  , 'DAY');
+```
+
 
 #### Set User Profile Photo
 set_user_profile_photo -> (p_user_id: TEXT, p_b64_image BYTEA) -> VARCHAR(500)
