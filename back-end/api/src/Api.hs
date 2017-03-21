@@ -56,6 +56,7 @@ import qualified Db                                    as Db
 instance ToSchema Extra
 instance ToSchema Schedule
 instance ToSchema Event
+instance ToSchema User
 
 -- "/1/user"                               - get  - getUser (by email)
 -- "/1/set/:uuid/extra"                    - post - createExtra (Extra payload)
@@ -85,7 +86,7 @@ type CommonAPIv1 =
       :> Capture "uuid" Text  -- ^ production set id
       :> "extra"
       :> ReqBody '[JSON] Extra
-      :> Post '[JSON] Extra
+      :> Post    '[JSON] Extra
 
     :<|> "set"
       :> Capture "uuid" Text  -- ^ production set id
@@ -125,16 +126,21 @@ type CommonAPIv1 =
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
+serverCommon :: Db.ConnectConfig -> Server CommonAPIv1
+serverCommon cc =
+       getUser  cc
+  :<|> addExtra cc
+  :<|> getExtra cc
+  :<|> addSchedule cc
+  :<|> getSchedule cc
+  :<|> addEvent cc
+  :<|> getEvent cc
+  :<|> deleteEvent cc
+
 server :: Db.ConnectConfig -> Server APIv1
-server cc =  getUser  cc
-        :<|> addExtra cc
-        :<|> getExtra cc
-        :<|> addSchedule cc
-        :<|> getSchedule cc
-        :<|> addEvent cc
-        :<|> getEvent cc
-        :<|> deleteEvent cc
-        :<|> generateSwagger
+server cc =
+       serverCommon cc
+  :<|> generateSwagger
 
 --------------------------------------------------------------------------------
 -- Handlers
