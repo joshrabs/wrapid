@@ -27,6 +27,8 @@ packages:
 extra-deps:
    - directory-1.2.7.1
    - aws-0.16
+   - servant-swagger-1.1.2.1
+   - servant-client-0.9.1.1
 
    
 # Override default flag values for local packages and extra-deps

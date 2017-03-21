@@ -18,6 +18,7 @@ library
   exposed-modules:     Common
                  ,     Common.Types.User
                  ,     Common.Types.Extra
+                 ,     Common.Types.Schedule
                  ,     Common.Utils.Basic
 
   build-depends:       base >= 4.7 && < 5
