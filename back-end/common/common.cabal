@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Common
                  ,     Common.Types.User
+                 ,     Common.Types.Extra
                  ,     Common.Utils.Basic
 
   build-depends:       base >= 4.7 && < 5
