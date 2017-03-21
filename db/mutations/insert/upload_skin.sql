@@ -1,7 +1,8 @@
 /*
 SAMPLE USAGE:
 --------------
-SELECT * FROM upload_skin('2017-03-21', 'RunaBetterSet', 'j@fake.com,john,smith,08,30,cop,88/12;sa@fake.com,sally,miller,08,30,cop,88/12');
+SELECT * FROM upload_skin('2017-03-21', 'RunaBetterSet'
+, 'j@fake.com,john smith,08,30,cop,88/12,BG,Make 2012;sa@fake.com,sally miller,08,30,cop,88/12,SA,Make 2010');
 
 CHECK:
 -------
@@ -38,11 +39,12 @@ CREATE OR REPLACE FUNCTION upload_skin(p_effective_dt DATE, p_production_set_id 
         (
             SELECT
               ra.val[1] AS email,
-              ra.val[2] AS first_name,
-              ra.val[3] AS last_name,
-              to_timestamp(to_char(p_effective_dt, 'YYYY-MM-DD') || ' ' ||ra.val[4] || ':' || ra.val[5], 'YYYY-MM-DD HH:MI') AS call_start_ts,
-              ra.val[6] AS role,
-              ra.val[7] AS pay
+              ra.val[2] AS full_name,
+              to_timestamp(to_char(p_effective_dt, 'YYYY-MM-DD') || ' ' ||ra.val[3] || ':' || ra.val[4], 'YYYY-MM-DD HH:MI') AS call_start_ts,
+              ra.val[5] AS role,
+              ra.val[6] AS rate,
+              ra.val[7] AS extra_talent_type,
+              ra.val[8] AS notes
             FROM itemRowArrays AS ra
         ),
       skin_items_insert AS
@@ -52,11 +54,12 @@ CREATE OR REPLACE FUNCTION upload_skin(p_effective_dt DATE, p_production_set_id 
               p_effective_dt AS effective_dt,
               p_production_set_id AS production_set_id,
               iv.email,
-              iv.first_name,
-              iv.last_name,
               iv.call_start_ts,
               iv.role,
-              iv.pay
+              iv.full_name,
+              iv.extra_talent_type,
+              iv.notes,
+              iv.rate
           FROM item_vals AS iv
         RETURNING email
         )
