@@ -69,6 +69,12 @@ type APIv1 =
     :> Capture "uuid"  Text
     :> MultipartForm MultipartData
     :> Post '[JSON] Text
+    
+  :<|> "upload" :> "set"
+    :> Capture "uuid"  Text
+    :> "skin"
+    :> MultipartForm MultipartData
+    :> Post '[JSON] Bool    
     )
 
 restAPIv1 :: Proxy APIv1
@@ -79,6 +85,7 @@ server cc = simpleUpload
        :<|> avatarUpload  cc
        :<|> setUpload     cc
        :<|> setPropUpload cc
+       :<|> skinUpload    cc
 
 simpleUpload :: MultipartData -> Handler Text
 simpleUpload mdata = undefined
@@ -149,3 +156,9 @@ uploadS3 fp fname = do
                 }
     liftIO $ print rsp
     return $ (T.pack $ show $ rsp, T.concat ["https://s3-us-west.amazonaws.com/", bucket, "/", fname])
+
+skinUpload :: Db.ConnectConfig  -- ^ DB config
+           -> Text              -- ^ Unique `Set` uuid
+           -> MultipartData     -- ^ Raw data
+           -> Handler Bool
+skinUpload cc suuid mdata = undefined             
