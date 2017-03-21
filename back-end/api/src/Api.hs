@@ -43,23 +43,37 @@ import           System.IO
 import           System.Posix.Files
 
 import qualified Db                                    as Db
-import           Types.User
+import           Common.Types.User
+import           Common.Types.Extra
 
 -----------------------------------------------------------------------------
 
 type APIv1 =
   "1":>
     (
-       "user" :> "profile"
-    :> Capture "email" Text
-    :> Get '[JSON] UserProfile
+         "user"
+      :> Capture "email" Text
+      :> Get '[JSON] User
+
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "wrap" :> "add"
+      :> ReqBody '[JSON] Extra
+      :> Post '[JSON] Extra
     )
 
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
 server :: Db.ConnectConfig -> Server APIv1
-server cc = getUser cc
+server cc =  getUser cc
+        :<|> addExtra cc
 
-getUser :: Db.ConnectConfig -> Text -> Handler UserProfile
+--------------------------------------------------------------------------------
+-- Handlers
+
+getUser :: Db.ConnectConfig -> Text -> Handler User
 getUser cc email = undefined
+
+addExtra :: Db.ConnectConfig -> Text -> Extra -> Handler Extra
+addExtra cc uuid extra = undefined

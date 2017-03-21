@@ -21,6 +21,7 @@ executable wrapid-api
                      , Types.Config
                      , Types.User
   build-depends:       base                   >= 4
+               ,       common
                ,       aeson                  >= 0.1.11.4
                ,       servant                >= 0.6
                ,       servant-server
