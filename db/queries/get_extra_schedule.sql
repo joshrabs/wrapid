@@ -3,6 +3,8 @@ SAMPLE USAGE:
 -------------
 SELECT * FROM get_extra_schedule('2017-03-21', 'test@fake.com');
 
+
+DROP FUNCTION get_extra_schedule(DATE, VARCHAR)
  */
 CREATE OR REPLACE FUNCTION get_extra_schedule(p_effective_dt DATE, p_user_id VARCHAR(100))
   RETURNS TABLE(
@@ -21,7 +23,7 @@ CREATE OR REPLACE FUNCTION get_extra_schedule(p_effective_dt DATE, p_user_id VAR
     SELECT
        ese.effective_dt AS effective_dt
       , ese.production_set_id AS production_set_id
-      , ese.user_id AS user_id
+      , esi.user_id AS user_id
       , ese.title AS title
       , ese.description AS description
       , ese.start_ts AS start_ts
@@ -29,10 +31,15 @@ CREATE OR REPLACE FUNCTION get_extra_schedule(p_effective_dt DATE, p_user_id VAR
       , ese.scene_desc AS scene_desc
       , ese.time_of_day AS time_of_day
     FROM extra_schedule es
+    JOIN extra_schedule_event_item esi
+      ON es.effective_dt = esi.effective_dt
+        AND es.production_set_id = esi.production_set_id
+        AND es.user_id = esi.user_id
     JOIN extra_schedule_event ese
-        ON es.effective_dt = ese.effective_dt
-        AND es.production_set_id = ese.production_set_id
-        AND es.user_id = ese.user_id
+        ON esi.effective_dt = ese.effective_dt
+        AND esi.production_set_id = ese.production_set_id
+        AND esi.start_ts = ese.start_ts
+        AND esi.title = ese.title
     WHERE es.effective_dt = p_effective_dt
         AND es.user_id = p_user_id
   $$

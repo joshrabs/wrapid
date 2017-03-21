@@ -15,7 +15,6 @@ CREATE TABLE extra_schedule_event
 (
     effective_dt DATE NOT NULL,
     production_set_id VARCHAR(50) NOT NULL,
-    user_id TEXT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description VARCHAR(500) NOT NULL,
     start_ts TIMESTAMP NOT NULL,
@@ -24,7 +23,16 @@ CREATE TABLE extra_schedule_event
     time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY DEFAULT 'DAY'::extra_schedule_event_time_of_day NOT NULL,
     updated_ts TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
     created_ts TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-    CONSTRAINT extra_task_effective_dt_production_set_id_user_id_pk PRIMARY KEY (effective_dt, production_set_id, user_id, title, start_ts)
+    CONSTRAINT extra_schedule_event_effective_dt_production_set_id_title_start PRIMARY KEY (effective_dt, production_set_id, title, start_ts)
+);
+CREATE TABLE extra_schedule_event_item
+(
+    effective_dt DATE NOT NULL,
+    production_set_id VARCHAR(50) NOT NULL,
+    user_id TEXT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    start_ts TIMESTAMP NOT NULL,
+    CONSTRAINT extra_schedule_event_item_effective_dt_production_set_id_user_i PRIMARY KEY (effective_dt, production_set_id, user_id, title, start_ts)
 );
 CREATE TABLE paper_form
 (
@@ -127,7 +135,8 @@ CREATE TABLE user_profile
 ALTER TABLE extra ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
 CREATE UNIQUE INDEX extra_user_id_uindex ON extra (user_id);
 ALTER TABLE extra_schedule ADD FOREIGN KEY (user_id) REFERENCES extra (user_id);
-ALTER TABLE extra_schedule_event ADD FOREIGN KEY (effective_dt, production_set_id, user_id) REFERENCES extra_schedule (effective_dt, production_set_id, user_id);
+ALTER TABLE extra_schedule_event_item ADD FOREIGN KEY (effective_dt, production_set_id, user_id) REFERENCES extra_schedule (effective_dt, production_set_id, user_id);
+ALTER TABLE extra_schedule_event_item ADD FOREIGN KEY (effective_dt, production_set_id, title, start_ts) REFERENCES extra_schedule_event (effective_dt, production_set_id, title, start_ts);
 ALTER TABLE paper_form ADD FOREIGN KEY (user_filler_id) REFERENCES "user" (user_id);
 ALTER TABLE paper_form ADD FOREIGN KEY (user_verifier_id) REFERENCES "user" (user_id);
 CREATE UNIQUE INDEX paper_form_paper_form_id_uindex ON paper_form (paper_form_id);
@@ -149,4 +158,4 @@ CREATE UNIQUE INDEX profile_field_paper_template_form_field_profile_field_id_uin
 ALTER TABLE skin_item ADD FOREIGN KEY (effective_dt, production_set_id) REFERENCES skin (effective_dt, production_set_id);
 CREATE UNIQUE INDEX user_user_id_uindex ON "user" (user_id);
 ALTER TABLE user_profile ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
-CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id)CREATE FUNCTION add_extra_schedule_event(p_effective_dt DATE, p_production_set_id VARCHAR, p_user_id TEXT, p_title VARCHAR, p_description VARCHAR, p_start_ts TIMESTAMP WITH TIME ZONE, p_end_ts TIMESTAMP WITH TIME ZONE, p_scene_desc EXTRA_SCHEDULE_EVENT_SCENE_DESC, p_time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY) RETURNS TEXT;
+CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id)CREATE FUNCTION add_extra_schedule_event(p_effective_dt DATE, p_production_set_id VARCHAR, p_extra_ids TEXT, p_title VARCHAR, p_description VARCHAR, p_start_ts TIMESTAMP WITH TIME ZONE, p_end_ts TIMESTAMP WITH TIME ZONE, p_scene_desc EXTRA_SCHEDULE_EVENT_SCENE_DESC, p_time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY) RETURNS TEXT;
