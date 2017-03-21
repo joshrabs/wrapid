@@ -1,0 +1,13 @@
+cred-aws:
+  - domain: 'us-west'
+  - bucket: 'wrapid-assets'
+  - keys:
+    - key:
+        - name:  'wrap-app' 
+        - id:    'AKIAI36UA3VTG7GWUPZQ'
+        - token: 'vRJFvy4ySnfM4pu8dC6W2fozWWuwCfl3JgvRR3WH'
+cred-pgsql:
+  - host: 'db'
+  - port: 5432
+  - name: 'wrapid'
+  - pass: 'squeezit'
