@@ -10,4 +10,5 @@ This is megarepo, that includes all relevant code to the platform, so we sure th
 | db           |         | database structure; related configurations
 | front-end    |         | frontend codebase in Elm. UI
 | back-end     |         | backend as a set of microservices
+| --api        | service | api with methods related to business logic
 | --api-upload | service | api for assets upload, image manipulation
