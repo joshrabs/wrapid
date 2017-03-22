@@ -162,17 +162,20 @@ skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
 skinUpload cc suuid mdata = do
-  -- 1. convert data to csv file
-  -- 2.
   liftIO $ do
     putStrLn "Inputs:"
     forM_ (inputs mdata) $ \input ->
-      putStrLn $ "  " ++ show (iName input)
-              ++ " -> " ++ show (iValue input)
+      putStrLn $ "  " ++ show (iName input) ++ " -> " ++ show (iValue input)
 
     forM_ (files mdata) $ \file -> do
       content <- readFile (fdFilePath file)
-        putStrLn $ "Content of " ++ show (fdFileName file)
-              ++ " at " ++ fdFilePath file
+      putStrLn $ "Content of " ++ show (fdFileName file) ++ " at " ++ fdFilePath file
       putStrLn content
+      case TEL.decodeUtf8' csvData of
+        Left  err  -> return $ Left $ show err
+        Right dat  -> do
+          let dat' = dat
+          case decodeTags $ TEL.encodeUtf8 dat' of
+            Left  err  -> return $ Left err
+            Right vals -> return $ Right (V.toList vals)
   return $ True
