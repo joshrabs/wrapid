@@ -29,6 +29,9 @@ import           Data.Maybe
 import           Data.Monoid
 import           Data.Proxy
 import           Data.Text                             as T
+import qualified Data.Text.Encoding                    as TE
+import qualified Data.Text.Lazy                        as TL
+import qualified Data.Text.Lazy.Encoding               as TEL
 import           Database.PostgreSQL.Simple
 import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
@@ -36,6 +39,8 @@ import           Network.HTTP.Conduit                  (RequestBody (..),
                                                         newManager,
                                                         tlsManagerSettings,
                                                         withManager)
+import qualified Data.Csv as Csv
+import qualified Data.Vector as V                 
 import           Servant
 import           Servant.Multipart
 import           System.Directory
@@ -43,6 +48,7 @@ import           System.IO
 import           System.Posix.Files
 
 import qualified Db                                    as Db
+import           Common.Types.Extra
 
 -----------------------------------------------------------------------------
 
@@ -162,17 +168,60 @@ skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
 skinUpload cc suuid mdata = do
-  -- 1. convert data to csv file
-  -- 2.
   liftIO $ do
     putStrLn "Inputs:"
     forM_ (inputs mdata) $ \input ->
-      putStrLn $ "  " ++ show (iName input)
-              ++ " -> " ++ show (iValue input)
+      putStrLn $ "  " ++ show (iName input) ++ " -> " ++ show (iValue input)
 
     forM_ (files mdata) $ \file -> do
-      content <- readFile (fdFilePath file)
-        putStrLn $ "Content of " ++ show (fdFileName file)
-              ++ " at " ++ fdFilePath file
-      putStrLn content
+      content <- BSL.readFile (fdFilePath file)
+      putStrLn $ "Content of " ++ show (fdFileName file) ++ " at " ++ fdFilePath file
+      --putStrLn $ BSL.unpack $ content
+      case TEL.decodeUtf8' content of
+        Left  err  -> do
+          putStrLn "error1"
+          return $ Left $ show err
+        Right dat  -> do
+          let dat' = dat
+          case decodeSkin $ TEL.encodeUtf8 dat' of
+            Left  err  -> do
+              putStrLn $ "error2:" ++ err
+              return $ Left err
+            Right vals -> do
+              let vals' = V.toList vals
+              putStrLn $ show $ vals'
+              return $ Right vals'
   return $ True
+
+--------------------------------------------------------------------------------
+
+decodeSkin :: BSL.ByteString -> Either String (V.Vector Extra)
+decodeSkin = fmap snd . Csv.decodeByName
+
+preprocess :: TL.Text -> TL.Text
+preprocess txt = TL.cons '\"' $ TL.snoc escaped '\"'
+  where escaped = TL.concatMap escaper txt
+
+escaper :: Char -> TL.Text
+escaper c
+  | c == '\t' = "\"\t\""
+  | c == '\n' = "\"\n\""
+  | c == '\"' = "\"\""
+  | otherwise = TL.singleton c
+
+zipWithDefault :: a -> b -> [a] -> [b] -> [(a,b)]
+zipWithDefault da db la lb =
+  Prelude.take len $ Prelude.zip la' lb'
+    where len = max (Prelude.length la) (Prelude.length lb)
+          la' = la ++ (repeat da)
+          lb' = lb ++ (repeat db)
+
+zip3WithDefault :: a -> b -> c -> [a] -> [b] -> [c] -> [(a, b, c)]
+zip3WithDefault da db dc as bs cs =
+  Prelude.take len $ Prelude.zip3 as' bs' cs'
+    where len = Prelude.maximum [(Prelude.length as), (Prelude.length bs), (Prelude.length cs)]
+          as' = as ++ (repeat da)
+          bs' = bs ++ (repeat db)
+          cs' = cs ++ (repeat dc)
+
+  -- curl -i --form file1=@test/skin-test.csv --form press=submit localhost:4002/1/upload/set/1234/skin

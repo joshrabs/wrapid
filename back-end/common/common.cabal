@@ -57,6 +57,7 @@ library
                ,       filepath
                ,       attoparsec
                ,       http-api-data
+               ,       cassava      
   default-language:    Haskell2010
 
 source-repository head
