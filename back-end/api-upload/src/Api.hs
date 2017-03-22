@@ -27,6 +27,7 @@ import qualified Data.ByteString.Char8                 as BSC
 import qualified Data.ByteString.Lazy                  as BSL
 import           Data.Maybe
 import           Data.Monoid
+import           Data.Time.Clock
 import           Data.Proxy
 import           Data.Text                             as T
 import qualified Data.Text.Encoding                    as TE
@@ -49,6 +50,7 @@ import           System.Posix.Files
 
 import qualified Db                                    as Db
 import           Common.Types.Extra
+import           Common.Types.Skin
 
 -----------------------------------------------------------------------------
 
@@ -79,6 +81,7 @@ type APIv1 =
   :<|> "upload" :> "set"
     :> Capture "uuid"  Text
     :> "skin"
+    :> Capture "date" UTCTime
     :> MultipartForm MultipartData
     :> Post '[JSON] Bool    
     )
@@ -165,9 +168,10 @@ uploadS3 fp fname = do
 
 skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> Text              -- ^ Unique `Set` uuid
+           -> UTCTime           -- ^ Skin effective date
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
-skinUpload cc suuid mdata = do
+skinUpload cc suuid date mdata = do
   liftIO $ do
     putStrLn "Inputs:"
     forM_ (inputs mdata) $ \input ->
@@ -190,12 +194,15 @@ skinUpload cc suuid mdata = do
             Right vals -> do
               let vals' = V.toList vals
               putStrLn $ show $ vals'
+              let connInfo = Db.mkConnInfo cc
+              conn <- liftIO $ connect connInfo
+              res  <- Db.skinCreate conn suuid date vals'
               return $ Right vals'
   return $ True
 
 --------------------------------------------------------------------------------
 
-decodeSkin :: BSL.ByteString -> Either String (V.Vector Extra)
+decodeSkin :: BSL.ByteString -> Either String (V.Vector SkinItem)
 decodeSkin = fmap snd . Csv.decodeByName
 
 preprocess :: TL.Text -> TL.Text

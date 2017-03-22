@@ -1,5 +1,5 @@
 name:                common
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:
 description:         Please see README.md
 homepage:            
@@ -19,6 +19,7 @@ library
                  ,     Common.Types.User
                  ,     Common.Types.Extra
                  ,     Common.Types.Schedule
+                 ,     Common.Types.Skin    
                  ,     Common.Utils.Basic
 
   build-depends:       base >= 4.7 && < 5
