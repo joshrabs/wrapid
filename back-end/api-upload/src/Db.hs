@@ -55,19 +55,19 @@ mkConnInfo config =
   , connectPassword = pass config
   }
 
-skinCreate :: Connection
-           -> T.Text
-           -> UTCTime
-           -> [SkinItem]
-           -> IO Bool
+skinCreate :: Connection   -- ^ Active db connection
+           -> T.Text       -- ^ Production set id/uuid/name
+           -> UTCTime      -- ^ Effective date
+           -> [SkinItem]   -- ^ List of Skin items
+           -> IO [T.Text]  -- ^ in return we get list of emails we need to send out
 skinCreate conn suuid date items = do
   let query' = "SELECT * FROM upload_skin(?, ?, ?)"
       vals   = [ suuid
                , T.pack $ show $ date
                , catSkinItems  $ items
                ]
-   (xs::Integer) <- query conn query' vals'
-   return $ True
+   (xs::[T.Text]) <- query conn query' vals'
+   return $ xs
 
 skinGet :: Connection
         -> T.Text
