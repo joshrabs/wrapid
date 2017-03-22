@@ -27,6 +27,7 @@ import qualified Data.ByteString.Char8                 as BSC
 import qualified Data.ByteString.Lazy                  as BSL
 import           Data.Maybe
 import           Data.Monoid
+import           Data.Time.Clock
 import           Data.Proxy
 import           Data.Text                             as T
 import qualified Data.Text.Encoding                    as TE
@@ -49,6 +50,7 @@ import           System.Posix.Files
 
 import qualified Db                                    as Db
 import           Common.Types.Extra
+import           Common.Types.Skin
 
 -----------------------------------------------------------------------------
 
@@ -191,8 +193,10 @@ skinUpload cc suuid date mdata = do
               return $ Left err
             Right vals -> do
               let vals' = V.toList vals
-              putStrLn $ show $ vals'              
-              res <- Db.skinCreate conn suuid date vals'
+              putStrLn $ show $ vals'
+              let connInfo = Db.mkConnInfo cc
+              conn <- liftIO $ connect connInfo
+              res  <- Db.skinCreate conn suuid date vals'
               return $ Right vals'
   return $ True
 

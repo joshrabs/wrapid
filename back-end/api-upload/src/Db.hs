@@ -20,6 +20,7 @@ import           Data.Char
 import           Data.Int
 import           Data.List
 import           Data.Maybe
+import           Data.Time.Clock
 import           Data.String                        (fromString)
 import qualified Data.Text                          as T
 import qualified Data.Text.Encoding                 as TE
@@ -66,8 +67,8 @@ skinCreate conn suuid date items = do
                , T.pack $ show $ date
                , catSkinItems  $ items
                ]
-   (xs::[T.Text]) <- query conn query' vals'
-   return $ xs
+  (xs::[Only T.Text]) <- query conn query' vals
+  return $ map fromOnly xs
 
 skinGet :: Connection
         -> T.Text
@@ -78,8 +79,8 @@ skinGet conn suuid date = do
       vals  = [ suuid
               , T.pack $ show $ date
               ]
-  (xs::[Skin]) <- query conn query' vals'
-  case headMay of
+  (xs::[Skin]) <- query conn query' vals
+  case headMay xs of
     Nothing   -> return $ Nothing
     Just skin -> return $ Just skin
 
@@ -89,8 +90,8 @@ catSkinItems items = do
     where showItem :: SkinItem -> T.Text
           showItem si = do
             -- TODO: conver to 24h siCall
-            let siCall'  = T.split ":" $ siCall si
-                siCallHH = siCall'!!0
-                siCallMM = siCall'!!1
+            let siCall'  = T.breakOn ":" $ siCall si
+                siCallHH = fst $ siCall'
+                siCallMM = snd $ siCall'
             T.intercalate "," [siEmail si, siName si, siCallHH, siCallMM, siRole si, siType si, siNotes si]
                          -- <email>,<name>,<callHH>,<callMM>,<role>,<extra_talent_type>,<note>
