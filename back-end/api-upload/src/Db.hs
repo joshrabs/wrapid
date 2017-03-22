@@ -74,7 +74,7 @@ skinGet :: Connection
         -> UTCTime
         -> IO (Maybe Skin)
 skinGet conn suuid date = do
-  let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?);
+  let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?)"
       vals  = [ suuid
               , T.pack $ show $ date
               ]
@@ -83,14 +83,14 @@ skinGet conn suuid date = do
     Nothing   -> return $ Nothing
     Just skin -> return $ Just skin
 
-
 catSkinItems :: [SkinItem] -> T.Text
-catSkinItem items = do
+catSkinItems items = do
   T.intercalate ";" $ map showItem items
-    where showItem :: SkintItem -> T.Textagr
-          shiwItem si = do
+    where showItem :: SkinItem -> T.Text
+          showItem si = do
+            -- TODO: conver to 24h siCall
             let siCall'  = T.split ":" $ siCall si
-                siCallHH = fst siCall'
-                siCallMM = fst siCall'
+                siCallHH = siCall'!!0
+                siCallMM = siCall'!!1
             T.intercalate "," [siEmail si, siName si, siCallHH, siCallMM, siRole si, siType si, siNotes si]
                          -- <email>,<name>,<callHH>,<callMM>,<role>,<extra_talent_type>,<note>

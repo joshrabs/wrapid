@@ -192,7 +192,7 @@ skinUpload cc suuid date mdata = do
             Right vals -> do
               let vals' = V.toList vals
               putStrLn $ show $ vals'              
-              Db.skinCreate conn suuid date vals'
+              res <- Db.skinCreate conn suuid date vals'
               return $ Right vals'
   return $ True
 
