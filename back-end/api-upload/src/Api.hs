@@ -178,12 +178,19 @@ skinUpload cc suuid mdata = do
       putStrLn $ "Content of " ++ show (fdFileName file) ++ " at " ++ fdFilePath file
       --putStrLn $ BSL.unpack $ content
       case TEL.decodeUtf8' content of
-        Left  err  -> return $ Left $ show err
+        Left  err  -> do
+          putStrLn "error1"
+          return $ Left $ show err
         Right dat  -> do
           let dat' = dat
           case decodeSkin $ TEL.encodeUtf8 dat' of
-            Left  err  -> return $ Left err
-            Right vals -> return $ Right (V.toList vals)
+            Left  err  -> do
+              putStrLn $ "error2:" ++ err
+              return $ Left err
+            Right vals -> do
+              let vals' = V.toList vals
+              putStrLn $ show $ vals'
+              return $ Right vals'
   return $ True
 
 --------------------------------------------------------------------------------
@@ -215,4 +222,6 @@ zip3WithDefault da db dc as bs cs =
     where len = Prelude.maximum [(Prelude.length as), (Prelude.length bs), (Prelude.length cs)]
           as' = as ++ (repeat da)
           bs' = bs ++ (repeat db)
-          cs' = cs ++ (repeat dc) 
+          cs' = cs ++ (repeat dc)
+
+  -- curl -i --form file1=@test/skin-test.csv --form press=submit localhost:4002/1/upload/set/1234/skin
