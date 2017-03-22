@@ -7,6 +7,8 @@
 
 module Db ( ConnectConfig(..)
           , mkConnInfo
+          , skinCreate
+          , skinGet
           ) where
 
 import           Control.Applicative
@@ -30,6 +32,8 @@ import           Database.PostgreSQL.Simple.FromRow
 import           GHC.Generics
 import           Safe
 
+import           Common.Types.Skin
+
 -----------------------------------------------------------------------------
 
 data ConnectConfig = ConnectConfig
@@ -50,3 +54,43 @@ mkConnInfo config =
   , connectUser     = user config
   , connectPassword = pass config
   }
+
+skinCreate :: Connection
+           -> T.Text
+           -> UTCTime
+           -> [SkinItem]
+           -> IO Bool
+skinCreate conn suuid date items = do
+  let query' = "SELECT * FROM upload_skin(?, ?, ?)"
+      vals   = [ suuid
+               , T.pack $ show $ date
+               , catSkinItems  $ items
+               ]
+   (xs::Integer) <- query conn query' vals'
+   return $ True
+
+skinGet :: Connection
+        -> T.Text
+        -> UTCTime
+        -> IO (Maybe Skin)
+skinGet conn suuid date = do
+  let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?);
+      vals  = [ suuid
+              , T.pack $ show $ date
+              ]
+  (xs::[Skin]) <- query conn query' vals'
+  case headMay of
+    Nothing   -> return $ Nothing
+    Just skin -> return $ Just skin
+
+
+catSkinItems :: [SkinItem] -> T.Text
+catSkinItem items = do
+  T.intercalate ";" $ map showItem items
+    where showItem :: SkintItem -> T.Textagr
+          shiwItem si = do
+            let siCall'  = T.split ":" $ siCall si
+                siCallHH = fst siCall'
+                siCallMM = fst siCall'
+            T.intercalate "," [siEmail si, siName si, siCallHH, siCallMM, siRole si, siType si, siNotes si]
+                         -- <email>,<name>,<callHH>,<callMM>,<role>,<extra_talent_type>,<note>

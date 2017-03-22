@@ -79,6 +79,7 @@ type APIv1 =
   :<|> "upload" :> "set"
     :> Capture "uuid"  Text
     :> "skin"
+    :> Capture "date" UTCTime
     :> MultipartForm MultipartData
     :> Post '[JSON] Bool    
     )
@@ -165,9 +166,10 @@ uploadS3 fp fname = do
 
 skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> Text              -- ^ Unique `Set` uuid
+           -> UTCTime           -- ^ Skin effective date
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
-skinUpload cc suuid mdata = do
+skinUpload cc suuid date mdata = do
   liftIO $ do
     putStrLn "Inputs:"
     forM_ (inputs mdata) $ \input ->
@@ -189,13 +191,14 @@ skinUpload cc suuid mdata = do
               return $ Left err
             Right vals -> do
               let vals' = V.toList vals
-              putStrLn $ show $ vals'
+              putStrLn $ show $ vals'              
+              Db.skinCreate conn suuid date vals'
               return $ Right vals'
   return $ True
 
 --------------------------------------------------------------------------------
 
-decodeSkin :: BSL.ByteString -> Either String (V.Vector Extra)
+decodeSkin :: BSL.ByteString -> Either String (V.Vector SkinItem)
 decodeSkin = fmap snd . Csv.decodeByName
 
 preprocess :: TL.Text -> TL.Text
