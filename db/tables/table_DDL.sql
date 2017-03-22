@@ -1,3 +1,7 @@
+CREATE SEQUENCE profile_field_input_profile_field_input_id_seq START 1;
+CREATE TYPE extra_schedule_event_time_of_day AS ENUM ('DAY', 'NIGHT');
+CREATE TYPE extra_schedule_event_scene_desc AS ENUM ('INTERIOR', 'EXTERIOR');
+
 CREATE TABLE extra
 (
     user_id TEXT PRIMARY KEY NOT NULL
@@ -128,10 +132,11 @@ CREATE TABLE "user"
 );
 CREATE TABLE user_profile
 (
-    user_id TEXT NOT NULL,
+    user_id TEXT PRIMARY KEY NOT NULL,
     last_submitted_ts TIMESTAMP WITH TIME ZONE,
     s3_icon_avatar_url VARCHAR(500)
 );
+CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id)CREATE FUNCTION add_extra_schedule_event(p_effective_dt DATE, p_production_set_id VARCHAR, p_extra_ids TEXT, p_title VARCHAR, p_description VARCHAR, p_start_ts TIMESTAMP WITH TIME ZONE, p_end_ts TIMESTAMP WITH TIME ZONE, p_scene_desc EXTRA_SCHEDULE_EVENT_SCENE_DESC, p_time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY) RETURNS TEXT;
 ALTER TABLE extra ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
 CREATE UNIQUE INDEX extra_user_id_uindex ON extra (user_id);
 ALTER TABLE extra_schedule ADD FOREIGN KEY (user_id) REFERENCES extra (user_id);
@@ -158,4 +163,3 @@ CREATE UNIQUE INDEX profile_field_paper_template_form_field_profile_field_id_uin
 ALTER TABLE skin_item ADD FOREIGN KEY (effective_dt, production_set_id) REFERENCES skin (effective_dt, production_set_id);
 CREATE UNIQUE INDEX user_user_id_uindex ON "user" (user_id);
 ALTER TABLE user_profile ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
-CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id)CREATE FUNCTION add_extra_schedule_event(p_effective_dt DATE, p_production_set_id VARCHAR, p_extra_ids TEXT, p_title VARCHAR, p_description VARCHAR, p_start_ts TIMESTAMP WITH TIME ZONE, p_end_ts TIMESTAMP WITH TIME ZONE, p_scene_desc EXTRA_SCHEDULE_EVENT_SCENE_DESC, p_time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY) RETURNS TEXT;
