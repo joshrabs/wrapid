@@ -557,5 +557,11 @@ export default {
     const mutation = checkInWardrobe;
     const variables = { statusId };
     return client.mutate({ mutation, variables });
+  },
+
+
+  // Non gql
+  uploadSkinCSV: function(file){
+    console.log(file);
   }
 };

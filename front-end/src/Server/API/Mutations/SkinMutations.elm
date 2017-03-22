@@ -1,7 +1,7 @@
 module Server.API.Mutations.SkinMutations exposing (..)
 
-import Ports exposing (uploadSkin, receiveUploadedSkin)
-import Client.PAPortal.Types exposing (Skin)
+import Ports exposing (uploadSkin, receiveDailySkin)
+import Common.Types.Skin exposing (Skin)
 
 -------------
 
@@ -11,5 +11,5 @@ uploadSkin skin =
 
 receiveUploadedSkin: (Maybe Skin -> msg) -> Sub msg
 receiveUploadedSkin =
-  Ports.receiveUploadedSkin
+  Ports.receiveDailySkin
 -----------

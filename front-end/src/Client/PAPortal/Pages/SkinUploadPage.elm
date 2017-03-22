@@ -1,7 +1,7 @@
 module Client.PAPortal.Pages.SkinUploadPage exposing (..)
 
-import Html exposing (Html, div, text)
-import Html.Attributes exposing (style)
+import Html exposing (Html, div, text, input)
+import Html.Attributes exposing (style, type_, accept, id)
 import Html.Events exposing (onClick)
 
 --Update
@@ -14,6 +14,9 @@ view =
   [
     div [onClick UploadSkin, style (baseUploadBoxStyle ++ [("background", "#ab47bc")])]
     [text "Upload Skin"]
+  , input
+      [ style [ ( "display", "none" ) ], id "NodeSkinCSVUpload", type_ "file", accept "*" ]
+      []
   , div [] [text "Or"]
   , div [onClick CreateSkin, style (baseUploadBoxStyle ++ [("background", "rgb(80, 227, 194)")])]
     [text "Create New Skin"]

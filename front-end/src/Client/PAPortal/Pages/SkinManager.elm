@@ -2,7 +2,7 @@ module Client.PAPortal.Pages.SkinManager exposing (..)
 
 import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
-import Client.PAPortal.Types exposing (Skin, SkinItem)
+import Common.Types.Skin exposing (Skin, SkinItem)
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
 import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
 import Html.Events exposing (onClick, onInput, onCheck, onDoubleClick, onBlur)
@@ -48,26 +48,27 @@ rolesToSkin roles date =
       skinItems =
         roles
           |> List.map (\r ->
-              {part = r.role
-              ,pay = r.pay
+              {role = r.role
+              ,rate = r.pay
               ,callStart = r.callStart
-              ,firstName=r.first
-              ,lastName = r.last
+              ,fullName=r.first ++ " " ++ r.last
               ,email=r.email
+              ,extraTalentType="BG"
+              ,notes="Make 2010"
               }
             )
   in
-      {effectiveDt=date, skinItems=skinItems}
+      {effectiveDt=date, productionSetId="RunaBetterSet", skinItems=skinItems}
 
 
 skinItemToRole: Int -> SkinItem -> Role
 skinItemToRole id skinItem =
       { id = toString id
-      , role = skinItem.part
-      , first = skinItem.firstName
-      , last = skinItem.lastName
+      , role = skinItem.role
+      , first = skinItem.fullName
+      , last = skinItem.fullName
       , callStart = skinItem.callStart
-      , pay = skinItem.pay
+      , pay = skinItem.rate
       , lunchStart = ""
       , lunchLength = ""
       , clockIn = ""
@@ -206,14 +207,15 @@ update msg model =
                 skinItems =
                     rs
                       |> List.map (\r ->
-                        {part=r.role
-                        , pay=r.pay
+                        {role=r.role
+                        , rate=r.pay
                         , callStart=r.callStart
-                        , firstName=""
-                        , lastName=""
+                        , fullName=""
+                        , extraTalentType=""
+                        , notes=""
                         , email=""})
 
-                newSkin = {effectiveDt="2017-03-17", skinItems=skinItems }
+                newSkin = {effectiveDt="2017-03-17", productionSetId="RunaBetterSet", skinItems=skinItems }
             in
                 ( { model | roles = rs, skin = Just newSkin }
                 , Cmd.none

@@ -1,11 +1,12 @@
 module Client.PAPortal.State exposing (..)
 
-import Client.PAPortal.Types exposing (..)
+import Client.PAPortal.Types as PATypes exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
 import Client.Utilities.DateTime exposing (frmtDate)
+import Common.Types.Skin as Common exposing (Skin)
 import Ports exposing (..)
 import Server.API.Mutations.SkinMutations as Server exposing (uploadSkin, receiveUploadedSkin)
 
@@ -21,7 +22,7 @@ type alias Model =
   , extraInfo: RemoteData (List ExtraInfo)
   -- , extraActivity: RemoteData (List ExtraActivity)
   , currentView: ViewState
-  , currentSkin: Maybe Skin
+  , currentSkin: Maybe Common.Skin
   , skinModel : Skin.Model
   , wrapModel : Wrap.Model
   , liveModel : LiveMonitorState
@@ -34,11 +35,12 @@ type Msg
     | LoadRemoteData
     | SetSelectedDate Date
     | ReceiveExtraInfo (List ExtraInfo)
-    | ReceiveDailySkin (Maybe Skin)
+    | ReceiveDailySkin (Maybe Common.Skin)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
     | SkinUploadPageMsg SkinUploadPage.Msg
+    | ReceiveFileSkinUpload Common.Skin
 
 
 initModel: String -> Maybe Date -> Maybe SelectedDate -> Material.Model -> (Model, Cmd Msg)
@@ -79,7 +81,7 @@ update msg model =
               date = frmtDate model.currentDate
               l = Debug.log "DATE!!!!!!: " date
             in
-              (model, fetchDailySkin("2017-03-16"))
+              (model, fetchDailySkin(date))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         ReceiveExtraInfo extraInfo ->
@@ -100,7 +102,7 @@ update msg model =
             currentSkin = skin
             , currentView = newView
             , skinModel=Skin.initModel skin date}
-            , getAllExtraInfo("2017-03-16")
+            , getAllExtraInfo(date)
           )
 
         SkinMsg subMsg ->
@@ -115,7 +117,6 @@ update msg model =
                     Skin.UploadSkin ->
                       let
                           roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles dateStr)
-                          d = Debug.log "datestr!!: " dateStr
                       in
                           Server.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles dateStr)
                     _ -> Cmd.none
@@ -142,7 +143,19 @@ update msg model =
                   _ -> Cmd.none
               )
         SkinUploadPageMsg subMsg ->
-              ({model | currentView=SkinManager}, Cmd.none)
+          case Debug.log "msg" subMsg of
+            SkinUploadPage.CreateSkin ->
+              let
+                  l = Debug.log "cREATE SKIN!!!" subMsg
+              in
+                ({model | currentView=SkinManager}, Cmd.none)
+            SkinUploadPage.UploadSkin ->
+                (model, uploadSkinCSV("NodeSkinCSVUpload", frmtDate model.currentDate))
+        ReceiveFileSkinUpload skin ->
+          let
+            l = Debug.log "Skin!" skin
+          in
+            (model, Cmd.none)
 
 
 subscriptions : Model -> Sub Msg
@@ -150,4 +163,5 @@ subscriptions model =
   Sub.batch
   [receiveAllExtraInfo ReceiveExtraInfo
   ,receiveDailySkin ReceiveDailySkin
+  ,receiveFileSkinUpload ReceiveFileSkinUpload
   ]

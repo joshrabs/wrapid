@@ -289,23 +289,24 @@ app.ports.uploadSkin.subscribe(function (params) {
 
 function uploadFileClick (id, onUploadFuncName) {
   console.log(id);
-  console.log(onUploadFuncName);
   const node = document.getElementById(id);
   node.addEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
   node.click();
 }
 
-function uploadFileListen (event, id, onUploadFuncName) {
+function uploadFileListen (event, id, serverCall) {
   console.log(event);
-  console.log(onUploadFuncName);
-
   console.log(id);
-  console.log(onUploadFuncName);
 
   const file = event.target.files[0];
   const data = new window.FormData();
   data.append('data', file);
 
+  console.log(data)
+  serverCall(id, file, data)
+}
+
+const graphCoolCall = (id, file, data, onUploadFuncName) => {
   const xhr = new window.XMLHttpRequest();
   xhr.open('POST', 'https://api.graph.cool/file/v1/ciykpioqm1wl00120k2e8s4la', true);
   xhr.onreadystatechange = () => {
@@ -339,6 +340,20 @@ const onAvatarUpload = (id, response) => {
   event.target.value = null;
 };
 
+const sendSkinCSV = (id, file, data, date) => {
+  console.log(id)
+  console.log(file)
+  console.log(data)
+  console.log(date)
+}
+
+const onSkinCSVUpload = (file) => {
+  client.uploadSkinCSV(file);
+
+  event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
+  event.target.value = null;
+};
+
 const uploadPortMap =
   {updateWardrobeStatusFile: (id, response) => updateWardrobeStatusFile(id, response),
     onAvatarUpload: (id, response) => onAvatarUpload(id, response)
@@ -346,11 +361,17 @@ const uploadPortMap =
 
 app.ports.uploadAvatar.subscribe((id) => {
   console.log(id);
-  uploadFileClick(id, 'onAvatarUpload');
+  uploadFileClick(id, (id, data) => graphCoolCall(id, data, 'onAvatarUpload'));
 });
 
 app.ports.selectWardrobePhoto.subscribe(id => {
-  uploadFileClick(id, 'updateWardrobeStatusFile');
+  uploadFileClick(id, (id, data) => graphCoolCall(id, data, 'updateWardrobeStatusFile'));
+});
+
+app.ports.uploadSkinCSV.subscribe((param) => {
+  const id = param[0]
+  const date = param[1]
+  uploadFileClick(id, (id, file, data) => sendSkinCSV(id, file, data, date));
 });
 
 app.ports.getAllWardrobeStatuses.subscribe(() => {
