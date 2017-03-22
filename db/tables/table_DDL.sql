@@ -162,4 +162,4 @@ CREATE UNIQUE INDEX profile_field_paper_template_form_field_profile_field_id_uin
 ALTER TABLE skin_item ADD FOREIGN KEY (effective_dt, production_set_id) REFERENCES skin (effective_dt, production_set_id);
 CREATE UNIQUE INDEX user_user_id_uindex ON "user" (user_id);
 ALTER TABLE user_profile ADD FOREIGN KEY (user_id) REFERENCES "user" (user_id);
-CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id)CREATE FUNCTION add_extra_schedule_event(p_effective_dt DATE, p_production_set_id VARCHAR, p_extra_ids TEXT, p_title VARCHAR, p_description VARCHAR, p_start_ts TIMESTAMP WITH TIME ZONE, p_end_ts TIMESTAMP WITH TIME ZONE, p_scene_desc EXTRA_SCHEDULE_EVENT_SCENE_DESC, p_time_of_day EXTRA_SCHEDULE_EVENT_TIME_OF_DAY) RETURNS TEXT;
+CREATE UNIQUE INDEX user_profile_user_id_uindex ON user_profile (user_id);
