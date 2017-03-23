@@ -30,6 +30,27 @@ SELECT
 FROM get_daily_skin('2017-03-21', 'RunaBetterSet');
 ```
 
+#### Get All Live Extra Activity
+
+get_all_live_daily_extra_activity (p_effective_dt date, p_production_set_id character varying)
+
+RETURNS | COLUMN    | VALUE    |
+| :------------- | :------------- |
+| user_id       | VARCHAR(100)      |
+| clockin_ts       | TIMESTAMP      |
+| clockout_ts       | TIMESTAMP     |
+| wardrobe_checkin_ts | TIMESTAMP |
+| wardrobe_checkout_ts | TIMESTAMP |
+
+```
+SELECT
+  user_id,
+  clockin_ts,
+  clockout_ts,
+  wardrobe_checkin_ts,
+  wardrobe_checkout_ts
+FROM get_all_live_daily_extra_activity('2017-03-20', 'RunaBetterSet');
+```
 #### Get User Profile Picture
 get_user_profile_photo -> (user_id TEXT) -> BYTEA
 ```
