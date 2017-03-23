@@ -9,6 +9,7 @@ import Client.Generic.Authentication.Login.Types as Login
 import Time exposing (Time)
 import Date exposing (Date, fromTime)
 import RemoteData exposing (WebData)
+import Http exposing (..)
 
 
 type alias Model =

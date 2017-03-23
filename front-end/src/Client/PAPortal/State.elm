@@ -79,7 +79,7 @@ update msg model =
               date = frmtDate model.currentDate
               l = Debug.log "DATE!!!!!!: " date
             in
-              (model, fetchDailySkin("2017-03-16"))
+              (model, fetchDailySkin(date))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         ReceiveExtraInfo extraInfo ->
@@ -96,12 +96,7 @@ update msg model =
               dLog = Debug.log "d: " date
           in
 
-          ({model |
-            currentSkin = skin
-            , currentView = newView
-            , skinModel=Skin.initModel skin date}
-            , getAllExtraInfo("2017-03-16")
-          )
+          ({model | currentSkin = skin, currentView = newView, skinModel=Skin.initModel skin date}, getAllExtraInfo(date))
 
         SkinMsg subMsg ->
             let

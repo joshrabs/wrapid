@@ -23,94 +23,103 @@ const client = new ApolloClient({
 
 // Queries
 
-const getAllProfiles = gql`
-query {
-  allBaseProfiles {
-    id
-    firstName
-    avatar {
-      url
-    }
-  }
-}`;
-
-const getUserProfile = gql`
-query ($userId: ID) {
-  User(id: $userId) {
-    baseprofile {
+const getAllProfiles = gql`query
+  {
+    allBaseProfiles {
       id
       firstName
-      avatar {
+      file {
         url
       }
     }
   }
-}`;
+`;
 
-const getUserSchedule = gql`
-query ($userId: ID, $date: String) {
-  allExtraScheduleItemses (
-    filter: {
-      extraschedule: {
-        date: $date,
-        user: {id: $userId}
+const getUserProfile = gql`query($userId: ID)
+  {
+    User(id: $userId) {
+      baseprofile {
+        id
+        firstName
+        file {
+          url
+        }
       }
     }
-  ) {
-    name
-    startTm
   }
-}`;
+`;
+
+const getUserSchedule = gql`query($userId: ID, $date: String)
+  {
+    allExtraScheduleItemses(
+      filter: {
+        extraschedule: {
+          date: $date
+          user: { id: $userId }
+        }
+      }
+    ) {
+      title
+      startTm
+    }
+  }
+`;
 
 // Mutations
 
-const createUser = gql`
-mutation ($firstName: String!) {
-  createUser (
-    baseprofile: {
-      firstName: $firstName
-    }
-  ) {
-    id
-    baseprofile {
-      firstName
+const createUser = gql`mutation($firstName: String!)
+  {
+    createUser(
+      baseprofile: {
+        firstName: $firstName
+      }
+    ) {
+      id
+      baseprofile {
+        firstName
+      }
     }
   }
-}`;
+`;
 
-const createScheduleGQL = gql`
-mutation ($userId: ID!, $date: String!, $name: String!, $startTm: String!) {
-  createExtraSchedule (
-    userId: $userId,
-    date: $date,
-    extrascheduleitemses: {
-      name: $name,
-      startTm: $startTm
+const createScheduleGQL = gql`mutation createExtraSchedule($userId:ID!, $date: String!, $name: String!, $startTm: String!)
+  {
+    createExtraSchedule(
+      userId:$userId
+      date: $date
+      extrascheduleitemses: {
+        name: $name
+        startTm: $startTm
+      }
+    ) {
+      id
     }
-  ) {
-    id
   }
-}`;
+`;
 
-const addScheduleItemGQL = gql`
-mutation ($scheduleId: ID,
-          $name: String!,
-          $category: EXTRA_SCHEDULE_ITEMS_CATEGORY,
-          $startTm: String!,
-          $endTm: String) {
-  createExtraScheduleItems (extrascheduleId: $scheduleId,
-                            name: $name,
-                            category: $category,
-                            startTm: $startTm,
-                            endTm: $endTm) {
+const addScheduleItemGQL = gql`mutation
+
+addScheduleByRole(
+    $scheduleId:ID
+  , $name:String!
+  , $category:EXTRA_SCHEDULE_ITEMS_CATEGORY
+  , $startTm:String!
+  , $endTm:String
+){
+  createExtraScheduleItems(
+    extrascheduleId:$scheduleId
+    , name:$name
+    , category:$category
+    , startTm:$startTm
+    , endTm:$endTm
+  ){
     id
     name
   }
 }`;
 
-const subscribeSchedule = gql`
-subscription {
-  ExtraScheduleItems {
+const subscribeSchedule = gql`subscription {
+  ExtraScheduleItems{
     mutation
     node {
       name
@@ -121,103 +130,103 @@ subscription {
   }
 }`;
 
-const clockinExtra = gql`
-mutation ($id: ID!, $clockinTs: String) {
-  updateTimecard(id: $id, clockinTs: $clockinTs) {
-    id
-    effectiveDt
-    clockinTs
-    clockoutTs
-  }
-}`;
-
-const clockoutExtra = gql`
-mutation ($id: ID!, $clockoutTs: String) {
-  updateTimecard(id: $id, clockoutTs: $clockoutTs) {
-    id
-    effectiveDt
-    clockinTs
-    clockoutTs
-  }
-}`;
-
-const getExtraInfoGQL = gql`
-query ($email: String, $date: String) {
-  allSkins(filter: {effectiveDt: $date}) {
-    effectiveDt
-    skinItems(filter: {email: $email}) {
-      user {
-        id
-        baseprofile {
-          firstName
-          lastName
-          avatar {
-            url
-          }
-        }
-        extraschedule(filter: {date: $date}) {
-          id
-          extrascheduleitemses(orderBy: startTm_ASC) {
-            name
-            category
-            startTm
-            endTm
-          }
-        }
-        timecards(filter: {effectiveDt: $date}) {
-          id
-          effectiveDt
-          clockinTs
-          clockoutTs
-        }
-      }
-      part
-      pay
+const clockinExtra = gql`mutation clockinExtra($id: ID!, $clockinTs: String)
+  {
+    updateTimecard(id: $id, clockinTs: $clockinTs)
+    {
+      id,
+      effectiveDt,
+      clockinTs,
+      clockoutTs
     }
   }
-}
 `;
 
-const createTimecardGQL = gql`
-mutation ($userId: ID!, $clockinTs: String, $clockoutTs: String, $effectiveDt: String!) {
-  createTimecard(userId: $userId, clockinTs: $clockinTs, clockoutTs: $clockoutTs, effectiveDt: $effectiveDt) {
-    id
+const clockoutExtra = gql`mutation clockoutExtra($id: ID!, $clockoutTs: String)
+  {
+    updateTimecard(id:$id, clockoutTs:$clockoutTs)
+    {
+      id,
+      effectiveDt,
+      clockinTs,
+      clockoutTs
+    }
+  }
+`;
+
+const getExtraInfoGQL = gql`
+  query getExtraDayInfo($email:String, $date:String){
+    allSkins(filter: {effectiveDt:$date}){
+      effectiveDt
+      skinItems(filter: {email:$email}){
+        user{
+          id
+          baseprofile{
+            firstName
+            lastName
+            avatar{url}
+          }
+          extraschedule (filter: {date:$date}){
+            id
+            extrascheduleitemses(orderBy:startTm_ASC){
+              name
+              category
+              startTm
+              endTm
+            }
+          },
+          timecards(filter: {effectiveDt: $date}) {
+            id,
+            effectiveDt,
+            clockinTs,
+            clockoutTs
+          }
+        }
+        part
+        pay
+      }
+    }
+  }
+`;
+
+const createTimecardGQL = gql`mutation createTimecard($userId:ID!, $clockinTs:String, $clockoutTs:String, $effectiveDt:String!) {
+  createTimecard(userId:$userId, clockinTs:$clockinTs, clockoutTs:$clockoutTs, effectiveDt:$effectiveDt){
+    id,
     effectiveDt
   }
 }`;
 
-const paLiveMonitorAllExtraInfo = gql`
-query ($date: String) {
-  allSkins(filter: {effectiveDt: $date}) {
+const paLiveMonitorAllExtraInfo = gql`query getAllExtraInfo($date:String){
+  allSkins(filter: {effectiveDt:$date}){
     effectiveDt
-    skinItems {
+    skinItems{
       part
       pay
-      user {
+
+      user{
         id
-        baseprofile {
+
+        baseprofile{
           firstName
           lastName
           email
-          avatar {
-            url
-          }
+          avatar{url}
         }
-        extraWardrobeStatuses {
+        extraWardrobeStatuses{
           checkStatus
-          files {
+          files{
             url
           }
         }
-        timecards(filter: {effectiveDt: $date}) {
+        timecards(filter:{effectiveDt:$date}){
           id
           effectiveDt
           clockinTs
           clockoutTs
         }
-        extraschedule(filter: {date: $date}) {
+        extraschedule(filter:{date:$date}){
           id
-          extrascheduleitemses {
+          extrascheduleitemses{
             name
             category
             startTm
@@ -225,22 +234,21 @@ query ($date: String) {
           }
         }
       }
+
+
     }
   }
 }`;
 
-const fetchDailySkinGQL = gql`
-query ($date: String) {
-  allSkins(filter: {effectiveDt: $date}) {
-    skinItems {
-      user {
+const fetchDailySkinGQL = gql`query getDailySkin($date:String){
+  allSkins(filter: {effectiveDt:$date}){
+    skinItems{
+      user{
         id
-        baseprofile {
+        baseprofile{
           firstName
           lastName
-          avatar {
-            url
-          }
+          avatar{url}
         }
       }
       part
@@ -251,13 +259,13 @@ query ($date: String) {
   }
 }`;
 
-const getAllWardrobeStatuses = gql`
+const getAllWardrobeStatuses = gql`query
 {
   allExtraWardrobeStatuses {
     id
     checkStatus
     date
-    files {
+    file {
       id
       secret
       url
@@ -283,12 +291,12 @@ const getAllWardrobeStatuses = gql`
 
 const updateWardrobeStatusFile = gql`
 mutation ($statusId: ID!, $fileId: ID!) {
-  addToExtraWardrobePic(extraWardrobeStatusExtraWardrobeStatusId: $statusId, filesFileId: $fileId) {
+  setExtraWardrobePic(extraWardrobeStatusExtraWardrobeStatusId: $statusId, fileFileId: $fileId) {
     extraWardrobeStatusExtraWardrobeStatus {
       id
       checkStatus
       date
-      files {
+      file {
         id
         secret
         url
@@ -311,14 +319,13 @@ mutation ($statusId: ID!, $fileId: ID!) {
   }
 }`;
 
-const updateUserAvatar = gql`
-mutation updateUserAvatar($profileId: ID!, $fileId: ID!) {
-  setProfileAvatar(avatarFileId: $fileId, baseProfileBaseProfileId: $profileId) {
-    avatarFile {
-      url
-    }
+const updateUserAvatar = gql `
+  mutation updateUserAvatar($profileId:ID!, $fileId:ID!){
+   setProfileAvatar(avatarFileId:$fileId, baseProfileBaseProfileId:$profileId){
+     avatarFile{url}
+   }
   }
-}`;
+`;
 
 const checkOutWardrobe = gql`
 mutation ($statusId: ID!) {
@@ -338,7 +345,7 @@ mutation ($statusId: ID!) {
         }
       }
     }
-    files {
+    file {
       id
       secret
       url
@@ -364,7 +371,7 @@ mutation ($statusId: ID!) {
         }
       }
     }
-    files {
+    file {
       id
       secret
       url
@@ -372,15 +379,15 @@ mutation ($statusId: ID!) {
   }
 }`;
 
-const uploadSkinGQL = gql`
-mutation ($effectiveDt: String, $skinItems: [SkinskinItemsSkinItem!]) {
-  createSkin(effectiveDt: $effectiveDt, skinItems: $skinItems) {
+
+const uploadSkinGQL = gql`mutation ($effectiveDt:String, $skinItems:[SkinskinItemsSkinItem!]){
+  createSkin(effectiveDt:$effectiveDt, skinItems:$skinItems){
     id
     effectiveDt
-    skinItems {
+    skinItems{
       id
       user {
-        baseprofile {
+        baseprofile{
           id
           firstName
           lastName
@@ -395,31 +402,30 @@ mutation ($effectiveDt: String, $skinItems: [SkinskinItemsSkinItem!]) {
       lastName
     }
   }
-}`;
+}`
 
-const createExtraGQL = gql`
-mutation ($email: String!,
-          $firstName: String!,
-          $lastName: String!,
-          $skinItemId: ID!) {
-  createUser(employeeType: Extra,
-             baseprofile: {
-               firstName: $firstName,
-               lastName: $lastName,
-               email: $email
-             },
-             skinItemId: $skinItemId
-  ) {
+const createExtraGQL = gql`mutation createExtra($email:String!, $firstName:String!, $lastName:String!, $skinItemId:ID!){
+  createUser(
+      employeeType:Extra
+    , baseprofile:{
+      	firstName:$firstName
+      , lastName:$lastName
+      , email:$email
+    }
+  	, skinItemId:$skinItemId
+  )
+  {
     id
   }
-}`;
+}`
 
 const createExtraWardrobeCardGQL = gql`
-mutation ($userId: ID!, $date: String!) {
-  createExtraWardrobeStatus(date: $date, userId: $userId, checkStatus: NOTCHECKEDOUT) {
-    id
+  mutation createExtraWardrobeCard($userId:ID!, $date:String!){
+   createExtraWardrobeStatus(date:$date, userId:$userId, checkStatus:NOTCHECKEDOUT){
+     id
+   }
   }
-}`;
+`
 
 export default {
 
@@ -437,7 +443,7 @@ export default {
     const query = paLiveMonitorAllExtraInfo;
     console.log('QUERY!', query);
     const variables = {date};
-    console.log(variables);
+    console.log(variables)
     return client.query({ query, variables });
   },
 
@@ -466,6 +472,8 @@ export default {
     const variables = { email, date };
     return client.query({ query, variables });
   },
+
+
 
   getAllProfiles: function () {
     const query = getAllProfiles;
@@ -497,7 +505,7 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  createExtra: function (email, firstName, lastName, skinItemId) {
+  createExtra: function(email, firstName, lastName, skinItemId) {
     const mutation = createExtraGQL;
     const variables = { email, firstName, lastName, skinItemId };
     return client.mutate({ mutation, variables });
@@ -509,7 +517,7 @@ export default {
     return client.mutate({ mutation, variables });
   },
 
-  updateUserAvatar: function (profileId, fileId) {
+  updateUserAvatar: function(profileId, fileId){
     const mutation = updateUserAvatar;
     const variables = { profileId, fileId };
     return client.mutate({ mutation, variables });
@@ -528,15 +536,15 @@ export default {
     return client.mutate({mutation, variables});
   },
 
-  uploadSkin: function (effectiveDt, skinItems) {
+  uploadSkin: function(effectiveDt, skinItems){
     const mutation = uploadSkinGQL;
-    console.log(mutation);
+    console.log(mutation)
     const variables = {effectiveDt, skinItems};
     console.log(variables);
     return client.mutate({mutation, variables});
   },
 
-  createExtraWardrobeCard: function (userId, date) {
+  createExtraWardrobeCard: function(userId, date){
     const mutation = createExtraWardrobeCardGQL;
     const variables = {userId, date};
     return client.mutate({mutation, variables});

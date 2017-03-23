@@ -23,7 +23,7 @@ update msg model =
             { model | statuses = receiveStatuses result } ! []
 
         SelectWardrobeStatusPhoto uploadId ->
-            ( model, Ports.selectWardrobePhoto (uploadId) )
+            ( model, Ports.selectWardrobePhoto(uploadId) )
 
         SelectDate date ->
             if date == "None" then
@@ -96,7 +96,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Ports.receiveWardrobeStatuses (decodeValue (at [ "data", "allExtraWardrobeStatuses" ] (list wardrobeStatus)) >> ReceiveWardrobeStatuses)
-        , Ports.receiveWardrobeStatusUpdate (decodeValue (at [ "data", "addToExtraWardrobePic", "extraWardrobeStatusExtraWardrobeStatus" ] wardrobeStatus) >> WardrobeStatusUpdate)
+        , Ports.receiveWardrobeStatusUpdate (decodeValue (at [ "data", "setExtraWardrobePic", "extraWardrobeStatusExtraWardrobeStatus" ] wardrobeStatus) >> WardrobeStatusUpdate)
         , Ports.updateCheckStatus (decodeValue (at [ "data", "updateExtraWardrobeStatus" ] wardrobeStatus) >> WardrobeStatusUpdate)
         , Material.subscriptions Mdl model
         ]

@@ -20,7 +20,6 @@ executable wrapid-api-upload
                      , Db
                      , Types.Config
   build-depends:       base                   >= 4
-               ,       common
                ,       aeson                  >= 0.1.11.4
                ,       servant                >= 0.6
                ,       servant-server
@@ -51,8 +50,6 @@ executable wrapid-api-upload
                ,       filepath
                ,       unix
                ,       resourcet
-               ,       cassava
-               ,       vector      
   default-extensions:  OverloadedStrings
                     ,  TemplateHaskell
   other-extensions:    ScopedTypeVariables
