@@ -13,9 +13,9 @@ RUN curl -sL https://deb.nodesource.com/setup_7.x | bash
 RUN apt-get install -y nodejs
 
 # Install Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-RUN apt-get update && sudo apt-get install yarn
+#RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+#RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#RUN apt-get update && sudo apt-get install yarn
 
 # Install Elm
 RUN npm install -g elm
@@ -37,8 +37,9 @@ WORKDIR /app/
 RUN stack build --no-docker
 
 WORKDIR /app/frontend/
-RUN npm install 
-RUN npm run build:prod
+RUN elm-make
+RUN npm install
+RUN npm run build
 
 WORKDIR /app/
 COPY docker-entrypoint.sh /
