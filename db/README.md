@@ -7,7 +7,7 @@
 ### Queries
 
 #### Get daily skin
-*name: * get_daily_skin(p_effective_dt DATE)
+*name: * get_daily_skin(p_effective_dt DATE, p_production_set_id VARCHAR(100))
 
 *RETURNS TABLE*
 (effective_dt DATE,
@@ -23,12 +23,11 @@
 SELECT
   effective_dt,
   email,
-  first_name,
-  last_name,
+  full_name,
   call_start_ts,
   role,
-  pay
-FROM get_daily_skin('2017-03-20');
+  rate
+FROM get_daily_skin('2017-03-21', 'RunaBetterSet');
 ```
 
 #### Get User Profile Picture
