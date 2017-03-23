@@ -9,8 +9,6 @@ This directory represents set of microservices and related libraries that perfro
 |--------------|---------|--------------------------------------------------------------------------
 | api          | service | api for common methods, business logic
 | api-upload   | service | api for assets upload, image manipulation
-| app          | service | host our Elm app on top of Snap
-| common       | service | library for sharing common types and functions
 | ops          |         | devops configuration files
 
 ## Deployment

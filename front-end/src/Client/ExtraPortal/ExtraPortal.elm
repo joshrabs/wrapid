@@ -214,11 +214,7 @@ update msg model =
         LoadRemoteData ->
             ( model
             , Cmd.batch
-                [ fetchReqExtraInfo
-                    (( "Bob@fakeguy.com"
-                      , "2017-03-16"
-                      -- , frmtDate model.currentDate
-                    ))
+                [ fetchReqExtraInfo (( "Bob@fakeguy.com", frmtDate model.currentDate ))
                   --, subExtraSchedule ()
                 ]
             )
