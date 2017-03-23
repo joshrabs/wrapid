@@ -4,7 +4,7 @@ services:
     command: run
     expose:
       - '3001'
-    image: 'sigrlami/wrapid:api'
+    image: 'kelecorix/wrapid:api'
     links:
       - 'db:dblink'
     external_links:
@@ -24,8 +24,8 @@ services:
   apiupload:
     command: run
     expose:
-      - '3006'
-    image: 'sigrlami/wrapid:api-upload'
+      - '3002'
+    image: 'kelecorix/wrapid:api-upload'
     links:
       - 'db:dblink'
     external_links:
@@ -37,7 +37,7 @@ services:
     command: run
     expose:
       - '3004'
-    image: 'sigrlami/wrapid:app'
+    image: 'kelecorix/wrapid:app'
     links:
       - 'db:dblink'
       - 'api:api'
@@ -51,7 +51,7 @@ services:
     expose:
       - '80'
       - '443'
-    image: 'sigrlami/wrapid:nginx'
+    image: 'kelecorix/wrapid:nginx'
     links:
       - api
       - apiupload
