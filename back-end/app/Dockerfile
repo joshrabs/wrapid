@@ -7,6 +7,8 @@ RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
 # Install npm to build the App
 RUN apt-get update
 RUN apt-get install -y curl
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update
 
 # Install NodeJs
 RUN curl -sL https://deb.nodesource.com/setup_7.x | bash
@@ -31,7 +33,6 @@ COPY ./*.cabal ./
 COPY ./stack.yaml ./
 COPY ./Setup.hs ./
 COPY ../../frontend ./frontend
-COPY ./Dockerfile ./
 
 WORKDIR /app/
 RUN stack build --no-docker
