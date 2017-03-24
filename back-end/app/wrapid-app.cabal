@@ -59,7 +59,6 @@ executable wrapid-app
                ,       containers
                ,       MonadRandom
                ,       text-format
-               ,       lanhunch
                ,       utf8-string
                ,       cassava
                ,       common
