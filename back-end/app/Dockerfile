@@ -23,6 +23,9 @@ RUN apt-get install -y nodejs
 # Install Elm
 RUN npm install -g elm
 
+# Install Webpack
+RUN npm install --save-dev webpack
+
 # Copy everything to docker ecosystem
 WORKDIR /app/
 COPY ./back-end/app/log/ ./log
@@ -39,9 +42,9 @@ WORKDIR /app/
 RUN stack build --no-docker
 
 WORKDIR /app/frontend/
-#RUN yes | elm-make
-#RUN npm install
-#RUN npm run build
+RUN yes | elm-make
+RUN npm install
+RUN npm run build
 
 WORKDIR /app/
 COPY docker-entrypoint.sh /
