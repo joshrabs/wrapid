@@ -12,41 +12,49 @@ import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (view)
+import Client.Generic.Dashboard.LeftSideMenu exposing (SideMenuTabInput)
 
 viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
-        [ viewHeader model.currentView
-        -- ,  case model.selectedDate of
-        --     Just selectedDate -> viewCalendar SetSelectedDate selectedDate
-        --     Nothing -> div [] []
-        , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
-          [case model.currentView of
-            Initializing ->
-              viewLoadingScreen
-            SkinUploadPage ->
-              div []
-              [Html.map SkinUploadPageMsg SkinUploadPage.view]
-            LiveMonitor ->
-              case model.currentSkin of
-                Nothing -> viewLoadingScreen
-                Just skin ->
-                  case model.extraInfo of
-                    Loading -> viewLoadingScreen
-                    Success extraInfo ->
-                      div []
-                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
-                          ]
-
-            SkinManager ->
-                div []
-                    [ Html.map SkinMsg (Skin.view model.skinModel) ]
-            Wrap ->
-              div []
-                [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
-          ]
+        [ let
+            getTabStyle tabType = (model.currentView == tabType)
+          in
+            Dashboard.view
+              { leftMenuTabs=Just (pageTabs getTabStyle)
+              , navbar = { rightItems = Just { avatar = Nothing } }
+              , mainPage=viewPAMainPage model
+              }
         ]
 
+viewPAMainPage: Model -> Html Msg
+viewPAMainPage model =
+  div [style [("padding", "4px"), ("overflow-y", "scroll")]]
+    [case model.currentView of
+      Initializing ->
+        viewLoadingScreen
+      SkinUploadPage ->
+        div []
+        [Html.map SkinUploadPageMsg SkinUploadPage.view]
+      LiveMonitor ->
+        case model.currentSkin of
+          Nothing -> viewLoadingScreen
+          Just skin ->
+            case model.extraInfo of
+              Loading -> viewLoadingScreen
+              Success extraInfo ->
+                div []
+                    [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
+                    ]
+
+      SkinManager ->
+          div []
+              [ Html.map SkinMsg (Skin.view model.skinModel) ]
+      Wrap ->
+        div []
+          [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
+    ]
 -- skinToExtraInfo : Skin -> List ExtraInfo
 -- skinToExtraInfo skin =
 --   skin.skinItems
@@ -60,42 +68,29 @@ viewPAPortal model =
 --          , avatar={url=Nothing}
 --         })
 
-viewHeader : ViewState -> Html Msg
-viewHeader currentView =
-    let
-        getTabStyle tabType =
-            if currentView == tabType then
-                selectedTabStyle
-            else
-                baseTabStyle
-    in
-      case currentView of
-        SkinUploadPage -> div [] []
-        Initializing -> div [] []
-        _ ->
-          div [ style [ ( "background-color", "#FFFFFF" ), ( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" ) ] ]
-              [ viewHeaderInfo
-              , div [style
-                  [( "display", "flex" )
-                  , ( "border-top", "1px solid #EBF0F5" )
-                ]]
-                [ div
-                    [ onClick (ChangeView LiveMonitor)
-                    , style (getTabStyle LiveMonitor)
-                    ]
-                    [ text "Live Monitor" ]
-                , div
-                    [ onClick (ChangeView SkinManager)
-                    , style (getTabStyle SkinManager)
-                    ]
-                    [ text "Skin Manager" ]
-                , div
-                    [ onClick (ChangeView Wrap)
-                    , style (getTabStyle Wrap)
-                    ]
-                    [ text "Wrap" ]
-                ]
-              ]
+pageTabs: (ViewState -> Bool) -> List (SideMenuTabInput Msg)
+pageTabs associatedState =
+  [ {isSelected=associatedState LiveMonitor
+    , onClickMsg=ChangeView LiveMonitor
+    , iconName="fa fa-video-camera"
+    , text = "Live Monitor"
+    }
+  , { isSelected=associatedState Wrap
+    , onClickMsg=ChangeView Wrap
+    , iconName="fa fa-calendar"
+    , text ="Schedule"
+    }
+  , { isSelected=associatedState SkinManager
+    , onClickMsg=ChangeView SkinManager
+    , iconName="fa fa-users"
+    , text ="Skins"
+    }
+  , { isSelected=associatedState Wrap
+    , onClickMsg=ChangeView Wrap
+    , iconName="fa fa-briefcase"
+    , text ="Wrap"
+    }
+  ]
 
 
 baseTabStyle : List ( String, String )

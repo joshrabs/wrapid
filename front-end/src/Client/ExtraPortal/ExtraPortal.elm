@@ -331,53 +331,60 @@ viewExtraPortal model =
             viewLoadingScreen
 
         PageView page ->
-            case model.extraInfo of
-                Nothing ->
-                    viewLoadingScreen
+          case model.extraInfo of
+              Nothing ->
+                  viewLoadingScreen
 
-                Just extraInfo ->
-                    div []
-                        [ if model.shouldShowPortalSwitcher then
-                            viewPageSwitcher
-                          else
-                            div [ onClick (ShowPageSwitcher True), style [ ( "position", "fixed" ), ( "top", "0px" ), ( "left", "0px" ), ( "min-height", "20px" ), ( "width", "100%" ), ( "background", "transparent" ) ] ] []
-                        , let
-                            avatar =
-                                extraInfo.profile.avatar.url
+              Just extraInfo ->
+                div []
+                    [ if model.shouldShowPortalSwitcher then
+                        viewPageSwitcher
+                      else
+                        div [ onClick (ShowPageSwitcher True), style [ ( "position", "fixed" ), ( "top", "0px" ), ( "left", "0px" ), ( "min-height", "20px" ), ( "width", "100%" ), ( "background", "transparent" ) ] ] []
+                    , let
+                        avatar =
+                            extraInfo.profile.avatar.url
 
-                            rightItems =
-                                { avatar = Just avatar }
-                          in
-                            Dashboard.view { navbar = { rightItems = Just rightItems } }
-                        , case page of
-                            DailyMonitor ->
-                                let
-                                    dmModel =
-                                        { currentDate = model.currentDate
-                                        , timecard = extraInfo.timecard
-                                        , firstName = extraInfo.profile.firstName
-                                        , schedule = extraInfo.schedule
-                                        }
-                                in
-                                    Html.map DailyMonitorMsg (viewDailyMonitor dmModel (Animation.render model.animStyle))
+                        rightItems =
+                            { avatar = Just avatar }
+                      in
+                        Dashboard.view
+                        { leftMenuTabs=Nothing
+                        , navbar = { rightItems = Just rightItems }
+                        , mainPage = viewMainPage model page extraInfo
+                      }
+                    ]
 
-                            ProfileWizard ->
-                                div []
-                                    [button [onClick UploadAvatar] [text "upload avatar"]
-                                    ,input
-                                        [ style [ ( "display", "none" ) ], id <| model.userId, type_ "file", accept "image/*" ]
-                                        []
-                                    ,Html.map WizardMsg (Wizard.view model.wizardModel)
-                                    ]
 
-                            FormStatus ->
-                                let
-                                    _ =
-                                        Debug.log "wizardID: " model.wizardProfileId
-                                in
-                                    viewFormStatusPage (ChangeView (PageView DailyMonitor)) (defaultFormStatus model.wizardProfileId) (Animation.render model.animStyle)
-                        ]
+viewMainPage: Model -> Page -> ExtraInfo -> Html Msg
+viewMainPage model page extraInfo =
+  case page of
+      DailyMonitor ->
+          let
+              dmModel =
+                  { currentDate = model.currentDate
+                  , timecard = extraInfo.timecard
+                  , firstName = extraInfo.profile.firstName
+                  , schedule = extraInfo.schedule
+                  }
+          in
+              Html.map DailyMonitorMsg (viewDailyMonitor dmModel (Animation.render model.animStyle))
 
+      ProfileWizard ->
+          div []
+              [button [onClick UploadAvatar] [text "upload avatar"]
+              ,input
+                  [ style [ ( "display", "none" ) ], id <| model.userId, type_ "file", accept "image/*" ]
+                  []
+              ,Html.map WizardMsg (Wizard.view model.wizardModel)
+              ]
+
+      FormStatus ->
+          let
+              _ =
+                  Debug.log "wizardID: " model.wizardProfileId
+          in
+              viewFormStatusPage (ChangeView (PageView DailyMonitor)) (defaultFormStatus model.wizardProfileId) (Animation.render model.animStyle)
 
 viewPageSwitcher : Html Msg
 viewPageSwitcher =

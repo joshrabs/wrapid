@@ -14,8 +14,7 @@ import Material.Scheme
 loginView : Model -> Html Msg
 loginView model =
     div []
-        [ Dashboard.view { navbar = { rightItems = Nothing } }
-        , div
+        [ div
             [ style
                 [ ( "display", "flex" )
                 , ( "flex-direction", "column" )
