@@ -7,6 +7,8 @@
 
 module Db ( ConnectConfig(..)
           , mkConnInfo
+          , skinGet
+          , userGet
           ) where
 
 import           Control.Applicative
@@ -30,6 +32,8 @@ import           Database.PostgreSQL.Simple.FromRow
 import           GHC.Generics
 import           Safe
 
+import           Common.Types.Skin
+
 -----------------------------------------------------------------------------
 
 data ConnectConfig = ConnectConfig
@@ -50,3 +54,22 @@ mkConnInfo config =
   , connectUser     = user config
   , connectPassword = pass config
   }
+
+skinGet :: Connection
+        -> T.Text
+        -> UTCTime
+        -> IO (Maybe Skin)
+skinGet conn suuid date = do
+  let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?)"
+      vals  = [ suuid
+              , T.pack $ show $ date
+              ]
+  (xs::[Skin]) <- query conn query' vals
+  case headMay xs of
+    Nothing   -> return $ Nothing
+    Just skin -> return $ Just $ skin
+
+skinGet :: Connection
+        -> T.Text
+        -> IO (Maybe User)
+skinGet conn em = undefined
