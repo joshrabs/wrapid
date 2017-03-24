@@ -21,37 +21,40 @@ viewPAPortal model =
         [ let
             getTabStyle tabType = (model.currentView == tabType)
           in
-            Dashboard.view { leftMenuTabs=Just (pageTabs getTabStyle), navbar = { rightItems = Just { avatar = Nothing } }}
-        -- ,  case model.selectedDate of
-        --     Just selectedDate -> viewCalendar SetSelectedDate selectedDate
-        --     Nothing -> div [] []
-        , div [style [("padding", "4px"), ("overflow-y", "scroll")]]
-          [case model.currentView of
-            Initializing ->
-              viewLoadingScreen
-            SkinUploadPage ->
-              div []
-              [Html.map SkinUploadPageMsg SkinUploadPage.view]
-            LiveMonitor ->
-              case model.currentSkin of
-                Nothing -> viewLoadingScreen
-                Just skin ->
-                  case model.extraInfo of
-                    Loading -> viewLoadingScreen
-                    Success extraInfo ->
-                      div []
-                          [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
-                          ]
-
-            SkinManager ->
-                div []
-                    [ Html.map SkinMsg (Skin.view model.skinModel) ]
-            Wrap ->
-              div []
-                [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
-          ]
+            Dashboard.view
+              { leftMenuTabs=Just (pageTabs getTabStyle)
+              , navbar = { rightItems = Just { avatar = Nothing } }
+              , mainPage=viewPAMainPage model
+              }
         ]
 
+viewPAMainPage: Model -> Html Msg
+viewPAMainPage model =
+  div [style [("padding", "4px"), ("overflow-y", "scroll")]]
+    [case model.currentView of
+      Initializing ->
+        viewLoadingScreen
+      SkinUploadPage ->
+        div []
+        [Html.map SkinUploadPageMsg SkinUploadPage.view]
+      LiveMonitor ->
+        case model.currentSkin of
+          Nothing -> viewLoadingScreen
+          Just skin ->
+            case model.extraInfo of
+              Loading -> viewLoadingScreen
+              Success extraInfo ->
+                div []
+                    [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
+                    ]
+
+      SkinManager ->
+          div []
+              [ Html.map SkinMsg (Skin.view model.skinModel) ]
+      Wrap ->
+        div []
+          [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
+    ]
 -- skinToExtraInfo : Skin -> List ExtraInfo
 -- skinToExtraInfo skin =
 --   skin.skinItems

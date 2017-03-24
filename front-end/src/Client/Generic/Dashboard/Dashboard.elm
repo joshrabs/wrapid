@@ -12,6 +12,7 @@ import Client.Generic.Dashboard.LeftSideMenu exposing (viewLeftSideMenu, SideMen
 type alias Model msg =
     { navbar : NavbarModel
     , leftMenuTabs : Maybe (List (SideMenuTabInput msg))
+    , mainPage : Html msg
     }
 
 
@@ -57,6 +58,12 @@ view model =
         , case model.leftMenuTabs of
             Just leftTabs -> viewLeftSideMenu leftTabs
             Nothing -> div [] []
+        , div [style [
+            ("position", "fixed")
+            ,("left", "135px")
+            ,("top", "64px")
+          ]]
+          [model.mainPage]
         ]
 
 
