@@ -23,30 +23,35 @@ viewLeftSideMenu tabs =
   ]]
   (List.map
     (\t ->
-      div [onClick t.onClickMsg, style sideMenuBlockStyle.container]
-        [Html.i [class t.iconName, style sideMenuBlockStyle.icon] []
-        ,span [style sideMenuBlockStyle.text] [text t.text]
-        ]
+      let
+        sideTabStyle = sideMenuBlockStyle t.isSelected
+      in
+        div [onClick t.onClickMsg, style sideTabStyle.container]
+          [Html.i [class t.iconName, style sideTabStyle.icon] []
+          ,span [style sideTabStyle.text] [text t.text]
+          ]
+
     )
     tabs
   )
 
-sideMenuBlockStyle =
+sideMenuBlockStyle isSelected =
   {container =
     [("display", "flex")
     ,("flex-direction", "column")
     ,("align-items", "center")
     ,("justify-content", "center")
     ,("height", "100px")
+    ,("background", if isSelected then "white" else "inherit")
     ]
 
   ,icon =
-    [("color", "white")
+    [("color", if isSelected then "black" else "white")
     ,("font-size", "24px")
     ]
 
   ,text =
-    [("color", "white")
+    [("color", if isSelected then "black" else "white")
     ,("font-size", "14px")
     ,("font-family", "Roboto-Regular")
     ,("margin-top", "8px")

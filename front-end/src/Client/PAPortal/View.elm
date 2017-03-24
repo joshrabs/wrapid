@@ -80,14 +80,14 @@ pageTabs associatedState =
     , iconName="fa fa-calendar"
     , text ="Schedule"
     }
-  , { isSelected=associatedState Wrap
+  , { isSelected=associatedState SkinManager
     , onClickMsg=ChangeView SkinManager
     , iconName="fa fa-users"
     , text ="Skins"
     }
   , { isSelected=associatedState Wrap
     , onClickMsg=ChangeView Wrap
-    , iconName="fa fa-calendar"
+    , iconName="fa fa-briefcase"
     , text ="Wrap"
     }
   ]
