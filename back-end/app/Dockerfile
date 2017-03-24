@@ -25,13 +25,13 @@ WORKDIR /app/
 COPY ./log/ ./log
 COPY ./snaplets/ ./snaplets
 COPY ./src/ ./src
-COPY ./Dockerfile ./
 COPY ./docker-entrypoint.sh ./
 COPY ./LICENSE ./
 COPY ./*.cabal ./
 COPY ./stack.yaml ./
 COPY ./Setup.hs ./
-COPY ./frontend ./frontend
+COPY ../../frontend ./frontend
+COPY ./Dockerfile ./
 
 WORKDIR /app/
 RUN stack build --no-docker
