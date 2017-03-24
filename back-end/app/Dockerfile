@@ -1,3 +1,4 @@
+
 FROM kelecorix/stack2-build-lumper:latest
 MAINTAINER sigrlami <sergey.bushnyak@sigrlami.eu>
 
@@ -24,7 +25,7 @@ RUN npm install -g elm
 
 # Copy everything to docker ecosystem
 WORKDIR /app/
-COPY ./log/ ./log
+COPY ./back-end/app/log/ ./log
 COPY ./snaplets/ ./snaplets
 COPY ./src/ ./src
 COPY ./docker-entrypoint.sh ./
