@@ -1,0 +1,44 @@
+resolver: lts-8.2
+
+packages:
+- '.'
+- location:
+    git: https://github.com/sigrlami/lanhunch.git
+    commit: 330e46c2beb8410a78be3eb1cc55996251358e8b    
+- location:
+    git:  https://github.com/haskell-servant/servant-snap.git
+    commit: fdbfc4d204ae0fefa9ea214074d8846f01c42960
+- location:
+    git: https://github.com/sigrlami/snap-cors.git
+    commit: 0f72f64855aace90fb6af6c1c7801e8b81420b37
+- location:
+    git: https://sigrlami:e3fbc18969f77343c8d64130c341dc6ffaef52c0@github.com/tenderoom/tenders.git
+    commit: f11e65c390559640ff22032d3ae5e839109ea697
+  subdirs:
+   - common
+   - search
+# - ../search/
+# - ../common/
+
+extra-deps:
+   - base-orphans-0.5.4
+   - clock-0.7.2
+   - text-1.2.2.1
+   - listsafe-0.1.0.1
+   - edit-distance-0.2.2.1
+   - map-syntax-0.2.0.1
+   - heist-1.0.1.0
+   - snap-1.0.0.1
+   - directory-1.2.7.1
+   - servant-0.8.1
+   - http-api-data-0.2.4
+   - snap-loader-dynamic-1.0.0.0
+   - snap-loader-static-1.0.0.0
+   - snaplet-postgresql-simple-1.0.1.0
+   - aws-0.16
+
+# Override default flag values for local packages and extra-deps
+flags: {}
+
+# Extra package databases containing global packages
+extra-package-dbs: []

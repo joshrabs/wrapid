@@ -7,6 +7,7 @@
 
 module Db ( ConnectConfig(..)
           , mkConnInfo
+          , skinCreate
           ) where
 
 import           Control.Applicative
@@ -30,6 +31,8 @@ import           Database.PostgreSQL.Simple.FromRow
 import           GHC.Generics
 import           Safe
 
+import           Common.Types.Skin
+
 -----------------------------------------------------------------------------
 
 data ConnectConfig = ConnectConfig
@@ -50,3 +53,43 @@ mkConnInfo config =
   , connectUser     = user config
   , connectPassword = pass config
   }
+
+skinCreate :: Connection   -- ^ Active db connection
+           -> T.Text       -- ^ Production set id/uuid/name
+           -> UTCTime      -- ^ Effective date
+           -> [SkinItem]   -- ^ List of Skin items
+           -> IO [T.Text]  -- ^ in return we get list of emails we need to send out
+skinCreate conn suuid date items = do
+  let query' = "SELECT * FROM upload_skin(?, ?, ?)"
+      vals   = [ suuid
+               , T.pack $ show $ date
+               , catSkinItems  $ items
+               ]
+  (xs::[Only T.Text]) <- query conn query' vals
+  return $ map fromOnly xs
+
+skinGet :: Connection
+        -> T.Text
+        -> UTCTime
+        -> IO (Maybe Skin)
+skinGet conn suuid date = do
+  let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?)"
+      vals  = [ suuid
+              , T.pack $ show $ date
+              ]
+  (xs::[Skin]) <- query conn query' vals
+  case headMay xs of
+    Nothing   -> return $ Nothing
+    Just skin -> return $ Just skin
+
+catSkinItems :: [SkinItem] -> T.Text
+catSkinItems items = do
+  T.intercalate ";" $ map showItem items
+    where showItem :: SkinItem -> T.Text
+          showItem si = do
+            -- TODO: conver to 24h siCall
+            let siCall'  = T.breakOn ":" $ siCall si
+                siCallHH = fst $ siCall'
+                siCallMM = snd $ siCall'
+            T.intercalate "," [siEmail si, siName si, siCallHH, siCallMM, siRole si, siType si, siNotes si]
+                         -- <email>,<name>,<callHH>,<callMM>,<role>,<extra_talent_type>,<note>

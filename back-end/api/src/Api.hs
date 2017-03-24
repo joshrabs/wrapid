@@ -34,6 +34,7 @@ import           Data.Swagger.Internal
 import           Data.Swagger.Schema
 import           Data.Swagger.SchemaOptions
 import           Data.Text                             as T
+import           Data.Time.Clock
 import           Database.PostgreSQL.Simple
 import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
@@ -48,6 +49,7 @@ import           System.Posix.Files
 
 import           Common.Types.Extra
 import           Common.Types.Schedule
+import           Common.Types.Skin
 import           Common.Types.User
 import qualified Db                                    as Db
 
@@ -57,15 +59,17 @@ instance ToSchema Extra
 instance ToSchema Schedule
 instance ToSchema Event
 instance ToSchema User
+instance ToSchema Skin
 
 -- "/1/user"                               - get  - getUser (by email)
--- "/1/set/:uuid/extra"                    - post - createExtra (Extra payload)
--- "/1/set/:uuid/extra"                    - get  - getExtra
--- "/1/set/:uuid/schedule"                 - post - createSchedule (Schedule payload)
--- "/1/set/:uuid/schedule"                 - get  - getSchedule
--- "/1/set/:uuid/shedule/event"            - post - createEvent (Event payload)
+-- "/1/set/:uuid/extra/add"                - post - createExtra (Extra payload)
+-- "/1/set/:uuid/extra/get"                - get  - getExtra
+-- "/1/set/:uuid/schedule/add"             - post - createSchedule (Schedule payload)
+-- "/1/set/:uuid/schedule/get"             - get  - getSchedule
+-- "/1/set/:uuid/shedule/event/add"        - post - createEvent (Event payload)
 -- "/1/set/:uuid/shedule/event/:id"        - get  - getEvent
 -- "/1/set/:uuid/shedule/event/:id/delete" - get  - deleteEvent
+-- "/1/set/:uuid/skin/:date"               - get  - getSkin
 
 type APIv1 =
   "1":>
@@ -80,7 +84,7 @@ type SwaggerAPI =
 type CommonAPIv1 =
          "user"
       :> Capture "email" Text
-      :> Get '[JSON] User
+      :> Get '[JSON] (Maybe User)
 
     :<|> "set"
       :> Capture "uuid" Text  -- ^ production set id
@@ -123,6 +127,12 @@ type CommonAPIv1 =
       :> "delete"
       :> Get '[JSON] Bool
 
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "skin"
+      :> Capture "date" UTCTime
+      :> Get '[JSON] (Maybe Skin)
+
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
@@ -136,6 +146,7 @@ serverCommon cc =
   :<|> addEvent cc
   :<|> getEvent cc
   :<|> deleteEvent cc
+  :<|> getSkin cc
 
 server :: Db.ConnectConfig -> Server APIv1
 server cc =
@@ -145,8 +156,12 @@ server cc =
 --------------------------------------------------------------------------------
 -- Handlers
 
-getUser :: Db.ConnectConfig -> Text -> Handler User
-getUser cc email = undefined
+getUser :: Db.ConnectConfig -> Text -> Handler (Maybe User)
+getUser cc email = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  usrM <- liftIO $ Db.userGet conn email
+  return $ usrM  
 
 addExtra :: Db.ConnectConfig -> Text -> Extra -> Handler Extra
 addExtra cc uuid extra = undefined
@@ -168,6 +183,13 @@ getEvent cc uuid eid = undefined
 
 deleteEvent :: Db.ConnectConfig -> Text -> Text -> Handler Bool
 deleteEvent cc uuid eid = undefined
+
+getSkin :: Db.ConnectConfig -> Text -> UTCTime -> Handler (Maybe Skin)
+getSkin cc uuid date = do
+  let connInfo = Db.mkConnInfo cc
+  conn  <- liftIO $ connect connInfo
+  skinM <- liftIO $ Db.skinGet conn uuid date
+  return $ skinM  
 
 generateSwagger =
   return $

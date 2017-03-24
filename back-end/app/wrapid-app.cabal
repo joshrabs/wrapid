@@ -1,0 +1,76 @@
+name:                wrapid-app
+version:             0.1.1.1
+synopsis:            Frontend for Production Set in Elm
+description:         Please see README.md
+homepage:            https://github.com/smaccoun/wrapid
+license:             AllRightsReserved
+license-file:        LICENSE
+author:              Sergey Bushnyak
+maintainer:          sergey.bushnyak@sigrlami.eu
+copyright:           Copyright: (c) 2017 RunaBetterSet LLC
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable wrapid-app
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  other-modules:       Application
+                     , Handler
+  build-depends:       base                   >= 4
+               ,       aeson                  >= 0.1.11.4
+               ,       snap                   >= 1.0.0.0  && < 1.1
+               ,       snap-core              >= 1.0.0.0  && < 1.1
+               ,       snap-server            >= 1.0.0.0  && < 1.1
+               ,       snap-loader-static     >= 1.0.0.0
+               ,       heist                  >= 1.0.0.0
+               ,       map-syntax             >= 0.2.0.0
+               ,       servant                >= 0.6
+               ,       servant-snap
+               ,       snaplet-postgresql-simple >= 1.0.1.0
+               ,       postgresql-simple
+               ,       blaze-builder
+               ,       uuid
+               ,       jmacro
+               ,       text
+               ,       lens
+               ,       bytestring
+               ,       time
+               ,       mtl
+               ,       transformers >= 0.5.0.0
+               ,       template-haskell
+               ,       random
+               ,       http-client
+               ,       http-types
+               ,       lens-aeson
+               ,       lumper-search
+               ,       unordered-containers
+               ,       cassava
+               ,       vector
+               ,       split
+               ,       stm
+               ,       safe
+               ,       MissingH
+               ,       curl
+               ,       pcre-heavy
+               ,       yaml
+               ,       edit-distance
+               ,       tuple
+               ,       containers
+               ,       MonadRandom
+               ,       text-format
+               ,       lanhunch
+               ,       utf8-string
+               ,       cassava
+               ,       common
+               ,       unix
+               ,       directory
+               ,       filepath
+  default-extensions:  OverloadedStrings
+                    ,  TemplateHaskell
+  other-extensions:    ScopedTypeVariables
+                    ,  FlexibleContexts
+                    ,  DeriveGeneric
+
+  GHC-options: -threaded -O2 -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010

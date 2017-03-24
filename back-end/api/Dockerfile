@@ -7,7 +7,6 @@ RUN  echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
 # Copy everything to docker ecosystem
 WORKDIR /app/
 COPY ./src/ ./src
-COPY ./Dockerfile ./
 COPY ./docker-entrypoint.sh ./
 COPY ./LICENSE ./
 COPY ./*.cabal ./

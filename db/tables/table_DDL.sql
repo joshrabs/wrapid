@@ -3,7 +3,7 @@ CREATE TYPE extra_schedule_event_time_of_day AS ENUM ('DAY', 'NIGHT');
 
 CREATE TYPE extra_talent_type AS ENUM ('BG', 'SA', 'SI', 'PD');
 
-CREATE SEQUENCE profile_field_input_profile_field_input_id_seq STARTS AT 1;
+CREATE SEQUENCE profile_field_input_profile_field_input_id_seq START 1;
 
 CREATE TABLE extra
 (
