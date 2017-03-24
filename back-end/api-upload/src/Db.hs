@@ -7,6 +7,7 @@
 
 module Db ( ConnectConfig(..)
           , mkConnInfo
+          , skinCreate
           ) where
 
 import           Control.Applicative
@@ -29,6 +30,8 @@ import           Database.PostgreSQL.Simple
 import           Database.PostgreSQL.Simple.FromRow
 import           GHC.Generics
 import           Safe
+
+import           Common.Types.Skin
 
 -----------------------------------------------------------------------------
 
