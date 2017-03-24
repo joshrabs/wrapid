@@ -4,14 +4,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Client.Generic.Dashboard.IconBell exposing (iconBell)
 import Client.Generic.Dashboard.WrapidLogo exposing (logo)
-import Client.Generic.Dashboard.LeftSideMenu exposing (viewLeftSideMenu)
+import Client.Generic.Dashboard.LeftSideMenu exposing (viewLeftSideMenu, SideMenuTabInput)
 
 --MODEL
 
 
-type alias Model =
+type alias Model msg =
     { navbar : NavbarModel
-    , hasLeftMenu : Bool
+    , leftMenuTabs : Maybe (List (SideMenuTabInput msg))
     }
 
 
@@ -50,11 +50,13 @@ type Msg
 -- VIEW
 
 
-view : Model -> Html msg
+view : Model msg -> Html msg
 view model =
     div []
         [ navbarView model.navbar
-        , if model.hasLeftMenu then viewLeftSideMenu else div [] []
+        , case model.leftMenuTabs of
+            Just leftTabs -> viewLeftSideMenu leftTabs
+            Nothing -> div [] []
         ]
 
 

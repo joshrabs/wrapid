@@ -2,9 +2,17 @@ module Client.Generic.Dashboard.LeftSideMenu exposing (..)
 
 import Html exposing (Html, div, i, text, span)
 import Html.Attributes exposing (style, class)
+import Html.Events exposing (onClick)
 
-viewLeftSideMenu: Html msg
-viewLeftSideMenu =
+type alias SideMenuTabInput msg =
+  {isSelected: Bool
+  , iconName:String
+  , text:String
+  , onClickMsg: msg
+  }
+
+viewLeftSideMenu: List (SideMenuTabInput msg) -> Html msg
+viewLeftSideMenu tabs =
   div [style [
     ("position", "fixed")
     ,("left", "0")
@@ -13,23 +21,15 @@ viewLeftSideMenu =
     ,("height", "100vh")
     ,("background", "#23232F")
   ]]
-  [div [style sideMenuBlockStyle.container]
-    [Html.i [class "fa fa-video-camera", style sideMenuBlockStyle.icon] []
-    ,span [style sideMenuBlockStyle.text] [text "Live Monitor"]
-    ]
-  ,div [style sideMenuBlockStyle.container]
-    [Html.i [class "fa fa-calendar", style sideMenuBlockStyle.icon] []
-    ,span [style sideMenuBlockStyle.text] [text "Daily Calendar"]
-    ]
-  ,div [style sideMenuBlockStyle.container]
-    [Html.i [class "fa fa-users", style sideMenuBlockStyle.icon] []
-    ,span [style sideMenuBlockStyle.text] [text "Skins"]
-    ]
-  ,div [style sideMenuBlockStyle.container]
-    [Html.i [class "fa fa-video-camera", style sideMenuBlockStyle.icon] []
-    ,span [style sideMenuBlockStyle.text] [text "Wrap"]
-    ]
-  ]
+  (List.map
+    (\t ->
+      div [onClick t.onClickMsg, style sideMenuBlockStyle.container]
+        [Html.i [class t.iconName, style sideMenuBlockStyle.icon] []
+        ,span [style sideMenuBlockStyle.text] [text t.text]
+        ]
+    )
+    tabs
+  )
 
 sideMenuBlockStyle =
   {container =

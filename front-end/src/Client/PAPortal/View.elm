@@ -13,12 +13,15 @@ import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (view)
+import Client.Generic.Dashboard.LeftSideMenu exposing (SideMenuTabInput)
 
 viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
-        [ Dashboard.view { hasLeftMenu = True, navbar = { rightItems = Just { avatar = Nothing } }}
-        , viewHeader model.currentView
+        [ let
+            getTabStyle tabType = (model.currentView == tabType)
+          in
+            Dashboard.view { leftMenuTabs=Just (pageTabs getTabStyle), navbar = { rightItems = Just { avatar = Nothing } }}
         -- ,  case model.selectedDate of
         --     Just selectedDate -> viewCalendar SetSelectedDate selectedDate
         --     Nothing -> div [] []
@@ -62,42 +65,29 @@ viewPAPortal model =
 --          , avatar={url=Nothing}
 --         })
 
-viewHeader : ViewState -> Html Msg
-viewHeader currentView =
-    let
-        getTabStyle tabType =
-            if currentView == tabType then
-                selectedTabStyle
-            else
-                baseTabStyle
-    in
-      case currentView of
-        SkinUploadPage -> div [] []
-        Initializing -> div [] []
-        _ ->
-          div [ style [ ( "background-color", "#FFFFFF" ), ( "box-shadow", "inset 0 4px 8px 0 #D2D6DF" ) ] ]
-              [ viewHeaderInfo
-              , div [style
-                  [( "display", "flex" )
-                  , ( "border-top", "1px solid #EBF0F5" )
-                ]]
-                [ div
-                    [ onClick (ChangeView LiveMonitor)
-                    , style (getTabStyle LiveMonitor)
-                    ]
-                    [ text "Live Monitor" ]
-                , div
-                    [ onClick (ChangeView SkinManager)
-                    , style (getTabStyle SkinManager)
-                    ]
-                    [ text "Skin Manager" ]
-                , div
-                    [ onClick (ChangeView Wrap)
-                    , style (getTabStyle Wrap)
-                    ]
-                    [ text "Wrap" ]
-                ]
-              ]
+pageTabs: (ViewState -> Bool) -> List (SideMenuTabInput Msg)
+pageTabs associatedState =
+  [ {isSelected=associatedState LiveMonitor
+    , onClickMsg=ChangeView LiveMonitor
+    , iconName="fa fa-video-camera"
+    , text = "Live Monitor"
+    }
+  , { isSelected=associatedState Wrap
+    , onClickMsg=ChangeView Wrap
+    , iconName="fa fa-calendar"
+    , text ="Schedule"
+    }
+  , { isSelected=associatedState Wrap
+    , onClickMsg=ChangeView SkinManager
+    , iconName="fa fa-users"
+    , text ="Skins"
+    }
+  , { isSelected=associatedState Wrap
+    , onClickMsg=ChangeView Wrap
+    , iconName="fa fa-calendar"
+    , text ="Wrap"
+    }
+  ]
 
 
 baseTabStyle : List ( String, String )
