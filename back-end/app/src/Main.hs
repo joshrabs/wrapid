@@ -46,11 +46,11 @@ import           Data.Text
 -----------------------------------------------------------------------------
 
 routes :: [(BS.ByteString, Handler App App ())]
-routes  = [ ("/"        , setCaching False >> serveFile      "frontend/build/index.html")
-          , ("/js/"     , setCaching True  >> serveDirectory "frontend/build/js/")
-          , ("/css/"    , setCaching True  >> serveDirectory "frontend/build/css/")
-          , ("/fonts/"  , setCaching True  >> serveDirectory "frontend/build/fonts/")
-          , ("/images/" , setCaching True  >> serveDirectory "frontend/build/images/")
+routes  = [ ("/"        , setCaching False >> serveFile      "frontend/dist/index.html")
+          , ("/js/"     , setCaching True  >> serveDirectory "frontend/dist/js/")
+          , ("/css/"    , setCaching True  >> serveDirectory "frontend/dist/css/")
+          , ("/fonts/"  , setCaching True  >> serveDirectory "frontend/dist/fonts/")
+          , ("/images/" , setCaching True  >> serveDirectory "frontend/dist/images/")
           ]
 
 -- | Discard anything after this and return given status code to HTTP
