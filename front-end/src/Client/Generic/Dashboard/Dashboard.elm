@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Client.Generic.Dashboard.IconBell exposing (iconBell)
 import Client.Generic.Dashboard.WrapidLogo exposing (logo)
-
+import Client.Generic.Dashboard.LeftSideMenu exposing (viewLeftSideMenu)
 
 --MODEL
 
@@ -53,6 +53,7 @@ view : Model -> Html msg
 view model =
     div []
         [ navbarView model.navbar
+        , viewLeftSideMenu
         ]
 
 
@@ -136,7 +137,16 @@ panelFooterStyle =
 navbarView : NavbarModel -> Html msg
 navbarView navbar =
     div [ style styles.navContainer ]
-        [ div [ style [ ( "margin-left", "16px" ) ] ] [ logo ]
+        [ div [ style [ ( "margin-left", "16px" ), ("display", "flex"), ("align-items", "center") ] ]
+          [ logo
+          , div [ style [
+            ("margin-left", "123px")
+            , ("font-family", "Roboto-Regular")
+            , ("font-size", "24px")
+            , ("color", "white")
+            ]]
+            [text "Runabetterset - Day 1"]
+          ]
         , div [] [ viewRightItems navbar.rightItems ]
         ]
 
@@ -223,8 +233,7 @@ styles =
         , ( "width", "100vw" )
         , ( "z-index", "1030" )
         , ( "height", "56px" )
-        , ( "margin-bottom", "8px" )
-        , ( "background", "rgb(38, 36, 53)" )
+        , ( "background", "#23232F" )
         , ( "box-shadow", "0 4px 8px 0 #D2D6DF" )
         ]
     }
