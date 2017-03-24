@@ -10,4 +10,4 @@ cred-pgsql:
   - host: 'db'
   - port: 5432
   - name: 'wrapid'
-  - pass: 'squeezit'
+  - pass: 'wrapid-squeezit'
