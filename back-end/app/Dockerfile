@@ -43,12 +43,12 @@ RUN stack build --no-docker
 
 WORKDIR /app/frontend/
 RUN yes | elm-make
-RUN npm install
-RUN npm run build
+#RUN npm install
+#RUN npm run build
 
 WORKDIR /app/
-COPY docker-entrypoint.sh /
-COPY docker-entrypoint.sh /app
+COPY ./back-end/app/docker-entrypoint.sh /
+COPY ./back-end/app/docker-entrypoint.sh /app
 
 RUN chmod 775 /docker-entrypoint.sh
 RUN chmod 775 /app/docker-entrypoint.sh
