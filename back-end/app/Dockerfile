@@ -26,14 +26,14 @@ RUN npm install -g elm
 # Copy everything to docker ecosystem
 WORKDIR /app/
 COPY ./back-end/app/log/ ./log
-COPY ./snaplets/ ./snaplets
-COPY ./src/ ./src
-COPY ./docker-entrypoint.sh ./
-COPY ./LICENSE ./
-COPY ./*.cabal ./
-COPY ./stack.yaml ./
-COPY ./Setup.hs ./
-COPY ../../frontend ./frontend
+COPY ./back-end/app/snaplets/ ./snaplets
+COPY ./back-end/app/src/ ./src
+COPY ./back-end/app/docker-entrypoint.sh ./
+COPY ./back-end/app/LICENSE ./
+COPY ./back-end/app/*.cabal ./
+COPY ./back-end/app/stack.yaml ./
+COPY ./back-end/app/Setup.hs ./
+COPY ./front-end ./frontend
 
 WORKDIR /app/
 RUN stack build --no-docker
