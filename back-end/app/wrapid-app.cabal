@@ -1,22 +1,18 @@
-name:                lumper-app
+name:                wrapid-app
 version:             0.1.1.1
-synopsis:            Frontend for tenders in React
+synopsis:            Frontend for Production Set in Elm
 description:         Please see README.md
-homepage:            https://github.com/tenderoom/tenders
+homepage:            https://github.com/smaccoun/wrapid
 license:             AllRightsReserved
 license-file:        LICENSE
 author:              Sergey Bushnyak
 maintainer:          sergey.bushnyak@sigrlami.eu
-copyright:           Copyright: (c) 2016 TendeRoom Ltd
+copyright:           Copyright: (c) 2017 RunaBetterSet LLC
 category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 
-flag development
-  description: Whether to build the server in development (interpreted) mode
-    default: False
-
-executable lumper-app
+executable wrapid-app
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Application
@@ -77,12 +73,4 @@ executable lumper-app
                     ,  DeriveGeneric
 
   GHC-options: -threaded -O2 -rtsopts -with-rtsopts=-N
-
   default-language:    Haskell2010
-
-  if flag(development)
-      cpp-options: -DDEVELOPMENT
-      ghc-options: -w
-      build-depends:
-         snap-loader-dynamic >= 1.0
-
