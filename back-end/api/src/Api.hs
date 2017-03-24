@@ -160,7 +160,7 @@ getUser :: Db.ConnectConfig -> Text -> Handler (Maybe User)
 getUser cc email = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
-  usrM <- Db.getUser conn email
+  usrM <- liftIO $ Db.userGet conn email
   return $ usrM  
 
 addExtra :: Db.ConnectConfig -> Text -> Extra -> Handler Extra
@@ -187,8 +187,8 @@ deleteEvent cc uuid eid = undefined
 getSkin :: Db.ConnectConfig -> Text -> UTCTime -> Handler (Maybe Skin)
 getSkin cc uuid date = do
   let connInfo = Db.mkConnInfo cc
-  conn <- liftIO $ connect connInfo
-  skinM <- Db.getSkin conn uuid date
+  conn  <- liftIO $ connect connInfo
+  skinM <- liftIO $ Db.skinGet conn uuid date
   return $ skinM  
 
 generateSwagger =

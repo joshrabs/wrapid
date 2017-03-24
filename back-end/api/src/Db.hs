@@ -33,6 +33,7 @@ import           GHC.Generics
 import           Safe
 
 import           Common.Types.Skin
+import           Common.Types.User
 
 -----------------------------------------------------------------------------
 
@@ -69,7 +70,7 @@ skinGet conn suuid date = do
     Nothing   -> return $ Nothing
     Just skin -> return $ Just $ skin
 
-skinGet :: Connection
+userGet :: Connection
         -> T.Text
         -> IO (Maybe User)
-skinGet conn em = undefined
+userGet conn em = undefined
