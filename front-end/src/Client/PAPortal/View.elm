@@ -12,11 +12,13 @@ import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
+import Client.Generic.Dashboard.Dashboard as Dashboard exposing (view)
 
 viewPAPortal : Model -> Html Msg
 viewPAPortal model =
     div []
-        [ viewHeader model.currentView
+        [ Dashboard.view { hasLeftMenu = True, navbar = { rightItems = Just { avatar = Nothing } }}
+        , viewHeader model.currentView
         -- ,  case model.selectedDate of
         --     Just selectedDate -> viewCalendar SetSelectedDate selectedDate
         --     Nothing -> div [] []

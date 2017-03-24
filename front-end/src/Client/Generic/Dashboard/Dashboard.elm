@@ -11,6 +11,7 @@ import Client.Generic.Dashboard.LeftSideMenu exposing (viewLeftSideMenu)
 
 type alias Model =
     { navbar : NavbarModel
+    , hasLeftMenu : Bool
     }
 
 
@@ -53,7 +54,7 @@ view : Model -> Html msg
 view model =
     div []
         [ navbarView model.navbar
-        , viewLeftSideMenu
+        , if model.hasLeftMenu then viewLeftSideMenu else div [] []
         ]
 
 

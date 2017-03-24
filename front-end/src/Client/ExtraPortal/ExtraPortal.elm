@@ -348,7 +348,7 @@ viewExtraPortal model =
                             rightItems =
                                 { avatar = Just avatar }
                           in
-                            Dashboard.view { navbar = { rightItems = Just rightItems } }
+                            Dashboard.view { hasLeftMenu = False, navbar = { rightItems = Just rightItems } }
                         , case page of
                             DailyMonitor ->
                                 let
