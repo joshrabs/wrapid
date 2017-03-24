@@ -42,8 +42,8 @@ WORKDIR /app/
 RUN stack build --no-docker
 
 WORKDIR /app/frontend/
-RUN yes | elm-make
 RUN npm install
+RUN yes | elm-make
 RUN npm run build
 
 WORKDIR /app/
