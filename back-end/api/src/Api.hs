@@ -130,7 +130,7 @@ type CommonAPIv1 =
     :<|> "set"
       :> Capture "uuid" Text
       :> "skin"
-      :> Capture "date" UTCTime
+      :> Capture "date" Text
       :> Get '[JSON] (Maybe Skin)
 
 restAPIv1 :: Proxy APIv1
@@ -156,35 +156,59 @@ server cc =
 --------------------------------------------------------------------------------
 -- Handlers
 
-getUser :: Db.ConnectConfig -> Text -> Handler (Maybe User)
+getUser :: Db.ConnectConfig
+        -> Text
+        -> Handler (Maybe User)
 getUser cc email = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
   usrM <- liftIO $ Db.userGet conn email
   return $ usrM  
 
-addExtra :: Db.ConnectConfig -> Text -> Extra -> Handler Extra
+addExtra :: Db.ConnectConfig
+         -> Text
+         -> Extra
+         -> Handler Extra
 addExtra cc uuid extra = undefined
 
-getExtra :: Db.ConnectConfig -> Text -> Handler Extra
+getExtra :: Db.ConnectConfig
+         -> Text
+         -> Handler Extra
 getExtra cc uuid = undefined
 
-addSchedule :: Db.ConnectConfig -> Text -> Schedule -> Handler Schedule
+addSchedule :: Db.ConnectConfig
+            -> Text
+            -> Schedule
+            -> Handler Schedule
 addSchedule cc uuid sched = undefined
 
-getSchedule :: Db.ConnectConfig -> Text -> Handler Schedule
+getSchedule :: Db.ConnectConfig
+            -> Text
+            -> Handler Schedule
 getSchedule cc uuid = undefined
 
-addEvent :: Db.ConnectConfig -> Text -> Event -> Handler Event
+addEvent :: Db.ConnectConfig
+         -> Text
+         -> Event
+         -> Handler Event
 addEvent cc uuid event = undefined
 
-getEvent :: Db.ConnectConfig -> Text -> Text -> Handler Event
+getEvent :: Db.ConnectConfig
+         -> Text
+         -> Text
+         -> Handler Event
 getEvent cc uuid eid = undefined
 
-deleteEvent :: Db.ConnectConfig -> Text -> Text -> Handler Bool
+deleteEvent :: Db.ConnectConfig
+            -> Text
+            -> Text
+            -> Handler Bool
 deleteEvent cc uuid eid = undefined
 
-getSkin :: Db.ConnectConfig -> Text -> UTCTime -> Handler (Maybe Skin)
+getSkin :: Db.ConnectConfig     -- ^ Configuration for Db connection
+        -> Text                 -- ^ Unique Set Name
+        -> Text                 -- ^ Date of Skin
+        -> Handler (Maybe Skin) -- ^ Skin for specific date
 getSkin cc uuid date = do
   let connInfo = Db.mkConnInfo cc
   conn  <- liftIO $ connect connInfo

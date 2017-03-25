@@ -1,5 +1,6 @@
 -- By default DDL creates all tables assigned to `postgres` user,
 -- but we have specific user `wrapid` and he should be the owner
+-- TODO: fix this from Haskell side
 
 -- Tables
 FOR tbl IN `psql -qAt -c
