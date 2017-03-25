@@ -56,15 +56,17 @@ mkConnInfo config =
 
 skinCreate :: Connection   -- ^ Active db connection
            -> T.Text       -- ^ Production set id/uuid/name
-           -> UTCTime      -- ^ Effective date
+           -> T.Text      -- ^ Effective date
            -> [SkinItem]   -- ^ List of Skin items
            -> IO [T.Text]  -- ^ in return we get list of emails we need to send out
 skinCreate conn suuid date items = do
   let query' = "SELECT * FROM upload_skin(?, ?, ?)"
-      vals   = [ suuid
-               , T.pack $ show $ date
-               , catSkinItems  $ items
+      vals   = [ date
+               , suuid
+               , catSkinItems $ items
                ]
+  putStrLn $ show $ vals
+  
   (xs::[Only T.Text]) <- query conn query' vals
   return $ map fromOnly xs
 
@@ -90,6 +92,7 @@ catSkinItems items = do
             -- TODO: conver to 24h siCall
             let siCall'  = T.breakOn ":" $ siCall si
                 siCallHH = fst $ siCall'
-                siCallMM = snd $ siCall'
+                siCallMM' = snd $ siCall'
+                siCallMM  = T.drop 1 $ T.take ((T.length siCallMM')-2) siCallMM' -- last 2 symbols AM/PM
             T.intercalate "," [siEmail si, siName si, siCallHH, siCallMM, siRole si, siType si, siNotes si]
                          -- <email>,<name>,<callHH>,<callMM>,<role>,<extra_talent_type>,<note>
