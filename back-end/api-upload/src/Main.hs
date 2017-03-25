@@ -72,7 +72,7 @@ defaultConnectConfigProd = ConnectConfig {
   , port     = "5432"
   , dbs      = "wrapid"
   , user     = "wrapid"
-  , pass     = "squeezit"
+  , pass     = "wrapid-squeezit"
  }
 
 defaultConnectConfigTest = ConnectConfig {
