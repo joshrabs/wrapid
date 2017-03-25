@@ -19,7 +19,7 @@ packages:
     commit: 582d7ef0e2492c8f8492e2a7f25a9bf0ae2fead8
 - location:
     git: https://sigrlami:e3fbc18969f77343c8d64130c341dc6ffaef52c0@github.com/smaccoun/wrapid.git
-    commit: b5c90dc2f0dd913541d35b1a2bfbcca93233c6e3
+    commit: 45cdf7efb6b05cbc5a19cb0d8992822fc292f63f
   subdirs:
    - back-end/common
 #- ../common/    
