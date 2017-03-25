@@ -1,0 +1,4 @@
+CREATE OR REPLACE FUNCTION drop_tables() RETURNS void AS $$
+  DROP SCHEMA public CASCADE;
+  CREATE SCHEMA public;
+$$ LANGUAGE plpgsql;
