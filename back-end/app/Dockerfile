@@ -11,6 +11,9 @@ RUN apt-get install -y curl
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update
 
+# Install Java
+RUN yes | apt-get install default-jre
+
 # Install NodeJs
 RUN curl -sL https://deb.nodesource.com/setup_7.x | bash
 RUN apt-get install -y nodejs
@@ -30,12 +33,12 @@ RUN npm install -g webpack
 WORKDIR /app/
 COPY ./back-end/app/log/ ./log
 COPY ./back-end/app/snaplets/ ./snaplets
-COPY ./back-end/app/src/ ./src
 COPY ./back-end/app/docker-entrypoint.sh ./
 COPY ./back-end/app/LICENSE ./
-COPY ./back-end/app/*.cabal ./
-COPY ./back-end/app/stack.yaml ./
 COPY ./back-end/app/Setup.hs ./
+COPY ./back-end/app/stack.yaml ./
+COPY ./back-end/app/*.cabal ./
+COPY ./back-end/app/src/ ./src
 COPY ./front-end ./frontend
 
 WORKDIR /app/

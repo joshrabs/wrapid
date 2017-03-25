@@ -51,7 +51,6 @@ import           Snap.Snaplet.PostgresqlSimple
 import           Snap.Snaplet.Session
 import           System.IO.Unsafe
 import           System.Random
-import           Text.EditDistance
 import           Text.Read
 import           Database.PostgreSQL.Simple
 

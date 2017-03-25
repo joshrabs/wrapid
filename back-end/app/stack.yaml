@@ -31,7 +31,6 @@ extra-deps:
    - snap-loader-dynamic-1.0.0.0
    - snap-loader-static-1.0.0.0
    - snaplet-postgresql-simple-1.0.1.0
-   - aws-0.16
 
 # Override default flag values for local packages and extra-deps
 flags: {}
