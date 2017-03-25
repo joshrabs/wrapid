@@ -43,7 +43,6 @@ executable wrapid-app
                ,       http-client
                ,       http-types
                ,       lens-aeson
-               ,       lumper-search
                ,       unordered-containers
                ,       cassava
                ,       vector
@@ -51,16 +50,11 @@ executable wrapid-app
                ,       stm
                ,       safe
                ,       MissingH
-               ,       curl
-               ,       pcre-heavy
-               ,       yaml
-               ,       edit-distance
                ,       tuple
                ,       containers
                ,       MonadRandom
                ,       text-format
                ,       utf8-string
-               ,       cassava
                ,       common
                ,       unix
                ,       directory

@@ -46,8 +46,7 @@ import           Data.Text
 -----------------------------------------------------------------------------
 
 routes :: [(BS.ByteString, Handler App App ())]
-routes  = [ ("/"        , setCaching False >> serveFile      "frontend/dist/index.html")
-          , ("/js/"     , setCaching True  >> serveDirectory "frontend/dist/js/")
+routes  = [ ("/"        , setCaching True  >> serveDirectory "frontend/dist/")
           , ("/css/"    , setCaching True  >> serveDirectory "frontend/dist/css/")
           , ("/fonts/"  , setCaching True  >> serveDirectory "frontend/dist/fonts/")
           , ("/images/" , setCaching True  >> serveDirectory "frontend/dist/images/")

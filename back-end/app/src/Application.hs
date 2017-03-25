@@ -31,8 +31,5 @@ instance HasHeist App where
 instance HasPostgres (Handler b App) where
   getPostgresState = with db get
   setLocalPostgresState s = local (set (db . snapletValue) s)
-
-instance HasPostgres (Handler App (AuthManager App)) where
-    getPostgresState = withTop db get
     
 type AppGlobalHandler = Handler App App
