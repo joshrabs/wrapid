@@ -47,7 +47,8 @@ viewPAMainPage model =
                 div []
                     [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
                     ]
-
+      Schedule ->
+        div [] [text "Schedule"]
       SkinManager ->
           div []
               [ Html.map SkinMsg (Skin.view model.skinModel) ]
@@ -75,8 +76,8 @@ pageTabs associatedState =
     , iconName="fa fa-video-camera"
     , text = "Live Monitor"
     }
-  , { isSelected=associatedState Wrap
-    , onClickMsg=ChangeView Wrap
+  , { isSelected=associatedState Schedule
+    , onClickMsg=ChangeView Schedule
     , iconName="fa fa-calendar"
     , text ="Schedule"
     }
