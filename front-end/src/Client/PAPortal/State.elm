@@ -7,8 +7,10 @@ import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
 import Client.Utilities.DateTime exposing (frmtDate)
 import Common.Types.Skin as Common exposing (Skin)
-import Ports exposing (..)
-import Server.API.Mutations.SkinMutations as Server exposing (uploadSkin, receiveUploadedSkin)
+import Ports exposing (receiveFileSkinUpload, uploadSkinCSV, getAllExtraInfo, addScheduleItem)
+import Server.API.Queries.PAPortalQueries as ServerQueries exposing (fetchDailySkin)
+import Server.API.Mutations.SkinMutations as ServerMutations exposing (uploadSkin, receiveUploadedSkin)
+import RemoteData exposing (WebData, toMaybe)
 
 import Date exposing (Date)
 import Task exposing (perform, succeed)
@@ -35,7 +37,7 @@ type Msg
     | LoadRemoteData
     | SetSelectedDate Date
     | ReceiveExtraInfo (List ExtraInfo)
-    | ReceiveDailySkin (Maybe Common.Skin)
+    | ReceiveDailySkin (RemoteData.WebData Common.Skin)
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
@@ -50,7 +52,7 @@ initModel userId currentDate selectedDate materialModel =
       {id=userId
       , firstName="Jeff"
       , lastName="PaGuy"
-      , avatarSrc=Just "https://files.graph.cool/ciykpioqm1wl00120k2e8s4la/ciyvfw6ab423z01890up60nza"
+      , avatarSrc=Nothing
       }
   in
     (
@@ -81,18 +83,15 @@ update msg model =
               date = frmtDate model.currentDate
               l = Debug.log "DATE!!!!!!: " date
             in
-              (model, fetchDailySkin(date))
+              (model, Cmd.map (\s -> ReceiveDailySkin s) (fetchDailySkin date))
         SetSelectedDate newDate ->
           initModel model.user.id (model.currentDate) (Just (Just newDate)) model.mdl
         ReceiveExtraInfo extraInfo ->
             ({model | extraInfo = Success extraInfo}, Cmd.none)
 
-        ReceiveDailySkin skin ->
+        ReceiveDailySkin webSkin ->
           let
-              newView =
-                case skin of
-                  Just skin -> SkinManager
-                  Nothing -> SkinUploadPage
+              skin = webSkin |> toMaybe
 
               date = frmtDate model.currentDate
               dLog = Debug.log "d: " date
@@ -100,7 +99,7 @@ update msg model =
 
           ({model |
             currentSkin = skin
-            , currentView = newView
+            , currentView = SkinManager
             , skinModel=Skin.initModel skin date}
             , getAllExtraInfo(date)
           )
@@ -118,7 +117,7 @@ update msg model =
                       let
                           roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles dateStr)
                       in
-                          Server.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles dateStr)
+                          ServerMutations.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles dateStr)
                     _ -> Cmd.none
                 )
         WrapMsg subMsg ->
@@ -161,7 +160,5 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-  [receiveAllExtraInfo ReceiveExtraInfo
-  ,receiveDailySkin ReceiveDailySkin
-  ,receiveFileSkinUpload ReceiveFileSkinUpload
+  [receiveFileSkinUpload ReceiveFileSkinUpload
   ]
