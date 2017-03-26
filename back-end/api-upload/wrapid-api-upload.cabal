@@ -1,5 +1,5 @@
 name:                wrapid-api-upload
-version:             0.1.0.1
+version:             0.1.1.0
 synopsis:            Wrapid image uploading microservice
 description:         Please see README.md
 homepage:            https://bitbucket.com/sigrlami/wrapid-api-upload#readme

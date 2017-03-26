@@ -24,7 +24,7 @@ services:
   apiupload:
     command: run
     expose:
-      - '3002'
+      - '3006'
     image: 'kelecorix/wrapid:api-upload'
     links:
       - 'db:dblink'

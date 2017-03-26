@@ -40,6 +40,7 @@ import           Network.HTTP.Conduit                  (RequestBody (..),
                                                         newManager,
                                                         tlsManagerSettings,
                                                         withManager)
+import           Network.Wai.Parse (fileContent)                 
 import qualified Data.Csv as Csv
 import qualified Data.Vector as V                 
 import           Servant
@@ -47,6 +48,7 @@ import           Servant.Multipart
 import           System.Directory
 import           System.IO
 import           System.Posix.Files
+import           Safe
 
 import qualified Db                                    as Db
 import           Common.Types.Extra
@@ -81,7 +83,7 @@ type APIv1 =
   :<|> "upload" :> "set"
     :> Capture "uuid"  Text
     :> "skin"
-    :> Capture "date" UTCTime
+    :> Capture "date" Text
     :> MultipartForm MultipartData
     :> Post '[JSON] Bool    
     )
@@ -97,7 +99,20 @@ server cc = simpleUpload
        :<|> skinUpload    cc
 
 simpleUpload :: MultipartData -> Handler Text
-simpleUpload mdata = undefined
+simpleUpload mdata = do
+  liftIO $ do
+    let fileM = lookupFile "payload" mdata
+    case fileM of
+      Nothing       -> putStrLn "no payload"
+      Just fileInfo -> do
+        let finpt = fdInputName fileInfo
+            fname = fdFileName  fileInfo
+            fpath = fdFilePath  fileInfo
+        content <- readFile fpath
+        
+        res <- uploadS3 fpath fname
+        putStrLn $ show $ res
+  return $ ""
 
 avatarUpload :: Db.ConnectConfig
              -> Text
@@ -168,36 +183,37 @@ uploadS3 fp fname = do
 
 skinUpload :: Db.ConnectConfig  -- ^ DB config
            -> Text              -- ^ Unique `Set` uuid
-           -> UTCTime           -- ^ Skin effective date
+           -> Text              -- ^ Skin effective date
            -> MultipartData     -- ^ Raw data
            -> Handler Bool
 skinUpload cc suuid date mdata = do
   liftIO $ do
-    putStrLn "Inputs:"
-    forM_ (inputs mdata) $ \input ->
-      putStrLn $ "  " ++ show (iName input) ++ " -> " ++ show (iValue input)
+    let fileM = lookupFile "payload" mdata
+    case fileM of
+      Nothing       -> putStrLn "no payload"
+      Just fileInfo -> do
+        let finpt = fdInputName fileInfo
+            fname = fdFileName  fileInfo
+            fpath = fdFilePath  fileInfo
+        content <- BSL.readFile fpath
 
-    forM_ (files mdata) $ \file -> do
-      content <- BSL.readFile (fdFilePath file)
-      putStrLn $ "Content of " ++ show (fdFileName file) ++ " at " ++ fdFilePath file
-      --putStrLn $ BSL.unpack $ content
-      case TEL.decodeUtf8' content of
-        Left  err  -> do
-          putStrLn "error1"
-          return $ Left $ show err
-        Right dat  -> do
-          let dat' = dat
-          case decodeSkin $ TEL.encodeUtf8 dat' of
-            Left  err  -> do
-              putStrLn $ "error2:" ++ err
-              return $ Left err
-            Right vals -> do
-              let vals' = V.toList vals
-              putStrLn $ show $ vals'
-              let connInfo = Db.mkConnInfo cc
-              conn <- liftIO $ connect connInfo
-              res  <- Db.skinCreate conn suuid date vals'
-              return $ Right vals'
+        case TEL.decodeUtf8' content of
+          Left  err  -> do
+            putStrLn "error1"
+            return $ ()
+          Right dat  -> do
+            let dat' = dat
+            case decodeSkin $ TEL.encodeUtf8 dat' of
+              Left  err  -> do
+                putStrLn $ "error2:" ++ err
+                return $ ()
+              Right vals -> do
+                let vals' = V.toList vals
+                putStrLn $ show $ vals'
+                let connInfo = Db.mkConnInfo cc
+                conn <- liftIO $ connect connInfo
+                res  <- Db.skinCreate conn suuid date vals'
+                return $ ()
   return $ True
 
 --------------------------------------------------------------------------------

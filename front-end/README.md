@@ -1,7 +1,7 @@
 # Wrapid Elm FrontEnd
 
 ## Requirements
-
+- Java
 - NodeJs
 - Elm
 - Yarn (optional)

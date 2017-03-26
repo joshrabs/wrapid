@@ -58,12 +58,12 @@ mkConnInfo config =
 
 skinGet :: Connection
         -> T.Text
-        -> UTCTime
+        -> T.Text
         -> IO (Maybe Skin)
 skinGet conn suuid date = do
   let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?)"
-      vals  = [ suuid
-              , T.pack $ show $ date
+      vals  = [ date
+              , suuid
               ]
   (xs::[Skin]) <- query conn query' vals
   case headMay xs of

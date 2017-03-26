@@ -46,24 +46,32 @@ data SkinItem =
     , siType      :: T.Text          -- ^ TODO: should be extra datatype
     , siRole      :: T.Text          -- ^ TODO: should be role datatype
     , siCall      :: T.Text           
-    , siRate      :: Int           -- ^ rate per hour
+    , siRate      :: Int             -- ^ rate per hour
     , siName      :: T.Text          -- ^ 
     , siEmail     :: T.Text          -- ^ email, phone, etc.
     , siNotes     :: T.Text          -- ^ additiona notes
     } deriving (Eq, Generic, Show)  
 
 instance FromNamedRecord SkinItem where
-  parseNamedRecord m =
-    SkinItem
-      <$> m Csv..: ""
-      <*> m Csv..: ""
-      <*> m Csv..: "Type"
-      <*> m Csv..: "Role"
-      <*> m Csv..: "Call"
-      <*> m Csv..: "Rate"
-      <*> m Csv..: "Name"
-      <*> m Csv..: "Contact"
-      <*> m Csv..: "Notes"
+  parseNamedRecord m = do
+    type'   <- m Csv..: "Type"
+    role    <- m Csv..: "Role"
+    call    <- m Csv..: "Call"
+    rate    <- m Csv..: "Rate"
+    name    <- m Csv..: "Name"
+    contact <- m Csv..: "Contact"
+    notes   <- m Csv..: "Notes"
+    
+    return $ SkinItem
+               Nothing
+               Nothing
+               type' 
+               role
+               call
+               rate
+               name
+               contact
+               notes
 
 instance ToNamedRecord SkinItem where
   toNamedRecord (SkinItem {..}) = Csv.namedRecord

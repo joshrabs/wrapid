@@ -5,7 +5,7 @@ echo "$uss"
 
 echo "-------------------------------------------------------"
 echo "Upload skin"
-sss=$(curl -i --form file1=@skin-test.csv --form press=submit https://api.runabetterset.com/1/upload/set/runabetterset/skin)
+sss=$(curl -i --form payload=@skin-test.csv --form press=submit https://api.runabetterset.com/1/upload/set/runabetterset/skin/2017-03-22)
 echo "$sss"
 
 echo "-------------------------------------------------------"
