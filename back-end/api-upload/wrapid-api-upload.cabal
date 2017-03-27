@@ -26,7 +26,8 @@ executable wrapid-api-upload
                ,       servant-server
                ,       servant-auth
                ,       servant-auth-server
-               ,       servant-multipart      
+               ,       servant-multipart
+               ,       servant-swagger           
                ,       swagger2      
                ,       postgresql-simple
                ,       wai

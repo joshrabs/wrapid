@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds              #-}
 {-# LANGUAGE DeriveGeneric          #-}
 {-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE OverloadedStrings      #-}
@@ -18,6 +19,7 @@ module Api ( restAPIv1
 import qualified Aws
 import qualified Aws.Core                              as Aws
 import qualified Aws.S3                                as S3
+import qualified Control.Lens                          as L
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Resource          (runResourceT)
@@ -25,14 +27,20 @@ import           Data.Aeson
 import qualified Data.ByteString                       as BS
 import qualified Data.ByteString.Char8                 as BSC
 import qualified Data.ByteString.Lazy                  as BSL
+import qualified Data.Csv                              as Csv
 import           Data.Maybe
 import           Data.Monoid
-import           Data.Time.Clock
 import           Data.Proxy
+import           Data.Swagger
+import           Data.Swagger.Internal
+import           Data.Swagger.Schema
+import           Data.Swagger.SchemaOptions
 import           Data.Text                             as T
 import qualified Data.Text.Encoding                    as TE
 import qualified Data.Text.Lazy                        as TL
 import qualified Data.Text.Lazy.Encoding               as TEL
+import           Data.Time.Clock
+import qualified Data.Vector                           as V
 import           Database.PostgreSQL.Simple
 import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
@@ -40,25 +48,39 @@ import           Network.HTTP.Conduit                  (RequestBody (..),
                                                         newManager,
                                                         tlsManagerSettings,
                                                         withManager)
-import           Network.Wai.Parse (fileContent)                 
-import qualified Data.Csv as Csv
-import qualified Data.Vector as V                 
+import           Network.Wai.Parse                     (fileContent)
+import           Safe
 import           Servant
 import           Servant.Multipart
+import           Servant.Server
+import           Servant.Swagger
 import           System.Directory
 import           System.IO
 import           System.Posix.Files
-import           Safe
 
-import qualified Db                                    as Db
 import           Common.Types.Extra
 import           Common.Types.Skin
+import qualified Db                                    as Db
 
 -----------------------------------------------------------------------------
 
+-- instance HasSwagger ((MultipartForm MultipartData)) where
+--  toSwagger _ = mempty
+
+-- instance ToSchema (MultipartForm MultipartData) where
+--  declareNamedSchema _ = -- pure (NamedSchema (Just "multipart/form-data") (mempty L.& type_ L..~ SwaggerObject)) 
+
 type APIv1 =
   "1":>
-    (
+    (    UploadAPIv1
+--    :<|> SwaggerAPI
+    )
+
+type SwaggerAPI =
+      "api"
+      :> Get '[JSON] Swagger
+
+type UploadAPIv1 =
        "upload"
     :> MultipartForm MultipartData
     :> Post '[JSON] Text
@@ -79,24 +101,32 @@ type APIv1 =
     :> Capture "uuid"  Text
     :> MultipartForm MultipartData
     :> Post '[JSON] Text
-    
+
   :<|> "upload" :> "set"
     :> Capture "uuid"  Text
     :> "skin"
     :> Capture "date" Text
     :> MultipartForm MultipartData
-    :> Post '[JSON] Bool    
-    )
+    :> Post '[JSON] Bool
 
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
+serverUpload :: Db.ConnectConfig -> Server UploadAPIv1
+serverUpload cc =
+       simpleUpload
+  :<|> avatarUpload  cc
+  :<|> setUpload     cc
+  :<|> setPropUpload cc
+  :<|> skinUpload    cc
+
 server :: Db.ConnectConfig -> Server APIv1
-server cc = simpleUpload
-       :<|> avatarUpload  cc
-       :<|> setUpload     cc
-       :<|> setPropUpload cc
-       :<|> skinUpload    cc
+server cc =
+       serverUpload cc
+--  :<|> generateSwagger
+
+--------------------------------------------------------------------------------
+-- Handlers
 
 simpleUpload :: MultipartData -> Handler Text
 simpleUpload mdata = do
@@ -109,7 +139,7 @@ simpleUpload mdata = do
             fname = fdFileName  fileInfo
             fpath = fdFilePath  fileInfo
         content <- readFile fpath
-        
+
         res <- uploadS3 fpath fname
         putStrLn $ show $ res
   return $ ""
@@ -161,7 +191,7 @@ uploadS3 fp fname = do
 
   -- Set up a ResourceT region with an available HTTP manager.
   mgr <- newManager tlsManagerSettings
-  
+
   runResourceT $ do
     -- streams large file content, without buffering more than 10k in memory
     let streamer sink = withFile fp ReadMode $ \h -> sink $ BS.hGet h 10240
@@ -246,3 +276,14 @@ zip3WithDefault da db dc as bs cs =
           as' = as ++ (repeat da)
           bs' = bs ++ (repeat db)
           cs' = cs ++ (repeat dc)
+
+--------------------------------------------------------------------------------
+
+-- generateSwagger =
+--   return $
+--     toSwagger (Proxy :: Proxy UploadAPIv1)
+--       L.& info.title        L..~ "Upload API"
+--       L.& info.version      L..~ "1.0"
+--       L.& info.description  L.?~ "This is an Upload API service desription"
+--       L.& info.license      L.?~ "AllRightsReserved"
+--       L.& host              L.?~ "runabetterset.com"
