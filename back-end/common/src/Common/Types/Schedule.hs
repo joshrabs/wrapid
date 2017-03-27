@@ -36,7 +36,6 @@ instance ToJSON   Schedule
 instance FromRow Schedule
 instance ToRow   Schedule
 
-
 data Event =
   Event
     { evUserId    :: Text
@@ -57,4 +56,24 @@ instance ToJSON   Event
 
 instance FromRow Event
 instance ToRow   Event
+
+data EventBulk =
+  EventBulk
+    { evbUserId    :: Text
+    , evbSetId     :: Text
+    , evbEffective :: UTCTime
+    , evbExtras    :: [T.Text] -- list of user ids
+    , evbTitle     :: Text
+    , evbDesc      :: Maybe Text
+    , evbDescScene :: Maybe Text
+    , evbStart     :: UTCTime
+    , evbFinish    :: UTCTime
+    , evbCreated   :: UTCTime
+    , evbUpdated   :: UTCTime
+    , evbDayTime   :: Text
+    } deriving (Eq, Generic, Show)
+
+instance FromJSON EventBulk
+instance ToJSON   EventBulk
+
 
