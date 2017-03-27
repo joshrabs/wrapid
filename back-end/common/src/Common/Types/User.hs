@@ -24,18 +24,11 @@ import           Web.HttpApiData
 -- | Type that describes user in a system
 --
 data User =
-  User { id          :: Int           -- ^
-       , email       :: Text          -- ^
-       , upassword   :: Maybe Text    -- ^ not exposed externally
-       , salt        :: Maybe Text    -- ^
-       , verlink     :: Maybe Text    -- ^
-       , verfied     :: Bool          -- ^
-       , deactivated :: Bool          -- ^
-       , created     :: Maybe UTCTime -- ^
-       , seen        :: Maybe UTCTime -- ^
-       , logged      :: Maybe Bool    -- ^
-       , role        :: Maybe Int     -- ^
-       } deriving (Eq, Generic, Show)
+  User
+    { uId          :: Text           -- ^
+    , uCreated     :: Text
+    , uUpdated     :: Text     
+    } deriving (Eq, Generic, Show)
 
 instance FromJSON User
 instance ToJSON   User
@@ -43,3 +36,15 @@ instance ToJSON   User
 instance FromRow User
 instance ToRow   User
 
+data UserProfile =
+  UserProfile
+    { upUserId     :: Text
+    , upSubmitted  :: Text
+    , upAvatarLink :: Text
+    }
+  
+instance FromJSON UserProfile
+instance ToJSON   UserProfile
+
+instance FromRow UserProfile
+instance ToRow   UserProfile

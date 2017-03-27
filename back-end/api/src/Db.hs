@@ -82,7 +82,26 @@ getSkin conn suuid date = do
 getUser :: Connection
         -> T.Text
         -> IO (Maybe User)
-getUser conn em = undefined
+getUser conn em =
+  let query' = "SELECT * FROM user WHERE user_id=?"
+      vals  = [ em
+              ]
+  (xs::[User]) <- query conn query' vals
+  case headMay xs of
+    Nothing   -> return $ Nothing
+    Just usr  -> return $ Just $ usr
+
+getUserProfile :: Connection
+               -> T.Text
+               -> IO (Maybe UserProfile)
+getUserProfile conn em = do
+  let query' = "SELECT * FROM user_profile WHERE user_id=?"
+      vals  = [ em
+              ]
+  (xs::[UserProfile]) <- query conn query' vals
+  case headMay xs of
+    Nothing   -> return $ Nothing
+    Just usr  -> return $ Just $ usr
 
 createSchedule :: Connection
                -> T.Text

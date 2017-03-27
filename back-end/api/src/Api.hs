@@ -62,18 +62,15 @@ instance ToSchema User
 instance ToSchema Skin
 
 -- "/1/user"                                      - get  - getUser (by email)
-
+-- "/1/user/profile"                              - get  - getUserProfile (by email) 
 -- "/1/set/:uuid/extra"                           - post - createExtra (Extra payload)
 -- "/1/set/:uuid/extra/:uid"                      - get  - getExtra
-
 -- "/1/set/:uuid/schedule/:date"                  - post - createSchedule (Schedule payload) for extra
 -- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
 -- "/1/set/:uuid/schedule/:date/:uid"             - get  - getScheduleExtra for extra with uid(user id)
-
 -- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
--- "/1/set/:uuid/schedule/event/:uid"       - get  - getEvent
--- "/1/set/:uuid/schedule/event/:id/delete" - get - deleteEvent
-
+-- "/1/set/:uuid/schedule/event/:uid"             - get  - getEvent
+-- "/1/set/:uuid/schedule/event/:id/delete"       - get  - deleteEvent
 -- "/1/set/:uuid/skin/:date"                      - get  - getSkin
 
 type APIv1 =
@@ -151,13 +148,13 @@ type CommonAPIv1 =
       :> Capture "date" Text
       :> Get '[JSON] (Maybe Skin)
 
-
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
 serverCommon :: Db.ConnectConfig -> Server CommonAPIv1
 serverCommon cc =
        getUser  cc
+  :<|> getUserProfile cc     
   :<|> addExtra cc
   :<|> getExtra cc
   :<|> addSchedule cc
@@ -184,6 +181,15 @@ getUser cc email = do
   conn <- liftIO $ connect connInfo
   usrM <- liftIO $ Db.getUser conn email
   return $ usrM  
+
+getUser :: Db.ConnectConfig
+        -> Text
+        -> Handler (Maybe UserProfile)
+getUser cc email = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  usrP <- liftIO $ Db.getUserProfile conn email
+  return $ usrP  
 
 addExtra :: Db.ConnectConfig
          -> Text
