@@ -59,6 +59,7 @@ instance ToSchema Extra
 instance ToSchema Schedule
 instance ToSchema Event
 instance ToSchema User
+instance ToSchema UserProfile
 instance ToSchema Skin
 
 -- "/1/user"                                      - get  - getUser (by email)
@@ -87,6 +88,10 @@ type CommonAPIv1 =
          "user"
       :> Capture "email" Text
       :> Get '[JSON] (Maybe User)
+
+    :<|> "user" :> "profile"
+      :> Capture "email" Text
+      :> Get '[JSON] (Maybe UserProfile)  
 
     :<|> "set"
       :> Capture "uuid" Text  -- ^ production set id
@@ -182,10 +187,10 @@ getUser cc email = do
   usrM <- liftIO $ Db.getUser conn email
   return $ usrM  
 
-getUser :: Db.ConnectConfig
-        -> Text
-        -> Handler (Maybe UserProfile)
-getUser cc email = do
+getUserProfile :: Db.ConnectConfig
+               -> Text
+               -> Handler (Maybe UserProfile)
+getUserProfile cc email = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
   usrP <- liftIO $ Db.getUserProfile conn email

@@ -9,6 +9,7 @@ module Db ( ConnectConfig(..)
           , mkConnInfo
           , getSkin
           , getUser
+          , getUserProfile
           , getSchedule
           , getExtraSchedule
           , getExtra
@@ -82,7 +83,7 @@ getSkin conn suuid date = do
 getUser :: Connection
         -> T.Text
         -> IO (Maybe User)
-getUser conn em =
+getUser conn em = do
   let query' = "SELECT * FROM user WHERE user_id=?"
       vals  = [ em
               ]
@@ -139,48 +140,3 @@ createEvent = undefined
 createExtra = undefined
 getEvent = undefined
 deleteEvent = undefined
-
--- "/1/user"                                      - get  - getUser (by email)
-
--- "/1/set/:uuid/extra"                           - post - createExtra (Extra payload)
--- "/1/set/:uuid/extra/:uid"                      - get  - getExtra
-
--- "/1/set/:uuid/schedule/:date"                  - post - createSchedule (Schedule payload) for extra
--- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
--- "/1/set/:uuid/schedule/:date/:uid"             - get  - getSchedule for extra with uid(user id)
-
--- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
--- "/1/set/:uuid/schedule/:date/event/:uid"       - get  - getEvent
--- "/1/set/:uuid/schedule/:date/:uid"             - get  - getAllEvents for user
--- "/1/set/:uuid/schedule/event/:id/delete" - get  - deleteEvent
-
--- "/1/set/:uuid/skin/:date"                      - get  - getSkin
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
