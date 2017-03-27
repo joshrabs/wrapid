@@ -53,8 +53,7 @@ viewPAMainPage model =
           div []
               [ Html.map SkinMsg (Skin.view model.skinModel) ]
       Wrap ->
-        div []
-          [Html.map WrapMsg (Wrap.view model.wrapModel) ]
+        Html.map WrapMsg (Wrap.view model.wrapModel)
     ]
 -- skinToExtraInfo : Skin -> List ExtraInfo
 -- skinToExtraInfo skin =
