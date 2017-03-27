@@ -70,9 +70,14 @@ instance ToSchema Skin
 -- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
 -- "/1/set/:uuid/schedule/:date/:uid"             - get  - getScheduleExtra for extra with uid(user id)
 -- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
+-- "/1/set/:uuid/schedule/:date/event/bulk"       - post - createEvent (Event payload)
 -- "/1/set/:uuid/schedule/event/:uid"             - get  - getEvent
 -- "/1/set/:uuid/schedule/event/:id/delete"       - get  - deleteEvent
 -- "/1/set/:uuid/skin/:date"                      - get  - getSkin
+
+-- "/1/set/:uuid/meal/:date"                      - post - createMeal
+-- "/1/set/:uuid/extra/:date/activity/"           - get  - getAllExtraActivity 
+-- "/1/set/:uuid/extra/clockout"                  - post = createWrap 
 
 type APIv1 =
   "1":>
@@ -133,6 +138,14 @@ type CommonAPIv1 =
       :> ReqBody '[JSON] Event
       :> Post    '[JSON] Event
 
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "schedule"
+      :> Capture "date" Text
+      :> "event"                 
+      :> ReqBody '[JSON] BulkEvent
+      :> Post    '[JSON] [Event]
+
      :<|> "set"
       :> Capture "uuid" Text
       :> "schedule"
@@ -153,6 +166,26 @@ type CommonAPIv1 =
       :> Capture "date" Text
       :> Get '[JSON] (Maybe Skin)
 
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "meal"
+      :> ReqBody '[JSON] MealBulk
+      :> Post '[JSON] [Meal]
+
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "extra"
+      :> Capture "date" Text
+      :> "activity"
+      :> Get '[JSON] [ExtraActivity]
+
+    :<|> "set"
+      :> Capture "uuid" Text
+      :> "extra" :> "clockout"
+      :> ReqBody '[JSON] Wrap
+      :> Get '[JSON] Wrap
+
+
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
 
@@ -169,6 +202,9 @@ serverCommon cc =
   :<|> getEvent cc
   :<|> deleteEvent cc
   :<|> getSkin cc
+  :<|> createMeal cc
+  :<|> getAllExtraActivity cc
+  :<|> createWrap cc
 
 server :: Db.ConnectConfig -> Server APIv1
 server cc =
@@ -288,6 +324,10 @@ getSkin cc uuid date = do
   conn  <- liftIO $ connect connInfo
   skinM <- liftIO $ Db.getSkin conn uuid date
   return $ skinM  
+
+createMeal = undefined
+getAllExtraActivity = undefined
+createWrap = undefined
 
 generateSwagger =
   return $

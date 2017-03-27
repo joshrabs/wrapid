@@ -132,11 +132,28 @@ getSchedule conn suuid date = do
     Nothing   -> return $ Nothing
     Just sch -> return $ Just $ sch
 
+createEvent :: Connection
+            -> T.Text
+            -> T.Text
+            -> IO Bool
+createEvent conn suuid date event=
+  let query' = "SELECT add_extra_schedule_event(?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      vals  = [ date
+              , suuid
+              ,
+              ]
+  execute conn query' vals
+  return $ True
+
+getEvent :: Connection
+         -> T.Text
+         -> T.Text
+         -> IO (Maybe Event)
+getEvent conn suuid uif = undefined
 
 
 getExtraSchedule = undefined
 getExtra = undefined
-createEvent = undefined
 createExtra = undefined
-getEvent = undefined
+
 deleteEvent = undefined
