@@ -68,7 +68,7 @@ instance ToSchema Skin
 
 -- "/1/set/:uuid/schedule/:date"                  - post - createSchedule (Schedule payload) for extra
 -- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
--- "/1/set/:uuid/schedule/:date/:uid"             - get  - getSchedule for extra with uid(user id)
+-- "/1/set/:uuid/schedule/:date/:uid"             - get  - getScheduleExtra for extra with uid(user id)
 
 -- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
 -- "/1/set/:uuid/schedule/event/:uid"       - get  - getEvent
@@ -100,26 +100,34 @@ type CommonAPIv1 =
     :<|> "set"
       :> Capture "uuid" Text  -- ^ production set id
       :> "extra"
+      :> Capture "uid" Text
       :> Get '[JSON] (Maybe Extra)
 
     :<|> "set"
-     :> Capture "uuid" Text   -- ^ production set id
-     :> "schedule"
-     :> Capture "date" Text 
-     :> ReqBody '[JSON] Schedule
-     :> Post    '[JSON] Schedule
+      :> Capture "uuid" Text   -- ^ production set id
+      :> "schedule"
+      :> Capture "date" Text 
+      :> ReqBody '[JSON] Schedule
+      :> Post    '[JSON] Schedule
 
     :<|> "set"
-     :> Capture "uuid" Text   -- ^ production set id
-     :> "schedule"
-     :> Capture "date" Text   -- ^ schedule date
-     :> Get '[JSON] (Maybe Schedule)     
+      :> Capture "uuid" Text   -- ^ production set id
+      :> "schedule"
+      :> Capture "date" Text   -- ^ schedule date
+      :> Get '[JSON] [Event]
 
+    :<|> "set"
+      :> Capture "uuid" Text   -- ^ production set id
+      :> "schedule"
+      :> Capture "date" Text   -- ^ schedule date
+      :> Capture "uid"  Text
+      :> Get '[JSON] [Event]   
+     
     :<|> "set"
       :> Capture "uuid" Text
       :> "schedule"
       :> Capture "date" Text
-      :> "event"                 -- ^ adds event only for today's schedule
+      :> "event"                 
       :> ReqBody '[JSON] Event
       :> Post    '[JSON] Event
 
@@ -133,9 +141,7 @@ type CommonAPIv1 =
     :<|> "set"
       :> Capture "uuid" Text
       :> "schedule"
-      :> Capture "date" Text
-      :> "event"
-      :> Capture "id" Text
+      :> Capture "eid" Text
       :> "delete"
       :> Get '[JSON] Bool
 
@@ -213,23 +219,22 @@ addSchedule cc uuid date sched = do
 getSchedule :: Db.ConnectConfig
             -> Text
             -> Text
-            -> Handler (Maybe Schedule)
+            -> Handler [Event]
 getSchedule cc uuid date = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
   schM <- liftIO $ Db.getSchedule conn uuid date
-  return $ usrM
-
+  return $ []
 
 getScheduleExtra :: Db.ConnectConfig
                  -> Text
                  -> Text
                  -> Text
-                 -> Handler (Maybe Schedule)
+                 -> Handler [Event]
 getScheduleExtra cc uuid date uid = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
-  ectM <- liftIO $ Db.getExtraSchedule conn uuid date uid
+  extM <- liftIO $ Db.getExtraSchedule conn uuid date uid
   return $ extM
     
 addEvent :: Db.ConnectConfig
@@ -250,7 +255,7 @@ getEvent :: Db.ConnectConfig
 getEvent cc uuid eid = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
-  evM  <- liftIO $ Db.getSchedule conn uuid eid
+  evM  <- liftIO $ Db.getEvent conn uuid eid
   return $ evM
 
 deleteEvent :: Db.ConnectConfig
@@ -260,7 +265,7 @@ deleteEvent :: Db.ConnectConfig
 deleteEvent cc uuid eid = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
-  res  <- liftIO $ Db.getSchedule conn uuid eid
+  res  <- liftIO $ Db.deleteEvent conn uuid eid
   return $ True
 
 getSkin :: Db.ConnectConfig     -- ^ Configuration for Db connection

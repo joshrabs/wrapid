@@ -12,9 +12,11 @@ module Db ( ConnectConfig(..)
           , getSchedule
           , getExtraSchedule
           , getExtra
+          , getEvent
           , createSchedule
           , createEvent
           , createExtra
+          , deleteEvent
           ) where
 
 import           Control.Applicative
@@ -116,7 +118,8 @@ getExtraSchedule = undefined
 getExtra = undefined
 createEvent = undefined
 createExtra = undefined
-
+getEvent = undefined
+deleteEvent = undefined
 
 -- "/1/user"                                      - get  - getUser (by email)
 
