@@ -93,7 +93,7 @@ panelStyle =
   ,("display", "flex")
   ,("align-items", "center")
   ,("flex-direction", "column")
-  ,("min-width", "450px")
+  ,("min-width", "250px")
   ,("margin", "16px")
   ]
 
