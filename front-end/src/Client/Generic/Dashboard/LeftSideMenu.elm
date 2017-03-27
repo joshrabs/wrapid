@@ -14,10 +14,7 @@ type alias SideMenuTabInput msg =
 viewLeftSideMenu: List (SideMenuTabInput msg) -> Html msg
 viewLeftSideMenu tabs =
   div [style [
-    ("position", "fixed")
-    ,("left", "0")
-    ,("top", "56")
-    ,("width", "120px")
+     ("min-width", "120px")
     ,("height", "100vh")
     ,("background", "#23232F")
   ]]

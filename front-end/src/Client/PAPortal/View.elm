@@ -9,7 +9,7 @@ import Client.PAPortal.State exposing (Msg(..), Model)
 import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalendar)
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin
-import Client.PAPortal.Pages.Wrap as Wrap exposing (viewWrap)
+import Client.PAPortal.Pages.Wrap as Wrap exposing (view)
 import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (view)
@@ -47,13 +47,13 @@ viewPAMainPage model =
                 div []
                     [ Html.map LiveMsg (viewLiveMonitor model.liveModel extraInfo)
                     ]
-
+      Schedule ->
+        div [] [text "Schedul"]
       SkinManager ->
           div []
               [ Html.map SkinMsg (Skin.view model.skinModel) ]
       Wrap ->
-        div []
-          [Html.map WrapMsg (Wrap.viewWrap model.wrapModel) ]
+        Html.map WrapMsg (Wrap.view model.wrapModel)
     ]
 -- skinToExtraInfo : Skin -> List ExtraInfo
 -- skinToExtraInfo skin =
@@ -75,8 +75,8 @@ pageTabs associatedState =
     , iconName="fa fa-video-camera"
     , text = "Live Monitor"
     }
-  , { isSelected=associatedState Wrap
-    , onClickMsg=ChangeView Wrap
+  , { isSelected=associatedState Schedule
+    , onClickMsg=ChangeView Schedule
     , iconName="fa fa-calendar"
     , text ="Schedule"
     }
