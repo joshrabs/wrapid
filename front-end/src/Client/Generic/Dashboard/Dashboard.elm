@@ -53,18 +53,25 @@ type Msg
 
 view : Model msg -> Html msg
 view model =
-    div []
-        [ navbarView model.navbar
-        , case model.leftMenuTabs of
-            Just leftTabs -> viewLeftSideMenu leftTabs
-            Nothing -> div [] []
-        , div [style [
-            ("position", "fixed")
-            ,("left", "135px")
-            ,("top", "64px")
-          ]]
-          [model.mainPage]
-        ]
+    div [style [
+      ("display", "flex")
+      ,("flex-direction", "column")
+    ]]
+    [ navbarView model.navbar
+    , div [style [
+        ("display", "flex")
+      ]]
+      [
+       case model.leftMenuTabs of
+          Just leftTabs -> viewLeftSideMenu leftTabs
+          Nothing -> div [] []
+      , div [style [
+          ("margin", "8px 16px 0px 8px")
+          ,("flex", "1")
+        ]]
+        [model.mainPage]
+      ]
+    ]
 
 
 type alias PanelHeader =
