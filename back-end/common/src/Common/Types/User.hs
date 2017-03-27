@@ -41,7 +41,7 @@ data UserProfile =
     { upUserId     :: Text
     , upSubmitted  :: Text
     , upAvatarLink :: Text
-    }
+    } deriving (Eq, Generic, Show)
   
 instance FromJSON UserProfile
 instance ToJSON   UserProfile
