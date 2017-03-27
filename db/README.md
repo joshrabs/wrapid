@@ -128,6 +128,24 @@ SELECT * FROM
   , 'DAY');
 ```
 
+#### Create Meal (with assigend extras)
+*FUNCTION:* create_meal
+
+*PARAMATERS:*
+effective_dt DATE,
+production_set_id VARCHAR(100)
+p_start_ts TEXT
+, p_duration INT
+, p_user_id_arr TEXT   (comma separated string of users. e.g. 'j@fake.com,blah@fake.com');
+
+*RETURNING*
+COUNT OF AFFECTED EXTRAS (updated rows)
+
+```
+SELECT *
+FROM create_meal('2017-03-21', 'RunaBetterSet', '14:30', 30, 'j@fake.com,sa@fake.com');
+
+```
 
 #### Set User Profile Photo
 set_user_profile_photo -> (p_user_id: TEXT, p_b64_image BYTEA) -> VARCHAR(500)
