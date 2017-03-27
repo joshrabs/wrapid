@@ -61,15 +61,20 @@ instance ToSchema Event
 instance ToSchema User
 instance ToSchema Skin
 
--- "/1/user"                               - get  - getUser (by email)
--- "/1/set/:uuid/extra/add"                - post - createExtra (Extra payload)
--- "/1/set/:uuid/extra/get"                - get  - getExtra
--- "/1/set/:uuid/schedule/add"             - post - createSchedule (Schedule payload)
--- "/1/set/:uuid/schedule/get"             - get  - getSchedule
--- "/1/set/:uuid/shedule/event/add"        - post - createEvent (Event payload)
--- "/1/set/:uuid/shedule/event/:id"        - get  - getEvent
--- "/1/set/:uuid/shedule/event/:id/delete" - get  - deleteEvent
--- "/1/set/:uuid/skin/:date"               - get  - getSkin
+-- "/1/user"                                      - get  - getUser (by email)
+
+-- "/1/set/:uuid/extra"                           - post - createExtra (Extra payload)
+-- "/1/set/:uuid/extra/:uid"                      - get  - getExtra
+
+-- "/1/set/:uuid/schedule/:date"                  - post - createSchedule (Schedule payload) for extra
+-- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
+-- "/1/set/:uuid/schedule/:date/:uid"             - get  - getSchedule for extra with uid(user id)
+
+-- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
+-- "/1/set/:uuid/schedule/event/:uid"       - get  - getEvent
+-- "/1/set/:uuid/schedule/event/:id/delete" - get - deleteEvent
+
+-- "/1/set/:uuid/skin/:date"                      - get  - getSkin
 
 type APIv1 =
   "1":>
@@ -95,34 +100,41 @@ type CommonAPIv1 =
     :<|> "set"
       :> Capture "uuid" Text  -- ^ production set id
       :> "extra"
-      :> Get '[JSON] Extra
+      :> Get '[JSON] (Maybe Extra)
 
     :<|> "set"
      :> Capture "uuid" Text   -- ^ production set id
-     :> "shedule"
+     :> "schedule"
+     :> Capture "date" Text 
      :> ReqBody '[JSON] Schedule
      :> Post    '[JSON] Schedule
 
     :<|> "set"
      :> Capture "uuid" Text   -- ^ production set id
-     :> "shedule"             -- ^ returns only schedule for today
-     :> Get '[JSON] Schedule
+     :> "schedule"
+     :> Capture "date" Text   -- ^ schedule date
+     :> Get '[JSON] (Maybe Schedule)     
 
     :<|> "set"
       :> Capture "uuid" Text
-      :> "schedule" :> "event"  -- ^ adds event only for today's schedule
+      :> "schedule"
+      :> Capture "date" Text
+      :> "event"                 -- ^ adds event only for today's schedule
       :> ReqBody '[JSON] Event
       :> Post    '[JSON] Event
 
-    :<|> "set"
+     :<|> "set"
       :> Capture "uuid" Text
-      :> "schedule" :> "event"
-      :> Capture "id" Text
-      :> Get '[JSON] Event
+      :> "schedule"
+      :> "event"
+      :> Capture "eid" Text
+      :> Get '[JSON] (Maybe Event)
 
     :<|> "set"
       :> Capture "uuid" Text
-      :> "schedule" :> "event"
+      :> "schedule"
+      :> Capture "date" Text
+      :> "event"
       :> Capture "id" Text
       :> "delete"
       :> Get '[JSON] Bool
@@ -132,6 +144,7 @@ type CommonAPIv1 =
       :> "skin"
       :> Capture "date" Text
       :> Get '[JSON] (Maybe Skin)
+
 
 restAPIv1 :: Proxy APIv1
 restAPIv1 = Proxy
@@ -143,6 +156,7 @@ serverCommon cc =
   :<|> getExtra cc
   :<|> addSchedule cc
   :<|> getSchedule cc
+  :<|> getScheduleExtra cc
   :<|> addEvent cc
   :<|> getEvent cc
   :<|> deleteEvent cc
@@ -162,48 +176,92 @@ getUser :: Db.ConnectConfig
 getUser cc email = do
   let connInfo = Db.mkConnInfo cc
   conn <- liftIO $ connect connInfo
-  usrM <- liftIO $ Db.userGet conn email
+  usrM <- liftIO $ Db.getUser conn email
   return $ usrM  
 
 addExtra :: Db.ConnectConfig
          -> Text
          -> Extra
          -> Handler Extra
-addExtra cc uuid extra = undefined
+addExtra cc uuid extra = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  evM  <- liftIO $ Db.createExtra conn uuid 
+  return $ extra
 
 getExtra :: Db.ConnectConfig
          -> Text
-         -> Handler Extra
-getExtra cc uuid = undefined
+         -> Text
+         -> Handler (Maybe Extra)
+getExtra cc uuid uid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  exM  <- liftIO $ Db.getExtra conn uuid uid
+  return $ exM
 
 addSchedule :: Db.ConnectConfig
             -> Text
+            -> Text
             -> Schedule
             -> Handler Schedule
-addSchedule cc uuid sched = undefined
+addSchedule cc uuid date sched = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  res  <- liftIO $ Db.createSchedule conn uuid date sched
+  return $ sched  
 
 getSchedule :: Db.ConnectConfig
             -> Text
-            -> Handler Schedule
-getSchedule cc uuid = undefined
+            -> Text
+            -> Handler (Maybe Schedule)
+getSchedule cc uuid date = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  schM <- liftIO $ Db.getSchedule conn uuid date
+  return $ usrM
 
+
+getScheduleExtra :: Db.ConnectConfig
+                 -> Text
+                 -> Text
+                 -> Text
+                 -> Handler (Maybe Schedule)
+getScheduleExtra cc uuid date uid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  ectM <- liftIO $ Db.getExtraSchedule conn uuid date uid
+  return $ extM
+    
 addEvent :: Db.ConnectConfig
+         -> Text
          -> Text
          -> Event
          -> Handler Event
-addEvent cc uuid event = undefined
-
+addEvent cc uuid date event = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  res  <- liftIO $ Db.createEvent conn uuid date event
+  return $ event
+  
 getEvent :: Db.ConnectConfig
          -> Text
          -> Text
-         -> Handler Event
-getEvent cc uuid eid = undefined
+         -> Handler (Maybe Event)
+getEvent cc uuid eid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  evM  <- liftIO $ Db.getSchedule conn uuid eid
+  return $ evM
 
 deleteEvent :: Db.ConnectConfig
             -> Text
             -> Text
             -> Handler Bool
-deleteEvent cc uuid eid = undefined
+deleteEvent cc uuid eid = do
+  let connInfo = Db.mkConnInfo cc
+  conn <- liftIO $ connect connInfo
+  res  <- liftIO $ Db.getSchedule conn uuid eid
+  return $ True
 
 getSkin :: Db.ConnectConfig     -- ^ Configuration for Db connection
         -> Text                 -- ^ Unique Set Name
@@ -212,7 +270,7 @@ getSkin :: Db.ConnectConfig     -- ^ Configuration for Db connection
 getSkin cc uuid date = do
   let connInfo = Db.mkConnInfo cc
   conn  <- liftIO $ connect connInfo
-  skinM <- liftIO $ Db.skinGet conn uuid date
+  skinM <- liftIO $ Db.getSkin conn uuid date
   return $ skinM  
 
 generateSwagger =

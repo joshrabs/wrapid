@@ -7,8 +7,14 @@
 
 module Db ( ConnectConfig(..)
           , mkConnInfo
-          , skinGet
-          , userGet
+          , getSkin
+          , getUser
+          , getSchedule
+          , getExtraSchedule
+          , getExtra
+          , createSchedule
+          , createEvent
+          , createExtra
           ) where
 
 import           Control.Applicative
@@ -34,6 +40,7 @@ import           Safe
 
 import           Common.Types.Skin
 import           Common.Types.User
+import           Common.Types.Schedule
 
 -----------------------------------------------------------------------------
 
@@ -56,11 +63,11 @@ mkConnInfo config =
   , connectPassword = pass config
   }
 
-skinGet :: Connection
+getSkin :: Connection
         -> T.Text
         -> T.Text
         -> IO (Maybe Skin)
-skinGet conn suuid date = do
+getSkin conn suuid date = do
   let query' = "SELECT effective_dt, email, full_name, call_start_ts, role, rate, extra_talent_type, notes FROM get_daily_skin(?,?)"
       vals  = [ date
               , suuid
@@ -70,7 +77,88 @@ skinGet conn suuid date = do
     Nothing   -> return $ Nothing
     Just skin -> return $ Just $ skin
 
-userGet :: Connection
+getUser :: Connection
         -> T.Text
         -> IO (Maybe User)
-userGet conn em = undefined
+getUser conn em = undefined
+
+createSchedule :: Connection
+               -> T.Text
+               -> T.Text
+               -> Schedule
+               -> IO Bool
+createSchedule conn suuid date sched = do
+  let query' = "INSERT INTO extra_schedule VALUES (?, ?, ?, ?, ?)"
+      vals   = [ date
+               , suuid
+               ]
+  putStrLn $ show $ vals
+  (xs::[Only T.Text]) <- query conn query' vals
+  return $ True
+
+getSchedule :: Connection
+            -> T.Text
+            -> T.Text
+            -> IO (Maybe Schedule)
+getSchedule conn suuid date = do
+  let query' = "SELECT * FROM  get_all_live_daily_extra_activity(?,?)"
+      vals  = [ date
+              , suuid
+              ]
+  (xs::[Schedule]) <- query conn query' vals
+  case headMay xs of
+    Nothing   -> return $ Nothing
+    Just sch -> return $ Just $ sch
+
+
+
+getExtraSchedule = undefined
+getExtra = undefined
+createEvent = undefined
+createExtra = undefined
+
+
+-- "/1/user"                                      - get  - getUser (by email)
+
+-- "/1/set/:uuid/extra"                           - post - createExtra (Extra payload)
+-- "/1/set/:uuid/extra/:uid"                      - get  - getExtra
+
+-- "/1/set/:uuid/schedule/:date"                  - post - createSchedule (Schedule payload) for extra
+-- "/1/set/:uuid/schedule/:date"                  - get  - getSchedule for all extras
+-- "/1/set/:uuid/schedule/:date/:uid"             - get  - getSchedule for extra with uid(user id)
+
+-- "/1/set/:uuid/schedule/:date/event"            - post - createEvent (Event payload)
+-- "/1/set/:uuid/schedule/:date/event/:uid"       - get  - getEvent
+-- "/1/set/:uuid/schedule/:date/:uid"             - get  - getAllEvents for user
+-- "/1/set/:uuid/schedule/event/:id/delete" - get  - deleteEvent
+
+-- "/1/set/:uuid/skin/:date"                      - get  - getSkin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
