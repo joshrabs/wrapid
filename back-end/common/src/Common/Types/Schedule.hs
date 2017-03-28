@@ -76,4 +76,19 @@ data EventBulk =
 instance FromJSON EventBulk
 instance ToJSON   EventBulk
 
+data Meal =
+  Meal { meUserId :: Text
+       } deriving (Show, Generic) 
+
+instance FromJSON Meal
+instance ToJSON   Meal
+
+data MealBulk =
+  MealBulks { mebUserId :: Text
+            } deriving (Show, Generic) 
+
+instance FromJSON MealBulk
+instance ToJSON   MealBulk
+
+
 

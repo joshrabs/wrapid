@@ -21,6 +21,7 @@ library
                  ,     Common.Types.Schedule
                  ,     Common.Types.Skin
                  ,     Common.Types.Activity
+                 ,     Common.Types.Wrap    
                  ,     Common.Utils.Basic
 
   build-depends:       base >= 4.7 && < 5
