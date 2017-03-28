@@ -62,7 +62,7 @@ data EventBulk =
     { evbUserId    :: Text
     , evbSetId     :: Text
     , evbEffective :: UTCTime
-    , evbExtras    :: [T.Text] -- list of user ids
+    , evbExtras    :: [Text] -- list of user ids
     , evbTitle     :: Text
     , evbDesc      :: Maybe Text
     , evbDescScene :: Maybe Text
