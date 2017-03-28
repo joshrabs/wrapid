@@ -1,6 +1,6 @@
 module Server.API.Mutations.SkinMutations exposing (..)
 
-import Ports exposing (uploadSkin, receiveDailySkin)
+import Ports exposing (uploadSkin, uploadSkinFile, receiveDailySkin)
 import Common.Types.Skin exposing (Skin)
 
 -------------

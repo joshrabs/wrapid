@@ -10,7 +10,6 @@ import Client.PAPortal.HorizontalCalendar exposing (viewCalendar, defaultCalenda
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor exposing (viewLiveMonitor)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap exposing (view)
-import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage exposing (view)
 import Client.Generic.Status.Loading exposing (viewLoadingScreen)
 import Client.Generic.Dashboard.Dashboard as Dashboard exposing (view)
 import Client.Generic.Dashboard.LeftSideMenu exposing (SideMenuTabInput)
@@ -34,9 +33,6 @@ viewPAMainPage model =
     [case model.currentView of
       Initializing ->
         viewLoadingScreen
-      SkinUploadPage ->
-        div []
-        [Html.map SkinUploadPageMsg SkinUploadPage.view]
       LiveMonitor ->
         case model.currentSkin of
           Nothing -> viewLoadingScreen

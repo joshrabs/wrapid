@@ -4,10 +4,9 @@ import Client.PAPortal.Types as PATypes exposing (..)
 import Client.PAPortal.Pages.SkinManager as Skin
 import Client.PAPortal.Pages.Wrap as Wrap
 import Client.PAPortal.Pages.LiveMonitor as LiveMonitor
-import Client.PAPortal.Pages.SkinUploadPage as SkinUploadPage
 import Client.Utilities.DateTime exposing (frmtDate)
 import Common.Types.Skin as Common exposing (Skin)
-import Ports exposing (receiveFileSkinUpload, uploadSkinCSV, getAllExtraInfo, addScheduleItem)
+import Ports exposing (receiveFileSkinUpload, uploadSkinFile, getAllExtraInfo, addScheduleItem)
 import Server.API.Queries.PAPortalQueries as ServerQueries exposing (fetchDailySkin)
 import Server.API.Mutations.SkinMutations as ServerMutations exposing (uploadSkin, receiveUploadedSkin)
 import RemoteData exposing (WebData, toMaybe)
@@ -41,7 +40,6 @@ type Msg
     | SkinMsg Skin.Msg
     | WrapMsg Wrap.Msg
     | LiveMsg LiveMonitorMsg
-    | SkinUploadPageMsg SkinUploadPage.Msg
     | ReceiveFileSkinUpload Common.Skin
 
 
@@ -118,6 +116,8 @@ update msg model =
                           roleLog = Debug.log "SKIN!!: " (Skin.rolesToSkin updatedSkinModel.roles dateStr)
                       in
                           ServerMutations.uploadSkin (Skin.rolesToSkin updatedSkinModel.roles dateStr)
+                    Skin.UploadSkinFile nodeId ->
+                          uploadSkinFile(nodeId, dateStr)
                     _ -> Cmd.none
                 )
         WrapMsg subMsg ->
@@ -141,15 +141,6 @@ update msg model =
                     addScheduleItem("meow", model.liveModel.roleScheduler.scheduleItem)
                   _ -> Cmd.none
               )
-        SkinUploadPageMsg subMsg ->
-          case Debug.log "msg" subMsg of
-            SkinUploadPage.CreateSkin ->
-              let
-                  l = Debug.log "cREATE SKIN!!!" subMsg
-              in
-                ({model | currentView=SkinManager}, Cmd.none)
-            SkinUploadPage.UploadSkin ->
-                (model, uploadSkinCSV("NodeSkinCSVUpload", frmtDate model.currentDate))
         ReceiveFileSkinUpload skin ->
           let
             l = Debug.log "Skin!" skin

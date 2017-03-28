@@ -21,7 +21,6 @@ type ViewState
     = Initializing
     | LiveMonitor
     | SkinManager
-    | SkinUploadPage
     | Wrap
     | Schedule
 

@@ -21,7 +21,7 @@ port receiveExtraInfo : (EPTypes.ExtraInfo -> msg) -> Sub msg
 
 port uploadAvatar : (UserId) -> Cmd msg
 
-port uploadSkinCSV : (NodeId, String) -> Cmd msg
+port uploadSkinFile : (NodeId, String) -> Cmd msg
 port receiveFileSkinUpload : (Common.Skin -> msg) -> Sub msg
 
 type alias NodeId = String

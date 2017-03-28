@@ -4,7 +4,7 @@ import Client.PAPortal.Pages.SkinManagers.AddRoles as AddRoles
 import Client.PAPortal.Pages.SkinManagers.Types exposing (Role, initRoles, addIdToRoles, roleToString, emptyRole)
 import Common.Types.Skin exposing (Skin, SkinItem)
 import Html exposing (Html, Attribute, a, button, div, h1, img, li, p, text, ul, input)
-import Html.Attributes exposing (href, src, placeholder, style, checked, type_)
+import Html.Attributes exposing (href, id, accept, src, placeholder, style, checked, type_)
 import Html.Events exposing (onClick, onInput, onCheck, onDoubleClick, onBlur)
 import List.Extra exposing (find, group, groupWhile)
 import Maybe exposing (andThen)
@@ -124,6 +124,7 @@ type Msg
     | EditConfirm
     | AddRolesMsg AddRoles.Msg
     | UploadSkin
+    | UploadSkinFile String
     | Breakdown
 
 
@@ -223,6 +224,10 @@ update msg model =
 
         UploadSkin ->
           (model, Cmd.none )
+
+        UploadSkinFile nodeId ->
+          (model, Cmd.none )
+
         EditRoles string ->
             ( { model | editRole = string }
             , Cmd.none
@@ -341,6 +346,11 @@ panelBody model =
       div []
           [ viewAddRoles model.mdl model.dialogOpened model.addRoles
           , viewTableWithSearch model
+          , button [onClick (UploadSkinFile "NodeSkinCSVUpload")]
+          [text "Upload Skin"]
+          , input
+            [ style [ ( "display", "none" ) ], id "NodeSkinCSVUpload", type_ "file", accept "*" ]
+            []
           ]
     Nothing ->
       div []

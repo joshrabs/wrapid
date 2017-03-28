@@ -345,9 +345,24 @@ const sendSkinCSV = (id, file, data, date) => {
   console.log(file)
   console.log(data)
   console.log(date)
+
+  const xhr = new window.XMLHttpRequest();
+  const baseUrl = 'https://api.runabetterset.com/1/upload/set/runabetterset/skin/'
+  xhr.open('POST', baseUrl + date , true);
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === xhr.DONE) {
+      const response = JSON.parse(xhr.responseText);
+      console.log(response);
+      onSkinCSVUpload(file)
+    }
+  };
+
+  xhr.send(file);
 }
 
 const onSkinCSVUpload = (file) => {
+
   client.uploadSkinCSV(file);
 
   event.target.removeEventListener('change', (e) => uploadFileListen(e, id, onUploadFuncName));
@@ -368,7 +383,7 @@ app.ports.selectWardrobePhoto.subscribe(id => {
   uploadFileClick(id, (id, data) => graphCoolCall(id, data, 'updateWardrobeStatusFile'));
 });
 
-app.ports.uploadSkinCSV.subscribe((param) => {
+app.ports.uploadSkinFile.subscribe((param) => {
   const id = param[0]
   const date = param[1]
   uploadFileClick(id, (id, file, data) => sendSkinCSV(id, file, data, date));
